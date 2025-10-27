@@ -7,7 +7,7 @@
     <!-- System Name -->
     <div class="ms-1 flex-1 text-start">
         <span class="font-sans font-semibold text-purple-700 text-lg md:text-xl tracking-wide">
-            GreatFestival
+            GreatEvent
         </span>
     </div>
 </div>

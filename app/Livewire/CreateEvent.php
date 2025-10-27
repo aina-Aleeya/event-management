@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Event;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class CreateEvent extends Component
@@ -19,6 +20,13 @@ class CreateEvent extends Component
     public $location;
     public $ads_start;
     public $ads_end;
+
+    public function mount()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+    }
 
     public function save()
     {

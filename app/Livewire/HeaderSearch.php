@@ -12,14 +12,16 @@ class HeaderSearch extends Component
 
     public function updatedQuery()
     {
-        if (strlen($this->query) > 1) {
-            $this->results = Event::where('title', 'like', "%{$this->query}%")
-                ->orderBy('event_date', 'desc')
-                ->limit(5)
-                ->get();
-        } else {
+        if (strlen(trim($this->query)) < 2) {
             $this->results = [];
+            return;
         }
+
+
+        $this->results = Event::where('title', 'like', '%' . $this->query . '%')
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
     }
 
     public function render()

@@ -5,6 +5,7 @@ use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use App\Livewire\EventDetails;
 use App\Livewire\CreateEvent;
+use App\Livewire\EventPage;
 
 Route::get('/', function () {
     return view('dashboard');
@@ -14,10 +15,10 @@ Route::view('dashboard', 'dashboard')->name('dashboard');
 
 Route::get('/events/{id}', EventDetails::class)->name('event.details');
 
-Route::get('/create-event', CreateEvent::class)->name('create-event');
-
+Route::get('/events', EventPage::class)->name('events.page');
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/create-event', CreateEvent::class)->name('create-event');
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
