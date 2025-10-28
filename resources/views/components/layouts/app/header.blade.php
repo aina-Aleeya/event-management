@@ -97,8 +97,9 @@
         {{ $slot }}
     </main>
 
-    @livewireScripts
-    @fluxScripts
+@livewireScripts
+@fluxScripts
+@stack('scripts')
 </body>
 
 </html>
