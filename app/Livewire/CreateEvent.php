@@ -52,7 +52,7 @@ class CreateEvent extends Component
         'max_participants' => 'nullable|integer|min:1',
     ];
 
-    // 🔹 This lets TinyMCE send updates to Livewire
+    // This lets TinyMCE send updates to Livewire
     protected $listeners = ['updateDescription' => 'updateDescription'];
 
     public function updateDescription($data)
@@ -73,7 +73,6 @@ class CreateEvent extends Component
             'poster' => $posterPath,
             'event_type' => $this->event_type,
             'venue' => $this->venue,
-            'address' => $this->address,
             'city' => $this->city,
             'contact_email' => $this->contact_email,
             'contact_phone' => $this->contact_phone,
@@ -96,7 +95,7 @@ class CreateEvent extends Component
         session()->flash('success', 'Event created successfully!');
         $this->reset();
 
-        // 🔹 This reinitializes TinyMCE after reset
+        // This reinitializes TinyMCE after reset
         $this->dispatch('refreshTinyMCE');
     }
 

@@ -15,13 +15,17 @@
                     <h2 class="text-2xl md:text-4xl font-extrabold leading-tight drop-shadow-lg mb-3">
                         {{ $event->title }}
                     </h2>
-                    <p class="text-base md:text-lg text-gray-200 mb-6">
-                        {{ $event->location ?? 'No location' }}
+                    <p class="text-base md:text-lg text-gray-200 mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-location-dot text-purple-300"></i>
+                        {{ $event->venue ?? 'No venue' }},
+                        <span class="text-gray-200">{{ $event->city ?? 'No city' }}</span>
                     </p>
 
+
                     {{-- Direct Laravel route --}}
-                    <a href="{{ route('event.details', ['id' => $event->id]) }}" class="inline-block bg-white text-purple-700 font-semibold px-3 py-1.5 rounded-lg
-                                      hover:bg-purple-100 hover:-translate-y-0.5 transition-all duration-200 shadow-lg">
+                    <a href="{{ route('event.details', ['id' => $event->id]) }}"
+                        class="inline-block bg-white text-purple-700 font-semibold px-3 py-1.5 rounded-lg
+                                          hover:bg-purple-100 hover:-translate-y-0.5 transition-all duration-200 shadow-lg">
                         Explore Event
                     </a>
                 </div>

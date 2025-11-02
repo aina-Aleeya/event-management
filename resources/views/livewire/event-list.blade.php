@@ -59,7 +59,7 @@
 
                         {{-- View Details Button --}}
                         <div class="flex items-center justify-end mt-auto">
-                            <a href="{{ route('event.details', ['id' => $event->id]) }}"
+                            <a href="{{ route('ads.click', ['id' => $event->id])  }}"
                                 class="text-xs font-semibold uppercase bg-purple-500/20 text-purple-700 px-3 py-1.5 rounded-md 
                                        hover:bg-sky-300 hover:text-gray-900 transition-all duration-150">
                                 View Details

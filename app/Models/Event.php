@@ -36,6 +36,12 @@ protected $fillable = [
         return $this->belongsTo(User::class);
     }
 
+public function peserta(){
+        return $this->belongsToMany(Peserta::class, 'penyertaan', 'event_id', 'peserta_id')
+                    ->withTimestamps();
+    }
+
+
     /**
      * Optional: Accessor untuk full address
      */

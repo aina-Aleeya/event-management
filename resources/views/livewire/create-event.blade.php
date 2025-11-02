@@ -33,13 +33,6 @@
                     @error('venue') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Address -->
-                <div>
-                    <label class="font-medium">Address</label>
-                    <input type="text" wire:model="address" class="w-full border rounded-lg p-2">
-                    @error('address') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
-
                 <!-- City -->
                 <div>
                     <label class="font-medium">City</label>
