@@ -3,8 +3,10 @@
 namespace App\Livewire;
 
 use App\Models\Peserta;
+use App\Models\Penyertaan;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Carbon\Carbon;
 
 class PesertaForm extends Component
 {
@@ -17,6 +19,7 @@ class PesertaForm extends Component
 
     public $idIklan;
     public $event;
+  
 
     public function mount($id)
     {
@@ -113,14 +116,80 @@ class PesertaForm extends Component
 
         $peserta = Peserta::updateOrCreate(['ic' => $this->ic], $validated);
         $peserta->events()->syncWithoutDetaching([$this->idIklan]);
+
+        $kategori = $this->tentukanKategori($this->tarikh_lahir, $this->jantina);
+
+        $existing = Penyertaan::where('event_id', $this->idIklan)
+        ->where('peserta_id', $peserta->id)
+        ->first();
+
+        if ($existing) {
+            // Kalau dah pernah daftar tapi kategori/unique_id kosong → update
+            if (empty($existing->kategori) || empty($existing->unique_id)) {
+        
+                $lastEntry = Penyertaan::where('event_id', $this->idIklan)
+                    ->where('kategori', $kategori)
+                    ->orderByDesc('id')
+                    ->first();
+        
+                $number = $lastEntry ? intval(substr($lastEntry->unique_id, -4)) + 1 : 1;
+                $uniqueId = $kategori . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
+
+                while (
+                    Penyertaan::where('event_id', $this->idIklan)
+                        ->where('unique_id', $uniqueId)
+                        ->exists()
+                ) {
+                    $number++;
+                    $uniqueId = $kategori . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
+                }
+        
+                $existing->kategori = $existing->kategori ?: $kategori;
+                $existing->unique_id = $existing->unique_id ?: $uniqueId;
+                $existing->save();
+            }
+        
+        } else {
+            // Kalau belum pernah daftar, cipta rekod baru
+            $lastEntry = Penyertaan::where('event_id', $this->idIklan)
+                ->where('kategori', $kategori)
+                ->orderByDesc('id')
+                ->first();
+        
+            $number = $lastEntry ? intval(substr($lastEntry->unique_id, -4)) + 1 : 1;
+            $uniqueId = $kategori . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
+        
+            Penyertaan::create([
+                'event_id' => $this->idIklan,
+                'peserta_id' => $peserta->id,
+                'kategori' => $kategori,
+                'unique_id' => $uniqueId,
+            ]);
+        }
+
         $this->dispatch('show-success', $this->idIklan);
 
         // session()->flash('message', 'Pendaftaran berjaya disimpan!');
         // $this->resetExcept('searchNama');
     }
 
+    private function tentukanKategori($tarikhLahir, $jantina){
+   
+        $umur = Carbon::parse($tarikhLahir)->age;
+
+        if ($umur <= 12) {
+            return $jantina === 'Lelaki' ? 'KB' : 'KG';
+        } elseif ($umur >= 60) {
+            return 'EL';
+        } else {
+            return $jantina === 'Lelaki' ? 'AM' : 'AF';
+        }
+    }
+
+
     public function render()
     {
-        return view('livewire.peserta-form');
+        return view('livewire.peserta-form')
+;
     }
 }

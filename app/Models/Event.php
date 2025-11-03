@@ -31,14 +31,17 @@ protected $fillable = [
     /**
      * Relationship: event belongs to a user
      */
-    public function user()
+   public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-public function peserta(){
+    public function pesertas()
+    {
         return $this->belongsToMany(Peserta::class, 'penyertaan', 'event_id', 'peserta_id')
-                    ->withTimestamps();
+            ->using(\App\Models\Penyertaan::class)
+            ->withPivot('kategori', 'unique_id')
+            ->withTimestamps();
     }
 
 

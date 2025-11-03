@@ -32,6 +32,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/participants/{event}', [AdminController::class, 'participants'])->name('participants');
     Route::get('/groups/{event}', [AdminController::class, 'groups'])->name('groups');
+        Route::get('/participant/{peserta}', [AdminController::class, 'viewParticipant'])->name('participant.view');
 });
 
 
