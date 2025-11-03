@@ -9,7 +9,7 @@
             {{-- Navigation Bar --}}
             <nav class="flex flex-wrap gap-2">
                 <a href="" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition">
-                    Dashboard
+                    Dashboards
                 </a>
                 <a href="" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
                     Events
