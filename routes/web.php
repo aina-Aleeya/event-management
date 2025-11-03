@@ -37,7 +37,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 
 Route::get('/participant/{peserta}', [AdminController::class, 'viewParticipant'])->name('participant.view');
-Route::get('/participant/{peserta}', [AdminController::class, 'viewParticipant'])->name('participant.view');
+Route::get('/partigitcipant/{peserta}', [AdminController::class, 'viewParticipant'])->name('participant.view');
+Route::get('/xx/{peserta}', [AdminController::class, 'viewParticipant'])->name('participant.view');
 
 
 Route::middleware(['auth'])->group(function () {
