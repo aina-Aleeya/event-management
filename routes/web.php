@@ -36,6 +36,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 
+Route::get('/participant/{peserta}', [AdminController::class, 'viewParticipant'])->name('participant.view');
+
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/create-event', CreateEvent::class)->name('create-event');
