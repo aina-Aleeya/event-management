@@ -48,13 +48,19 @@
         <!-- IC -->
         <div>
             <label class="block text-gray-700 font-medium">No. Kad Pengenalan (tanpa '-')</label>
-            <input type="text" wire:model="ic" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-300 focus:border-blue-400 bg-white">
+            <input type="text" wire:model.live="ic" maxlength="12" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-300 focus:border-blue-400 bg-white">
         </div>
 
         <!-- Tarikh lahir -->
         <div>
             <label class="block text-gray-700 font-medium">Tarikh Lahir</label>
-            <input type="date" wire:model="tarikh_lahir" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 bg-white focus:ring-2 focus:ring-blue-300 focus:border-blue-400">
+            <input type="date" wire:model="tarikh_lahir" readonly class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 bg-white focus:ring-2 focus:ring-blue-300 focus:border-blue-400">
+        </div>
+
+        <!-- Jantina -->
+        <div>
+            <label class="block text-gray-700 font-medium">Jantina</label>
+            <input type="text" wire:model="jantina" readonly class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 bg-white focus:ring-2 focus:ring-blue-300 focus:border-blue-400">
         </div>
 
         <!-- email -->
@@ -63,30 +69,7 @@
             <input type="email" wire:model="email" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-300 focus:border-blue-400 bg-white">
         </div>
 
-        <!-- Jantina -->
-        <div x-data="{ open: false }" class="relative">
-            <label class="block text-gray-700 font-medium">Jantina</label>
-
-            <!-- Kotak utama -->
-            <div 
-                @click="open = !open"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 bg-white cursor-pointer focus:ring-2 focus:ring-blue-400text-gray-800 flex justify-between items-center">
-                <span>{{ $jantina ?: '-- Pilih --' }}</span>
-                <span class="text-gray-500">▼</span>
-            </div>
-
-            <!-- Senarai pilihan -->
-            <div x-show="open" @click.away="open = false" class="absolute mt-1 w-full bg-white border border-gray-200 rounded-md shadow-md z-10 overflow-hidden">
-                <div wire:click="$set('jantina', 'Lelaki')" @click="open = false" class="px-3 py-2 hover:bg-blue-50 cursor-pointer">
-                Lelaki
-                </div>
-                <div wire:click="$set('jantina', 'Perempuan')" @click="open = false" class="px-3 py-2 hover:bg-blue-50 cursor-pointer">
-                Perempuan
-                </div>
-            </div>
-        </div>
-
-        <!-- Gambar -->
+         <!-- Gambar -->
         <div>
             <label class="block text-gray-700 font-medium mb-1">Gambar</label>
 

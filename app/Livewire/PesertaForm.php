@@ -42,6 +42,23 @@ class PesertaForm extends Component
                             ->get();
     }
 
+    public function updatedIc($value){
+        $value = preg_replace('/\D/', '', $value);
+        if (strlen($value) == 12) {
+            $tahun = substr($value, 0, 2);
+            $bulan = substr($value, 2, 2);
+            $hari  = substr($value, 4, 2);
+
+            $tahun_penuh = ($tahun < date('y')) ? '20' . $tahun : '19' . $tahun;
+            $this->tarikh_lahir = sprintf('%04d-%02d-%02d', $tahun_penuh, $bulan, $hari);
+            $jantina_digit = substr($value, -1);
+            $this->jantina = ($jantina_digit % 2 == 0) ? 'Perempuan' : 'Lelaki';
+        } else {
+            $this->tarikh_lahir = null;
+            $this->jantina = null;
+        }
+    }
+
     public function fillForm($id)
     {
         $peserta = Peserta::find($id);
@@ -105,6 +122,5 @@ class PesertaForm extends Component
     public function render()
     {
         return view('livewire.peserta-form');
-            
     }
 }

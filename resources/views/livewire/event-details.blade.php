@@ -1,124 +1,127 @@
-<div class="max-w-4xl mx-auto p-8 bg-gradient-to-br from-white to-blue-50 shadow-xl rounded-2xl mt-10 space-y-8">
-    {{-- Event Poster --}}
+<div class="relative w-full min-h-screen bg-white">
+
+    {{-- Hero background --}}
     @if ($event->poster)
-        <div class="relative overflow-hidden rounded-2xl shadow-md">
-            <img src="{{ asset('storage/' . $event->poster) }}" alt="Event Poster"
-                class="w-full max-h-[450px] object-cover transition-transform duration-500">
+        <div class="relative h-[400px] overflow-hidden">
+            <div class="absolute inset-0 bg-cover bg-center"
+                 style="background-image: url('{{ asset('storage/' . $event->poster) }}');">
+            </div>
+            <div class="absolute inset-0 bg-black/30 backdrop-blur-md"></div>
         </div>
     @endif
 
-    {{-- Title --}}
-    <div class="text-center">
-        <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">
-            {{ $event->title }}
-        </h1>
-        <p class="text-blue-600 font-medium uppercase tracking-wide">
-            {{ $event->event_type }}
-        </p>
-    </div>
+    {{-- Event Content Card --}}
+    <div class="relative max-w-6xl mx-auto -mt-60 bg-white rounded-2xl shadow-xl p-10 space-y-10 z-20">
 
-    {{-- Event Info --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/80 p-6 rounded-xl shadow-sm">
-        <div>
-            <p class="text-gray-700 mb-1"><strong>Date:</strong></p>
-            <p class="text-gray-800">
-                {{ \Carbon\Carbon::parse($event->start_date)->format('d M Y') }} –
-                {{ \Carbon\Carbon::parse($event->end_date)->format('d M Y') }}
-            </p>
+        {{-- Title --}}
+        <div class="flex items-center justify-between flex-wrap gap-3 border-b pb-4">
+            <h1 class="text-4xl font-bold text-gray-800">{{ $event->title }}</h1>
+            <span class="uppercase text-blue-600 font-semibold">{{ $event->event_type }}</span>
         </div>
-        <div>
-            <p class="text-gray-700 mb-1"><strong>Time:</strong></p>
-            <p class="text-gray-800">
-                {{ \Carbon\Carbon::parse($event->start_time)->format('g:i A') }} –
-                {{ \Carbon\Carbon::parse($event->end_time)->format('g:i A') }}
-            </p>
-        </div>
-        <div>
-            <p class="text-gray-700 mb-1"><strong>Venue:</strong></p>
-            <p class="text-gray-800">{{ $event->venue }}</p>
-        </div>
-        <div>
-            <p class="text-gray-700 mb-1"><strong>City:</strong></p>
-            <p class="text-gray-800">{{ $event->city }}</p>
-        </div>
-        @if ($event->entry_fee)
-            <div>
-                <p class="text-gray-700 mb-1"><strong>Entry Fee:</strong></p>
-                <p class="text-gray-800">RM {{ number_format($event->entry_fee, 2) }}</p>
+
+        {{-- Content Grid --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            {{-- Left: Poster --}}
+            <div class="md:col-span-2">
+                <img src="{{ asset('storage/' . $event->poster) }}" alt="Event Poster"
+                     class="rounded-xl shadow-md w-full">
             </div>
-        @endif
-        @if ($event->max_participants)
-            <div>
-                <p class="text-gray-700 mb-1"><strong>Max Participants:</strong></p>
-                <p class="text-gray-800">{{ $event->max_participants }}</p>
+
+            {{-- Right: QR & Info --}}
+            <div class="space-y-5">
+                {{-- QR Code --}}
+                @if (!empty($event->qr_code))
+                    <div class="bg-gray-50 border rounded-xl p-4 shadow-sm text-center">
+                        <img src="{{ $event->qr_code }}" class="w-32 h-32 mx-auto" alt="QR Code">
+                        <p class="text-sm text-gray-600 mt-2">Scan or share link</p>
+                        <button onclick="navigator.clipboard.writeText('{{ url()->current() }}'); alert('Link copied!');"
+                            class="mt-2 text-purple-600 text-sm hover:underline flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-copy"></i> Copy Link
+                        </button>
+                    </div>
+                @endif
+
+                {{-- Venue --}}
+                <div class="bg-gray-50 border rounded-xl p-4 shadow-sm">
+                    <p class="font-semibold text-gray-700">
+                        <i class="fa-solid fa-location-dot text-red-500"></i> Venue
+                    </p>
+                    <p class="text-gray-800">{{ $event->venue }}, {{ $event->city }}</p>
+                </div>
+
+                {{-- Date & Time --}}
+                <div class="bg-gray-50 border rounded-xl p-4 shadow-sm">
+                    <p class="font-semibold text-gray-700">
+                        <i class="fa-regular fa-calendar text-pink-500"></i> Date & Time
+                    </p>
+                    <p class="text-gray-800">
+                        {{ \Carbon\Carbon::parse($event->start_date)->format('d M Y') }} – 
+                        {{ \Carbon\Carbon::parse($event->end_date)->format('d M Y') }}
+                        <br>
+                        {{ \Carbon\Carbon::parse($event->start_time)->format('g:i A') }} – 
+                        {{ \Carbon\Carbon::parse($event->end_time)->format('g:i A') }}
+                    </p>
+                </div>
+
+                {{-- Entry Fee --}}
+                @if ($event->entry_fee)
+                    <div class="bg-gray-50 border rounded-xl p-4 shadow-sm">
+                        <p class="font-semibold text-gray-700">
+                            <i class="fa-solid fa-money-bill-wave text-green-500"></i> Entry Fee
+                        </p>
+                        <p class="text-gray-800">
+                            RM {{ number_format($event->entry_fee, 2) }}
+                        </p>
+                    </div>
+                @else
+                    <div class="bg-gray-50 border rounded-xl p-4 shadow-sm">
+                        <p class="font-semibold text-gray-700">
+                            <i class="fa-solid fa-money-bill-wave text-green-500"></i> Entry Fee
+                        </p>
+                        <p class="text-gray-500">Free Entry</p>
+                    </div>
+                @endif
             </div>
-        @endif
-    </div>
+        </div>
 
-    {{-- Description --}}
-    <div class="prose max-w-none text-gray-700 leading-relaxed">
-        {!! $event->description !!}
-    </div>
+        {{-- Description --}}
+        <div class="bg-gray-50 border rounded-xl p-6 shadow-sm text-gray-700 leading-relaxed">
+            {!! $event->description !!}
+        </div>
 
-    {{-- Categories --}}
-    @if (!empty($event->categories))
-        @php
-            $categories = is_array($event->categories)
-                ? $event->categories
-                : explode(',', $event->categories);
-        @endphp
-
-        <div>
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">Categories</h3>
+        {{-- Categories --}}
+        @if (!empty($event->categories))
+            @php
+                $categories = is_array($event->categories)
+                    ? $event->categories
+                    : explode(',', $event->categories);
+            @endphp
             <div class="flex flex-wrap gap-2">
                 @foreach ($categories as $cat)
-                    <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
+                    <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
                         {{ trim($cat) }}
                     </span>
                 @endforeach
             </div>
+        @endif
+
+        {{-- Contact Info --}}
+        <div class="border-t pt-6 text-center">
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Contact Information</h3>
+            <p class="text-gray-700">
+                📧 {{ $event->contact_email }} <br>
+                📞 {{ $event->contact_phone }}
+            </p>
         </div>
-    @endif
 
-
-    {{-- QR Code --}}
-    @if (!empty($event->qr_code))
-        <div class="text-center mt-6" x-data="{ showQR: false }">
-            <button @click="showQR = !showQR"
-                class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition">
-                <span x-show="!showQR">Show QR Code</span>
-                <span x-show="showQR">Hide QR Code</span>
-            </button>
-
-            <div x-show="showQR" x-transition class="mt-4">
-                <img src="{{ $event->qr_code }}" alt="QR Code" class="w-44 mx-auto rounded-lg shadow-md">
-            </div>
+        {{-- Register Button (moved below, right-aligned) --}}
+        <div class="flex justify-end pt-4">
+            <a href="{{ route('peserta.form', ['id' => $event->id]) }}"
+               class="flex items-center gap-2 bg-green-500 hover:bg-green-300 text-gray-900 px-6 py-3 rounded-lg shadow-md transition">
+                <i class="fa-solid fa-ticket"></i> Register Now
+            </a>
         </div>
-    @endif
 
-
-    {{-- Contact Info --}}
-    <div class="bg-white/70 p-6 rounded-xl shadow-sm">
-        <h3 class="text-lg font-semibold text-gray-800 mb-2">Contact Information</h3>
-        <p class="text-gray-700">
-            📧 {{ $event->contact_email }}<br>
-            📞 {{ $event->contact_phone }}
-        </p>
     </div>
-
-    {{-- Register Button --}}
-    <a href="{{ route('peserta.form', ['id' => $event->id]) }}"
-        class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-xl shadow-lg hover:opacity-90 transition font-semibold">
-        Register Now
-    </a>
-
-    <div class="flex left-4 items-center gap-2 mt-4">
-        {{-- Copy Link Button --}}
-        <button onclick="navigator.clipboard.writeText('{{ url()->current() }}'); alert('Event link copied!');"
-            class="flex items-center gap-2 bg-purple-300 hover:bg-sky-300 text-gray-900 px-5 py-2 rounded-lg transition shadow-md">
-            <i class="fa-solid fa-link"></i>
-            Copy Link
-        </button>
-    </div>
-
 </div>

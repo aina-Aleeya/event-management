@@ -62,6 +62,7 @@ class CreateEvent extends Component
 
     public function save()
     {
+  
         $this->validate();
 
         $posterPath = $this->poster ? $this->poster->store('event_posters', 'public') : null;
@@ -87,8 +88,8 @@ class CreateEvent extends Component
             'entry_fee' => $this->entry_fee,
             'max_participants' => $this->max_participants,
         ]);
-
-        $event->event_link = url('/events/' . $event->id);
+    
+        $event->event_link = url(path: '/events/' . $event->id);
         $event->qr_code = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($event->event_link);
         $event->save();
 

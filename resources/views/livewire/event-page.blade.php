@@ -6,8 +6,11 @@
             <div x-show="active === {{ $index }}" x-transition:enter="transition ease-out duration-700"
                 x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
                 class="absolute inset-0">
-                <img src="{{ asset('storage/' . $event->poster) }}" alt="{{ $event->title }}"
-                    class="w-full h-full object-cover object-center" />
+            <img src="{{ asset('storage/' . $event->poster) }}"
+                 alt="{{ $event->title }}"
+                 class="w-full h-full object-cover object-center select-none"
+                 loading="lazy" />
+
                 <div class="absolute inset-0 bg-black/40"></div>
 
                 {{--Overlay Text --}}
