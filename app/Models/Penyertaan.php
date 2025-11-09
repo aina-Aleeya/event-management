@@ -13,6 +13,8 @@ class Penyertaan extends Pivot
         'peserta_id',
         'kategori',
         'unique_id',
+        'status_bayaran',
+        'group_token'
     ];
 
     public function peserta()
@@ -45,4 +47,15 @@ class Penyertaan extends Pivot
 
         return  "{$type} - {$kategoriUmur}";
     }
+    public function getJumlahBayaranAttribute()
+{
+    $bilPeserta = self::where('event_id', $this->event_id)
+        ->where('kategori', $this->kategori)
+        ->count();
+
+    $hargaSeorang = $this->event->entry_fee ?? 0;
+
+    return $hargaSeorang * $bilPeserta;
+}
+
 }

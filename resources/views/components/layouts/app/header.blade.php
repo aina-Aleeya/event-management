@@ -9,28 +9,33 @@
 <body class="min-h-screen bg-white dark:bg-zinc-800">
 
     <!-- Header Section -->
-    <header
-        class="fixed top-0 left-0 z-50 w-full bg-purple-200/70 backdrop-blur-md border-b border-purple-300/50 shadow-md transition-all duration-300">
-        <div class="flex w-full items-center justify-between px-6 py-2 text-gray-900">
+<header class="fixed top-0 left-0 z-50 w-full bg-white shadow-md border-b border-gray-200">
+    <div class="flex w-full items-center justify-between px-6 py-3">
 
-            <!-- Left: Logo + System Name -->
-            <div class="flex items-center">
-                <a href="{{ route('dashboard') }}" class="flex items-center space-x-2 hover:opacity-80 transition"
-                    wire:navigate>
-                    <x-app-logo class="size-8 text-purple-400" />
-                </a>
+        <!-- Left: Logo + System Name -->
+        <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 hover:opacity-90 transition" wire:navigate>
+            <!-- Logo Circle with Gradient for Energy -->
+            <div class="flex aspect-square w-10 h-10 items-center justify-center rounded-full bg-gradient-to-tr from-purple-500 via-pink-500 to-red-500 text-white shadow-lg">
+                <x-app-logo-icon class="w-5 h-5 fill-current" />
             </div>
+            <!-- System Name -->
+            <span class="font-sans font-bold text-black text-lg md:text-xl tracking-wide">
+                GreatEvent
+            </span>
+        </a>
 
-            <!-- Right: Home, Event, User Menu -->
-            <div class="flex items-center space-x-4">
-                <a href="{{ route('dashboard') }}" class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Home</a>
-                <a href="{{ route('events.page') }}" class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">
-                    Events
-                </a>
+        <!-- Right: Menu / Auth -->
+        <div class="flex items-center space-x-4">
+            <!-- Navigation Links -->
+            <a href="{{ route('dashboard') }}"
+                class="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition">
+                Home
+            </a>
+            <a href="{{ route('events.page') }}"
+                class="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition">
+                Events
+            </a>
 
-
-                <!-- Right: Auth / User Menu -->
-                <div class="flex items-center space-x-4">
                     @auth
                         <!-- User Dropdown -->
                         <flux:dropdown position="top" align="end">
@@ -87,13 +92,14 @@
                             Register
                         </a>
                     @endauth
-                </div>
-            </div>
-    </header>
 
+        </div>
 
-    <!-- Page Content -->
-    <main class="pt-9 p-4">
+    </div>
+</header>
+
+<!-- Page Content Placeholder -->
+    <main class="pt-9">
         {{ $slot }}
     </main>
 

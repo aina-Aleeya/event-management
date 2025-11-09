@@ -1,11 +1,11 @@
-
 <div class="max-w-xl mx-auto p-6 bg-white shadow-lg rounded-2xl border border-gray-200">
     <h2 class="text-2xl font-bold mb-5 text-gray-800 text-center">Borang Pendaftaran</h2>
+
     @if($event)
-    <p class="text-lg text-center text-gray-600 mb-5">
-        {{ $event->title }}
-    </p>
-@endif
+        <p class="text-lg text-center text-gray-600 mb-5">
+            {{ $event->title }}
+        </p>
+    @endif
 
     <script>
         document.addEventListener('livewire:init', () => {

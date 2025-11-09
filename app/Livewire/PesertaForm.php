@@ -12,13 +12,13 @@ class PesertaForm extends Component
 {
     use WithFileUploads;
 
-    public $pesertas = [];
+    public $nama_penuh, $nama_panggilan, $kelas, $gambar, $email, $jantina, $ic, $tarikh_lahir;
 
+    // public $searchNama = ''; // untuk auto-suggestion
     public $suggestions = [];
 
     public $idIklan;
     public $event;
-  
 
     public function mount($id)
     {
@@ -108,6 +108,20 @@ class PesertaForm extends Component
         ];
 
         $this->suggestions[$index] = [];
+        $this->pesertas[$index] = [
+            'nama_penuh' => $peserta->nama_penuh,
+            'nama_panggilan' => $peserta->nama_panggilan,
+            'kelas' => $peserta->kelas,
+            'ic' => $peserta->ic,
+            'tarikh_lahir' => $peserta->tarikh_lahir,
+            'jantina' => $peserta->jantina,
+            'email' => $peserta->email,
+            'gambar' => null,
+            'category' => '',
+            'kategori' => $this->tentukanKategori($peserta->tarikh_lahir, $peserta->jantina),
+        ];
+
+        $this->suggestions[$index] = [];
     }
 
     private function resetFormFields($index){
@@ -157,7 +171,16 @@ class PesertaForm extends Component
 
     public function save()
     {
+        $savedIds = [];
+        $groupToken = \Str::uuid();
+
         foreach ($this->pesertas as $p) {
+            // Basic validation
+            if (empty($p['nama_penuh']) || empty($p['ic'])) {
+                session()->flash('error', 'Sila isi nama penuh dan nombor IC untuk semua peserta.');
+                return;
+            }
+
             $validated = [
                 'nama_penuh' => $p['nama_penuh'],
                 'nama_panggilan' => $p['nama_panggilan'] ?? '',
@@ -173,10 +196,8 @@ class PesertaForm extends Component
             ];
 
             if (!empty($p['gambar']) && is_object($p['gambar'])) {
-                // Upload baru
                 $validated['gambar'] = $p['gambar']->store('peserta', 'public');
             } else {
-                // Kalau tak upload, pakai gambar lama (kalau ada)
                 $existingPeserta = Peserta::where('ic', $p['ic'])->first();
                 if ($existingPeserta && $existingPeserta->gambar) {
                     $validated['gambar'] = $existingPeserta->gambar;
@@ -185,38 +206,72 @@ class PesertaForm extends Component
 
             $peserta = Peserta::updateOrCreate(['ic' => $p['ic']], $validated);
 
-            // gabung kategori umur + category (individual/group)
-            $kategoriUmur = $p['kategori']; // AM, AF, KB, KG, EL
+            $kategoriUmur = $p['kategori']; // KB/KG/AM/AF/EL
             $categoryType = $p['category'] === 'Individu' ? 'I' : 'G';
             $gabung = $categoryType . $kategoriUmur; // Contoh: IAM / GAF
 
-            // Semak sama ada peserta dah pernah daftar untuk event ni
             $existing = Penyertaan::where('event_id', $this->idIklan)
-            ->where('peserta_id', $peserta->id)
-            ->first();
-
-            // Kalau belum ada, cipta baru
-            $lastEntry = Penyertaan::where('event_id', $this->idIklan)
-                ->where('kategori', $gabung)
-                ->orderByDesc('id')
+                ->where('peserta_id', $peserta->id)
                 ->first();
 
-            $number = $lastEntry ? intval(substr($lastEntry->unique_id, -4)) + 1 : 1;
-            $uniqueId = $gabung . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
+            if ($existing) {
+                if (empty($existing->kategori) || empty($existing->unique_id)) {
+                    $lastEntry = Penyertaan::where('event_id', $this->idIklan)
+                        ->where('kategori', $gabung)
+                        ->orderByDesc('id')
+                        ->first();
 
-            Penyertaan::create([
-                'event_id' => $this->idIklan,
-                'peserta_id' => $peserta->id,
-                'kategori' => $gabung,
-                'unique_id' => $uniqueId,
-            ]);
+                    $number = $lastEntry ? intval(substr($lastEntry->unique_id, -4)) + 1 : 1;
+                    $uniqueId = $gabung . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
+
+                    while (
+                        Penyertaan::where('event_id', $this->idIklan)
+                            ->where('unique_id', $uniqueId)
+                            ->exists()
+                    ) {
+                        $number++;
+                        $uniqueId = $gabung . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
+                    }
+
+                    $existing->kategori = $existing->kategori ?: $gabung;
+                    $existing->unique_id = $existing->unique_id ?: $uniqueId;
+                    $existing->group_token = $groupToken;
+                    $existing->status_bayaran = 'pending';
+                    $existing->save();
+                }
+                $savedIds[] = $existing->id;
+            } else {
+                $lastEntry = Penyertaan::where('event_id', $this->idIklan)
+                    ->where('kategori', $gabung)
+                    ->orderByDesc('id')
+                    ->first();
+
+                $number = $lastEntry ? intval(substr($lastEntry->unique_id, -4)) + 1 : 1;
+                $uniqueId = $gabung . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
+
+                $penyertaan = Penyertaan::create([
+                    'event_id' => $this->idIklan,
+                    'peserta_id' => $peserta->id,
+                    'kategori' => $gabung,
+                    'unique_id' => $uniqueId,
+                    'group_token' => $groupToken,
+                    'status_bayaran' => 'pending',
+                ]);
+
+                $savedIds[] = $penyertaan->id;
+            }
         }
 
         $this->dispatch('show-success', $this->idIklan);
+
+
+        return redirect()->route('payment.form', ['group_token' => $groupToken]);
     }
 
-    private function tentukanKategori($tarikhLahir, $jantina){
-   
+
+
+    private function tentukanKategori($tarikhLahir, $jantina)
+    {
         $umur = Carbon::parse($tarikhLahir)->age;
 
         if ($umur <= 12) {
@@ -227,7 +282,6 @@ class PesertaForm extends Component
             return $jantina === 'Lelaki' ? 'AM' : 'AF';
         }
     }
-
 
     public function render()
     {
