@@ -16,7 +16,7 @@
         {{-- Title --}}
         <div class="flex items-center justify-between flex-wrap gap-3 border-b pb-4">
             <h1 class="text-4xl font-bold text-gray-800">{{ $event->title }}</h1>
-            <span class="uppercase text-blue-600 font-semibold">{{ $event->event_type }}</span>
+            <span class="uppercase text-red-600 font-semibold">{{ $event->event_type }}</span>
         </div>
 
         {{-- Content Grid --}}
@@ -30,13 +30,14 @@
 
             {{-- Right: QR & Info --}}
             <div class="space-y-5">
+
                 {{-- QR Code --}}
                 @if (!empty($event->qr_code))
                     <div class="bg-gray-50 border rounded-xl p-4 shadow-sm text-center">
                         <img src="{{ $event->qr_code }}" class="w-32 h-32 mx-auto" alt="QR Code">
                         <p class="text-sm text-gray-600 mt-2">Scan or share link</p>
                         <button onclick="navigator.clipboard.writeText('{{ url()->current() }}'); alert('Link copied!');"
-                            class="mt-2 text-purple-600 text-sm hover:underline flex items-center justify-center gap-1">
+                            class="mt-2 text-red-600 text-sm hover:underline flex items-center justify-center gap-1">
                             <i class="fa-solid fa-copy"></i> Copy Link
                         </button>
                     </div>
@@ -53,7 +54,7 @@
                 {{-- Date & Time --}}
                 <div class="bg-gray-50 border rounded-xl p-4 shadow-sm">
                     <p class="font-semibold text-gray-700">
-                        <i class="fa-regular fa-calendar text-pink-500"></i> Date & Time
+                        <i class="fa-regular fa-calendar text-red-500"></i> Date & Time
                     </p>
                     <p class="text-gray-800">
                         {{ \Carbon\Carbon::parse($event->start_date)->format('d M Y') }} – 
@@ -65,23 +66,15 @@
                 </div>
 
                 {{-- Entry Fee --}}
-                @if ($event->entry_fee)
-                    <div class="bg-gray-50 border rounded-xl p-4 shadow-sm">
-                        <p class="font-semibold text-gray-700">
-                            <i class="fa-solid fa-money-bill-wave text-green-500"></i> Entry Fee
-                        </p>
-                        <p class="text-gray-800">
-                            RM {{ number_format($event->entry_fee, 2) }}
-                        </p>
-                    </div>
-                @else
-                    <div class="bg-gray-50 border rounded-xl p-4 shadow-sm">
-                        <p class="font-semibold text-gray-700">
-                            <i class="fa-solid fa-money-bill-wave text-green-500"></i> Entry Fee
-                        </p>
-                        <p class="text-gray-500">Free Entry</p>
-                    </div>
-                @endif
+                <div class="bg-gray-50 border rounded-xl p-4 shadow-sm">
+                    <p class="font-semibold text-gray-700">
+                        <i class="fa-solid fa-money-bill-wave text-green-500"></i> Entry Fee
+                    </p>
+                    <p class="{{ $event->entry_fee ? 'text-gray-800' : 'text-gray-500' }}">
+                        {{ $event->entry_fee ? 'RM '.number_format($event->entry_fee, 2) : 'Free Entry' }}
+                    </p>
+                </div>
+
             </div>
         </div>
 
@@ -97,28 +90,35 @@
                     ? $event->categories
                     : explode(',', $event->categories);
             @endphp
-            <div class="flex flex-wrap gap-2">
-                @foreach ($categories as $cat)
-                    <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-                        {{ trim($cat) }}
-                    </span>
-                @endforeach
+            <div class="mt-6">
+                <h3 class="text-gray-800 font-semibold mb-2 text-lg">Event Categories</h3>
+                <div class="flex flex-wrap gap-2">
+                    @foreach ($categories as $cat)
+                        <span class="px-3 py-1 rounded-full text-sm font-medium text-white 
+                                     bg-gradient-to-r from-red-400 via-pink-500 to-yellow-400
+                                     shadow-sm hover:scale-105 transition transform">
+                            {{ trim($cat) }}
+                        </span>
+                    @endforeach
+                </div>
             </div>
         @endif
 
         {{-- Contact Info --}}
-        <div class="border-t pt-6 text-center">
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">Contact Information</h3>
+        <div class="mt-8 bg-gray-50 border rounded-xl p-6 shadow-sm">
+            <h3 class="text-gray-800 font-semibold text-lg mb-2">Contact Information</h3>
+            <p class="text-gray-700 mb-1">
+                📧 Email: <a href="mailto:{{ $event->contact_email }}" class="text-red-600 hover:underline">{{ $event->contact_email }}</a>
+            </p>
             <p class="text-gray-700">
-                📧 {{ $event->contact_email }} <br>
-                📞 {{ $event->contact_phone }}
+                📞 Phone: <a href="tel:{{ $event->contact_phone }}" class="text-red-600 hover:underline">{{ $event->contact_phone }}</a>
             </p>
         </div>
 
-        {{-- Register Button (moved below, right-aligned) --}}
+        {{-- Register Button --}}
         <div class="flex justify-end pt-4">
             <a href="{{ route('peserta.form', ['id' => $event->id]) }}"
-               class="flex items-center gap-2 bg-green-500 hover:bg-green-300 text-gray-900 px-6 py-3 rounded-lg shadow-md transition">
+               class="flex items-center gap-2 bg-red-300 hover:bg-red-600 text-gray-900 px-6 py-3 rounded-lg shadow-md transition transform hover:-translate-y-0.5">
                 <i class="fa-solid fa-ticket"></i> Register Now
             </a>
         </div>

@@ -7,8 +7,11 @@ use App\Livewire\EventDetails;
 use App\Livewire\CreateEvent;
 use App\Livewire\EventPage;
 use App\Livewire\PesertaForm;
+use App\Livewire\PaymentForm;
+use App\Livewire\SenaraiPeserta;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminReportController;
 
 Route::get('/', function () {
     return view('dashboard');
@@ -28,20 +31,26 @@ Route::get('/events/{id}', EventDetails::class)
 Route::get('/ads/{id}/click', [EventController::class, 'trackClick'])
     ->name('ads.click');
 
+Route::get('/events/{id}/participants', SenaraiPeserta::class)->name('event.participants');
+
+Route::get('/payment/{group_token}', PaymentForm::class)->name('payment.form');
+
+
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/participants/{event}', [AdminController::class, 'participants'])->name('participants');
     Route::get('/groups/{event}', [AdminController::class, 'groups'])->name('groups');
-        Route::get('/participant/{peserta}', [AdminController::class, 'viewParticipant'])->name('participant.view');
+    Route::get('/participant/{peserta}', [AdminController::class, 'viewParticipant'])->name('participant.view');
+    Route::get('/events/{event}/report', [AdminReportController::class, 'generate'])
+        ->name('events.report');
 });
 
 
-Route::get('/participant/{peserta}', [AdminController::class, 'viewParticipant'])->name('participant.view');
-Route::get('/partigitcipant/{peserta}', [AdminController::class, 'viewParticipant'])->name('participant.view');
-Route::get('/xx/{peserta}', [AdminController::class, 'viewParticipant'])->name('participant.view');
-
 
 Route::middleware(['auth'])->group(function () {
+
+   
+     Route::get('/payment/{id}', PaymentForm::class)->name('payment.form');
     Route::get('/create-event', CreateEvent::class)->name('create-event');
     Route::redirect('settings', 'settings/profile');
 

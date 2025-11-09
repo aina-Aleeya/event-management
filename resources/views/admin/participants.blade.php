@@ -1,34 +1,19 @@
 <x-layouts.app>
     {{-- Page header --}}
-    <x-slot name="header">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Participants — {{ $event->title }}
-            </h2>
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"></div>
+    <div class="flex justify-end mb-3">
+        <a href="{{ route('admin.events.report', $event->id) }}"
+            class="px-2 py-1 bg-purple-300 text-gray-900 rounded-lg hover:bg-sky-300 transition">
+            Generate Report
+        </a>
+    </div>
 
-            {{-- Navigation Bar --}}
-            <nav class="flex flex-wrap gap-2">
-                <a href="" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition">
-                    Dashboard
-                </a>
-                <a href="" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-                    Events
-                </a>
-                <a href="" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-                    Participants
-                </a>
-                {{-- <a href="" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-                    Reports
-                </a> --}}
-            </nav>
-        </div>
-    </x-slot>
 
     <div class="max-w-7xl mx-auto px-6 py-8">
 
         {{-- Table Card --}}
         <div class="bg-white rounded-xl shadow p-6">
-            <h1 class="text-xl font-semibold mb-4">Participant List</h1>
+            <h1 class="text-xl font-semibold mb-4">Participant List — {{ $event->title }}</h1>
 
             <div class="overflow-x-auto">
                 <table class="w-full shadow-sm rounded-lg overflow-hidden">
@@ -37,6 +22,7 @@
                             <th class="p-3 text-left">Name</th>
                             <th class="p-3 text-left">Category</th>
                             <th class="p-3 text-left">Unique ID</th>
+                            <th class="p-3 text-left">Payment Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -50,12 +36,23 @@
                                 </td>
                                 <td class="p-3">{{ $p->pivot->kategori_nama }}</td>
                                 <td class="p-3 font-medium text-gray-700">{{ $p->pivot->unique_id }}</td>
+                                <td class="p-3">
+                                    @if ($p->pivot->status_bayaran === 'complete')
+                                        <span class="px-3 py-1 text-sm rounded-full bg-green-100 text-green-700 font-medium">
+                                            Completed
+                                        </span>
+                                    @else
+                                        <span class="px-3 py-1 text-sm rounded-full bg-yellow-100 text-yellow-700 font-medium">
+                                            Pending
+                                        </span>
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
 
                         @if ($participants->isEmpty())
                             <tr>
-                                <td colspan="3" class="p-4 text-center text-gray-500">
+                                <td colspan="4" class="p-4 text-center text-gray-500">
                                     No participants have registered yet.
                                 </td>
                             </tr>
@@ -71,6 +68,7 @@
                     ← Back
                 </a>
             </div>
+
         </div>
 
     </div>
