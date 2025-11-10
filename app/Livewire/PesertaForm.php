@@ -157,10 +157,12 @@ class PesertaForm extends Component
     public function save()
     {
         $savedIds = [];
-        $groupToken = \Str::uuid();
+
+
+        $groupToken = \Str::uuid()->toString();
 
         foreach ($this->pesertas as $p) {
-            // Basic validation
+
             if (empty($p['nama_penuh']) || empty($p['ic'])) {
                 session()->flash('error', 'Sila isi nama penuh dan nombor IC untuk semua peserta.');
                 return;
@@ -220,7 +222,10 @@ class PesertaForm extends Component
 
                     $existing->kategori = $existing->kategori ?: $gabung;
                     $existing->unique_id = $existing->unique_id ?: $uniqueId;
+
+
                     $existing->group_token = $groupToken;
+
                     $existing->status_bayaran = 'pending';
                     $existing->save();
                 }
@@ -239,7 +244,9 @@ class PesertaForm extends Component
                     'peserta_id' => $peserta->id,
                     'kategori' => $gabung,
                     'unique_id' => $uniqueId,
+
                     'group_token' => $groupToken,
+
                     'status_bayaran' => 'pending',
                 ]);
 

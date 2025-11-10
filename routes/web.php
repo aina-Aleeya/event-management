@@ -50,7 +50,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::middleware(['auth'])->group(function () {
 
    
-     Route::get('/payment/{id}', PaymentForm::class)->name('payment.form');
+     Route::get('/payment/{id}', action: PaymentForm::class)->name('payment.form');
     Route::get('/create-event', CreateEvent::class)->name('create-event');
     Route::redirect('settings', 'settings/profile');
 
