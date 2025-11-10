@@ -6,19 +6,21 @@ use Livewire\Component;
 use App\Models\Peserta;
 use App\Models\Penyertaan;
 use \App\Models\Event;
+use Illuminate\Support\Facades\Auth;
 
 class SenaraiPeserta extends Component
 {
     public $pesertas = [];
-    public $event;
+    public $events;
 
-    public function mount($id)
+    public function mount()
     {
-        $this->event = Event::find($id);
-        $this->pesertas = Penyertaan::with('peserta')
-            ->where('event_id', $id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $user = Auth::user();
+        $this->events = Penyertaan::with(['event', 'peserta'])
+            ->where('pendaftar_id', $user->id)
+            ->orderBy('event_id')
+            ->get()
+            ->groupBy('event_id');
     }
 
     public function render()

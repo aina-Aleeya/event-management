@@ -27,6 +27,11 @@ class Penyertaan extends Pivot
         return $this->belongsTo(Event::class);
     }
 
+    public function pendaftar()
+    {
+        return $this->belongsTo(User::class, 'pendaftar_id');
+    }
+
     public function getKategoriNamaAttribute()
     {
         $kategori = strtoupper($this->kategori);
@@ -36,10 +41,10 @@ class Penyertaan extends Pivot
         $kodUmurJantina = substr($kategori, -2);
         
         $mapping = [
-            'AM' => 'Adult-Male',
-            'AF' => 'Adult-Female',
-            'KB' => 'Kid-Boy',
-            'KG' => 'Kid-Girl',
+            'AM' => 'Adult Male',
+            'AF' => 'Adult Female',
+            'KB' => 'Kid Boy',
+            'KG' => 'Kid Girl',
             'EL' => 'Elderly',
         ];
 

@@ -4,21 +4,26 @@ namespace App\Livewire;
 
 use App\Models\Peserta;
 use App\Models\Penyertaan;
+use App\Models\User;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+
 
 class PesertaForm extends Component
 {
     use WithFileUploads;
 
-    public $nama_penuh, $nama_panggilan, $kelas, $gambar, $email, $jantina, $ic, $tarikh_lahir;
-
-    // public $searchNama = ''; // untuk auto-suggestion
+    public $pesertas = [];
     public $suggestions = [];
 
     public $idIklan;
     public $event;
+    public $pendaftar_nama;
+    public $pendaftar_email;
+
 
     public function mount($id)
     {
@@ -108,20 +113,7 @@ class PesertaForm extends Component
         ];
 
         $this->suggestions[$index] = [];
-        $this->pesertas[$index] = [
-            'nama_penuh' => $peserta->nama_penuh,
-            'nama_panggilan' => $peserta->nama_panggilan,
-            'kelas' => $peserta->kelas,
-            'ic' => $peserta->ic,
-            'tarikh_lahir' => $peserta->tarikh_lahir,
-            'jantina' => $peserta->jantina,
-            'email' => $peserta->email,
-            'gambar' => null,
-            'category' => '',
-            'kategori' => $this->tentukanKategori($peserta->tarikh_lahir, $peserta->jantina),
-        ];
-
-        $this->suggestions[$index] = [];
+        
     }
 
     private function resetFormFields($index){
@@ -173,6 +165,27 @@ class PesertaForm extends Component
     {
         $savedIds = [];
         $groupToken = \Str::uuid();
+
+        if (auth()->check()) {
+            $pendaftarId = auth()->id();
+        } else {
+            // Kalau tak login → wajib isi maklumat pendaftar
+            if (empty($this->pendaftar_nama) || empty($this->pendaftar_email)) {
+                session()->flash('error', 'Sila isi nama dan email pendaftar.');
+                return;
+            }
+    
+            // Cipta atau ambil guest user
+            $guest = User::firstOrCreate(
+                ['email' => $this->pendaftar_email, 'role' => 'guest'],
+                [
+                    'name' => $this->pendaftar_nama,
+                    'password' => Hash::make(Str::random(8)),
+                ]
+            );
+    
+            $pendaftarId = $guest->id;
+        }
 
         foreach ($this->pesertas as $p) {
             // Basic validation
@@ -256,6 +269,7 @@ class PesertaForm extends Component
                     'unique_id' => $uniqueId,
                     'group_token' => $groupToken,
                     'status_bayaran' => 'pending',
+                    'pendaftar_id' => $pendaftarId,
                 ]);
 
                 $savedIds[] = $penyertaan->id;

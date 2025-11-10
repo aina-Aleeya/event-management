@@ -17,6 +17,19 @@
     </script>
 
     <form wire:submit.prevent="save" class="space-y-4 text-gray-800">
+    @if(!Auth::check())
+    <div class="border rounded p-4 mb-4 bg-gray-50">
+        <h3 class="font-semibold mb-2">Maklumat Pendaftar (Guest)</h3>
+        <div class="mb-2">
+            <label>Nama Pendaftar</label>
+            <input type="text" wire:model="pendaftar_nama" class="w-full border p-2 rounded">
+        </div>
+        <div>
+            <label>Email Pendaftar</label>
+            <input type="email" wire:model="pendaftar_email" class="w-full border p-2 rounded">
+        </div>
+    </div>
+    @endif
     @foreach ($pesertas as $index => $peserta)
         <div class="border p-4 rounded-lg mb-3">
             <h3 class="font-semibold text-lg mb-2">Peserta {{ $index + 1 }}</h3>
