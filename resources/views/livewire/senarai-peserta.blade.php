@@ -1,20 +1,21 @@
-<div class="max-w-xl mx-auto p-6 bg-white shadow-lg rounded-2xl border border-gray-200">
-    <h1 class="text-2xl font-semibold mb-4">Senarai Peserta Didaftarkan</h1>
+<div class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-2xl border border-gray-200">
+    <h1 class="text-2xl font-semibold mb-4">Registered Participant  List</h1>       
+
     @forelse($events as $eventId => $group)
         <div class="mb-8">
             <h2 class="text-xl font-semibold text-blue-600 mb-3">
-                {{ $group->first()->event->title ?? 'Event Tidak Dikenali' }}
+                {{ $group[0]->event->title ?? 'Event Tidak Dikenali' }}
             </h2>
 
             <table class="w-full border border-gray-300 rounded-lg mb-3">
                 <thead class="bg-gray-100">
                     <tr>
                         <th class="p-2 border">No.</th>
-                        <th class="p-2 border">Nama Penuh</th>
-                        <th class="p-2 border">IC</th>
-                        <th class="p-2 border">Kelab</th>
-                        <th class="p-2 border">Kategori</th>
-                        <th class="p-2 border">Status Bayaran</th>
+                        <th class="p-2 border">Full Name</th>
+                        <th class="p-2 border">MyKad Number</th>
+                        <th class="p-2 border">Club</th>
+                        <th class="p-2 border">Category</th>
+                        <th class="p-2 border">Payment Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,5 +35,4 @@
     @empty
         <p class="text-gray-500">Tiada peserta didaftarkan lagi.</p>
     @endforelse
-
 </div>

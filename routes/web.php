@@ -27,7 +27,7 @@ Route::get('/events/{id}', EventDetails::class)->name('event.details');
 
 Route::get('/ads/{id}/click', [EventController::class, 'trackClick'])->name('ads.click');
 
-Route::get('/payment/{group_token}', PaymentForm::class)->name('payment.form');
+Route::get('/payment/{event_id}', PaymentForm::class)->name('payment.form');
 
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -48,7 +48,7 @@ Route::get('/test/{peserta}', [AdminController::class, 'viewParticipant'])->name
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/participants', SenaraiPeserta::class)->name('participants.events');
-    Route::get('/payment/{id}', PaymentForm::class)->name('payment.form');
+    Route::get('/payment/{id}', action: PaymentForm::class)->name('payment.form');
     Route::get('/create-event', CreateEvent::class)->name('create-event');
     Route::redirect('settings', 'settings/profile');
 

@@ -14,7 +14,8 @@ class Penyertaan extends Pivot
         'kategori',
         'unique_id',
         'status_bayaran',
-        'group_token'
+        'group_token',
+        'pendaftar_id',
     ];
 
     public function peserta()

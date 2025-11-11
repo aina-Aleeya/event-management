@@ -1,5 +1,5 @@
 <div class="max-w-xl mx-auto p-6 bg-white shadow-lg rounded-2xl border border-gray-200">
-    <h2 class="text-2xl font-bold mb-5 text-gray-800 text-center">Borang Pendaftaran</h2>
+    <h2 class="text-2xl font-bold mb-5 text-gray-800 text-center">Registration Form</h2>
 
     @if($event)
         <p class="text-lg text-center text-gray-600 mb-5">
@@ -10,8 +10,8 @@
     <script>
         document.addEventListener('livewire:init', () => {
             Livewire.on('show-success', (eventId) => {
-                alert('Pendaftaran berjaya!');
-                window.location.href = `/events/${eventId}/participants`; 
+                alert('Registration successful!');
+                window.location.href = `/payment/${eventId}`; 
             });
         });
     </script>
@@ -19,24 +19,24 @@
     <form wire:submit.prevent="save" class="space-y-4 text-gray-800">
     @if(!Auth::check())
     <div class="border rounded p-4 mb-4 bg-gray-50">
-        <h3 class="font-semibold mb-2">Maklumat Pendaftar (Guest)</h3>
+        <h3 class="font-semibold mb-2">Registrant Information (Guest)</h3>
         <div class="mb-2">
-            <label>Nama Pendaftar</label>
+            <label>Registrant Name</label>
             <input type="text" wire:model="pendaftar_nama" class="w-full border p-2 rounded">
         </div>
         <div>
-            <label>Email Pendaftar</label>
+            <label>Registrant E-mail</label>
             <input type="email" wire:model="pendaftar_email" class="w-full border p-2 rounded">
         </div>
     </div>
     @endif
     @foreach ($pesertas as $index => $peserta)
         <div class="border p-4 rounded-lg mb-3">
-            <h3 class="font-semibold text-lg mb-2">Peserta {{ $index + 1 }}</h3>
+            <h3 class="font-semibold text-lg mb-2">Participant {{ $index + 1 }}</h3>
 
             <!-- Nama Penuh -->
             <div>
-                <label class="block text-gray-700 font-medium">Nama Penuh</label>
+                <label class="block text-gray-700 font-medium">Full Name</label>
                 <input type="text" wire:model.live.debounce="pesertas.{{ $index }}.nama_penuh" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-300 focus:border-blue-400 bg-white">
 
                 @if(!empty($suggestions[$index]))
@@ -54,43 +54,43 @@
 
                 <!-- Nama Panggilan -->
                 <div>
-                    <label class="block text-gray-700 font-medium">Nama Panggilan</label>
+                    <label class="block text-gray-700 font-medium">Preferred Name</label>
                     <input type="text" wire:model="pesertas.{{ $index }}.nama_panggilan" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-300 focus:border-blue-400 bg-white">
                 </div>
 
                 <!-- Kelab -->
                 <div>
-                    <label class="block text-gray-700 font-medium">Kelab</label>
+                    <label class="block text-gray-700 font-medium">Club</label>
                     <input type="text" wire:model="pesertas.{{ $index }}.kelas" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-300 focus:border-blue-400 bg-white">
                 </div>
 
                 <!-- IC -->
                 <div>
-                    <label class="block text-gray-700 font-medium">No. Kad Pengenalan</label>
-                    <input type="text" wire:model.live="pesertas.{{ $index }}.ic" maxlength="12" placeholder="tanpa '-'" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-300 focus:border-blue-400 bg-white">
+                    <label class="block text-gray-700 font-medium">MyKad Number</label>
+                    <input type="text" wire:model.live="pesertas.{{ $index }}.ic" maxlength="12" placeholder="without '-'" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-300 focus:border-blue-400 bg-white">
                 </div>
 
                 <!-- Tarikh lahir -->
                 <div>
-                    <label class="block text-gray-700 font-medium">Tarikh Lahir</label>
+                    <label class="block text-gray-700 font-medium">Date of birth</label>
                     <input type="date" wire:model="pesertas.{{ $index }}.tarikh_lahir" readonly class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 bg-white focus:ring-2 focus:ring-blue-300 focus:border-blue-400">
                 </div>
 
                 <!-- Jantina -->
                 <div>
-                    <label class="block text-gray-700 font-medium">Jantina</label>
+                    <label class="block text-gray-700 font-medium">Gender</label>
                     <input type="text" wire:model="pesertas.{{ $index }}.jantina" readonly class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 bg-white focus:ring-2 focus:ring-blue-300 focus:border-blue-400">
                 </div>
 
                 <!-- email -->
                 <div>
-                    <label class="block text-gray-700 font-medium">Email</label>
+                    <label class="block text-gray-700 font-medium">E-mail</label>
                     <input type="email" wire:model="pesertas.{{ $index }}.email" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-300 focus:border-blue-400 bg-white">
                 </div>
 
                 <!-- Gambar -->
                 <div>
-                    <label class="block text-gray-700 font-medium mb-1">Gambar</label>
+                    <label class="block text-gray-700 font-medium mb-1">Picture</label>
 
                     <!-- Hidden Input -->
                     <input  type="file" wire:model="pesertas.{{ $index }}.gambar" id="gambarInput{{ $index }}" class="hidden"  accept="image/*">
@@ -120,7 +120,7 @@
 
                 <!-- Kategori -->
                 <div>
-                    <label class="block text-gray-700 font-medium">Kategori</label>
+                    <label class="block text-gray-700 font-medium">Category</label>
                     <div class="flex items-center space-x-6 mt-1">
                         <label class="flex items-center space-x-2">
                             <input 
@@ -129,7 +129,7 @@
                                 value="Individu" 
                                 class="text-blue-500 focus:ring-blue-400"
                             >
-                            <span>Individu</span>
+                            <span>Individual</span>
                         </label>
 
                         <label class="flex items-center space-x-2">
@@ -139,7 +139,7 @@
                                 value="Berkumpulan" 
                                 class="text-blue-500 focus:ring-blue-400"
                             >
-                            <span>Berkumpulan</span>
+                            <span>Grouping</span>
                         </label>
                     </div>
                 </div>
@@ -154,7 +154,7 @@
 
     <div class="text-right">
         <button type="button" wire:click="addPeserta" class="bg-blue-500 text-white py-2 px-4 rounded-lg">
-        + Tambah Peserta
+        + Add Member
         </button>
         @if (session()->has('maxPeserta'))
             <p class="text-red-500 text-sm mt-2">
@@ -168,14 +168,14 @@
             <a 
                 href="{{ url('/events/'.$idIklan) }}" 
                 class="w-1/2 text-center bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-lg text-lg font-semibold shadow-md transition duration-150 flex items-center justify-center">
-                ← Batal
+                ← Cancel
             </a>
 
             <!-- Daftar Button -->
             <button 
                 type="submit" 
                 class="w-1/2 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg text-lg font-semibold shadow-md transition duration-150">
-                Daftar
+                Register
             </button>
         </div>
     </form>

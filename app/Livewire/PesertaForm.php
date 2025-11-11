@@ -23,7 +23,7 @@ class PesertaForm extends Component
     public $event;
     public $pendaftar_nama;
     public $pendaftar_email;
-
+    
 
     public function mount($id)
     {
@@ -164,7 +164,8 @@ class PesertaForm extends Component
     public function save()
     {
         $savedIds = [];
-        $groupToken = \Str::uuid();
+
+        $groupToken = $this->groupToken ?? \Str::uuid()->toString();
 
         if (auth()->check()) {
             $pendaftarId = auth()->id();
@@ -177,18 +178,24 @@ class PesertaForm extends Component
     
             // Cipta atau ambil guest user
             $guest = User::firstOrCreate(
-                ['email' => $this->pendaftar_email, 'role' => 'guest'],
+                ['email' => $this->pendaftar_email],
                 [
                     'name' => $this->pendaftar_nama,
                     'password' => Hash::make(Str::random(8)),
+                    'role' => 'guest',
                 ]
             );
     
             $pendaftarId = $guest->id;
+            session(['guest_id' => $pendaftarId]);
         }
 
+        $pending = Penyertaan::where('pendaftar_id', $pendaftarId)
+            ->where('status_bayaran', 'pending')
+            ->first();
+
         foreach ($this->pesertas as $p) {
-            // Basic validation
+
             if (empty($p['nama_penuh']) || empty($p['ic'])) {
                 session()->flash('error', 'Sila isi nama penuh dan nombor IC untuk semua peserta.');
                 return;
@@ -227,59 +234,56 @@ class PesertaForm extends Component
                 ->where('peserta_id', $peserta->id)
                 ->first();
 
-            if ($existing) {
-                if (empty($existing->kategori) || empty($existing->unique_id)) {
+                if ($existing) {
+                    // Kemas kini group token & pendaftar
+                    $existing->update([
+                        'group_token' => $groupToken,
+                        'pendaftar_id' => $pendaftarId,
+                        'status_bayaran' => 'pending',
+                    ]);
+        
+                    // Tambah unique_id kalau belum ada
+                    if (empty($existing->unique_id)) {
+                        $lastEntry = Penyertaan::where('event_id', $this->idIklan)
+                            ->where('kategori', $gabung)
+                            ->orderByDesc('id')
+                            ->first();
+        
+                        $number = $lastEntry ? intval(substr($lastEntry->unique_id, -4)) + 1 : 1;
+                        $uniqueId = $gabung . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
+                        $existing->update([
+                            'kategori' => $gabung,
+                            'unique_id' => $uniqueId,
+                        ]);
+                    }
+        
+                    $savedIds[] = $existing->id;
+        
+                } else {
+                    // Cipta penyertaan baru
                     $lastEntry = Penyertaan::where('event_id', $this->idIklan)
                         ->where('kategori', $gabung)
                         ->orderByDesc('id')
                         ->first();
-
+        
                     $number = $lastEntry ? intval(substr($lastEntry->unique_id, -4)) + 1 : 1;
                     $uniqueId = $gabung . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
-
-                    while (
-                        Penyertaan::where('event_id', $this->idIklan)
-                            ->where('unique_id', $uniqueId)
-                            ->exists()
-                    ) {
-                        $number++;
-                        $uniqueId = $gabung . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
-                    }
-
-                    $existing->kategori = $existing->kategori ?: $gabung;
-                    $existing->unique_id = $existing->unique_id ?: $uniqueId;
-                    $existing->group_token = $groupToken;
-                    $existing->status_bayaran = 'pending';
-                    $existing->save();
+        
+                    $penyertaan = Penyertaan::create([
+                        'event_id' => $this->idIklan,
+                        'peserta_id' => $peserta->id,
+                        'kategori' => $gabung,
+                        'unique_id' => $uniqueId,
+                        'group_token' => $groupToken,
+                        'status_bayaran' => 'pending',
+                        'pendaftar_id' => $pendaftarId,
+                    ]);
+        
+                    $savedIds[] = $penyertaan->id;
                 }
-                $savedIds[] = $existing->id;
-            } else {
-                $lastEntry = Penyertaan::where('event_id', $this->idIklan)
-                    ->where('kategori', $gabung)
-                    ->orderByDesc('id')
-                    ->first();
-
-                $number = $lastEntry ? intval(substr($lastEntry->unique_id, -4)) + 1 : 1;
-                $uniqueId = $gabung . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
-
-                $penyertaan = Penyertaan::create([
-                    'event_id' => $this->idIklan,
-                    'peserta_id' => $peserta->id,
-                    'kategori' => $gabung,
-                    'unique_id' => $uniqueId,
-                    'group_token' => $groupToken,
-                    'status_bayaran' => 'pending',
-                    'pendaftar_id' => $pendaftarId,
-                ]);
-
-                $savedIds[] = $penyertaan->id;
             }
-        }
 
         $this->dispatch('show-success', $this->idIklan);
-
-
-        return redirect()->route('payment.form', ['group_token' => $groupToken]);
     }
 
 

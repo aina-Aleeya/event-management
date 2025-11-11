@@ -16,11 +16,16 @@ class SenaraiPeserta extends Component
     public function mount()
     {
         $user = Auth::user();
-        $this->events = Penyertaan::with(['event', 'peserta'])
+        
+        $registrations = Penyertaan::with(['event', 'peserta'])
             ->where('pendaftar_id', $user->id)
             ->orderBy('event_id')
-            ->get()
-            ->groupBy('event_id');
+            ->get();
+            
+        $this->events = [];
+        foreach($registrations as $reg) {
+            $this->events[$reg->event_id][] = $reg;
+        }
     }
 
     public function render()

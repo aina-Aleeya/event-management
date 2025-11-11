@@ -19,13 +19,13 @@ class AdminController extends Controller
         //     ->groupBy('event_id', 'category')
         //     ->get();
 
-$participantSummary = \DB::table('penyertaan')
-    ->join('events', 'penyertaan.event_id', '=', 'events.id')
-    ->join('pesertas', 'penyertaan.peserta_id', '=', 'pesertas.id')
-    ->select('events.id as event_id', 'events.title', 'events.event_type')
-    ->selectRaw('COUNT(pesertas.id) as total')
-    ->groupBy('events.id', 'events.title', 'events.event_type')
-    ->get();
+        $participantSummary = \DB::table('penyertaan')
+        ->join('events', 'penyertaan.event_id', '=', 'events.id')
+        ->join('pesertas', 'penyertaan.peserta_id', '=', 'pesertas.id')
+        ->select('events.id as event_id', 'events.title', 'events.event_type')
+        ->selectRaw('COUNT(pesertas.id) as total')
+        ->groupBy('events.id', 'events.title', 'events.event_type')
+        ->get();
 
 
         return view('admin.dashboard', compact('events', 'participantSummary'));
