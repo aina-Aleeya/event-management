@@ -9,6 +9,9 @@ use App\Livewire\EventPage;
 use App\Livewire\PesertaForm;
 use App\Livewire\PaymentForm;
 use App\Livewire\SenaraiPeserta;
+use App\Livewire\RankingReportPage;
+use App\Livewire\EventDashboardPage;
+use App\Livewire\LeaderBoardPage;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminReportController;
@@ -35,22 +38,22 @@ Route::get('/events/{id}/participants', SenaraiPeserta::class)->name('event.part
 
 Route::get('/payment/{group_token}', PaymentForm::class)->name('payment.form');
 
-
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/participants/{event}', [AdminController::class, 'participants'])->name('participants');
     Route::get('/groups/{event}', [AdminController::class, 'groups'])->name('groups');
     Route::get('/participant/{peserta}', [AdminController::class, 'viewParticipant'])->name('participant.view');
-    Route::get('/events/{event}/report', [AdminReportController::class, 'generate'])
-        ->name('events.report');
+    Route::get('/events/{event}/report', [AdminReportController::class, 'generate'])->name('events.report');
+    Route::get('/ranking-report/{event}', RankingReportPage::class)->name('ranking.report');
+    Route::get('/events/{event}/dashboard', EventDashboardPage::class)->name('event.dashboard');
+    Route::get('/event/{event}/leaderboard', LeaderboardPage::class) ->name('event.leaderboard');
 });
-
 
 
 Route::middleware(['auth'])->group(function () {
 
    
-     Route::get('/payment/{id}', action: PaymentForm::class)->name('payment.form');
+    Route::get('/payment/{id}', action: PaymentForm::class)->name('payment.form');
     Route::get('/create-event', CreateEvent::class)->name('create-event');
     Route::redirect('settings', 'settings/profile');
 
