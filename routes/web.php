@@ -9,6 +9,7 @@ use App\Livewire\EventPage;
 use App\Livewire\PesertaForm;
 use App\Livewire\PaymentForm;
 use App\Livewire\SenaraiPeserta;
+use App\Livewire\HistoryPage;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminReportController;
@@ -47,7 +48,8 @@ Route::get('/test/{peserta}', [AdminController::class, 'viewParticipant'])->name
 
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/participants', SenaraiPeserta::class)->name('participants.events');
+    Route::get('/history', HistoryPage::class)->name('history');
+    Route::get('/history-participant/{eventId}', SenaraiPeserta::class)->name('history.participant');
     Route::get('/payment/{id}', action: PaymentForm::class)->name('payment.form');
     Route::get('/create-event', CreateEvent::class)->name('create-event');
     Route::redirect('settings', 'settings/profile');

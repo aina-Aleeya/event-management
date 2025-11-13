@@ -10,22 +10,19 @@ use Illuminate\Support\Facades\Auth;
 
 class SenaraiPeserta extends Component
 {
-    public $pesertas = [];
-    public $events;
+    public $registrations;
+    public $eventId;
 
-    public function mount()
+    public function mount($eventId)
     {
-        $user = Auth::user();
+        $this->eventId = $eventId;
+        $userId = Auth::id();
         
-        $registrations = Penyertaan::with(['event', 'peserta'])
-            ->where('pendaftar_id', $user->id)
-            ->orderBy('event_id')
+        $this->registrations = Penyertaan::with(['event', 'peserta'])
+            ->where('pendaftar_id', $userId)
+            ->where('event_id', $eventId)
+            ->orderBy('id')
             ->get();
-            
-        $this->events = [];
-        foreach($registrations as $reg) {
-            $this->events[$reg->event_id][] = $reg;
-        }
     }
 
     public function render()

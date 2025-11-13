@@ -35,7 +35,7 @@
                 class="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition">
                 Events
             </a>
-            <a href="{{ route('participants.events') }}"
+            <a href="{{ route('history') }}"
                 class="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition">
                 History
             </a>

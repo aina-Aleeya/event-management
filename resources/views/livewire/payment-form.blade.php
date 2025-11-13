@@ -88,6 +88,29 @@
                         {{ session('success') }}
                     </div>
                 @endif
+
+                @if($showModal)
+                    <div class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+                        <!-- Modal Content -->
+                        <div class="mt-10 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-80 text-center pointer-events-auto">
+                            <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">Please Login</h2>
+                            <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm">
+                                You need to login to see participants registered list.
+                                <strong>Please reset password, to create new password.</strong>
+                            </p>
+                            <div class="flex justify-center gap-3">
+                                <a href="{{ route('login') }}"
+                                    class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition">
+                                    Login
+                                </a>
+                                <button wire:click="closeModal"
+                                        class="bg-gray-200 hover:bg-gray-300 text-gray-900 px-4 py-2 rounded-lg transition">
+                                    Stay as Guest
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

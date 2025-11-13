@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Penyertaan;
+use Illuminate\Support\Facades\Auth;
+
 
 class PaymentForm extends Component
 {
@@ -11,6 +13,7 @@ class PaymentForm extends Component
     public $registrations;
     public $totalAmount = 0;
     public $eventId;
+    public $showModal;
 
     public function mount($group_token = null, $event_id = null)
     {
@@ -43,6 +46,17 @@ class PaymentForm extends Component
             $reg->update(['status_bayaran' => 'complete']);
         }
         session()->flash('success', 'Payment completed successfully!');
+        if (Auth::check()) {
+            return redirect()->route('history.participant', ['eventId' => $this->eventId]);
+        }
+
+        // Kalau guest, trigger modal
+        $this->showModal = true;
+    }
+
+    public function closeModal()
+    {
+        $this->showModal = false;
         $this->loadRegistrations();
     }
 
