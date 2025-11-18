@@ -15,7 +15,7 @@
         <!-- Left: Logo + System Name -->
         <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 hover:opacity-90 transition" wire:navigate>
             <!-- Logo Circle with Gradient for Energy -->
-            <div class="flex aspect-square w-10 h-10 items-center justify-center rounded-full bg-gradient-to-tr from-purple-500 via-pink-500 to-red-500 text-white shadow-lg">
+            <div class="flex aspect-square w-10 h-10 items-center justify-center rounded-full bg-gradient-to-tr from-purple-500 via-pink-500 to-white-500 text-white shadow-lg">
                 <x-app-logo-icon class="w-5 h-5 fill-current" />
             </div>
             <!-- System Name -->
@@ -51,7 +51,7 @@
                                         <div class="flex items-center gap-2 px-2 py-2 text-start text-sm">
                                             <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
                                                 <span
-                                                    class="flex h-full w-full items-center justify-center rounded-lg bg-purple-300 text-white dark:bg-purple-400">
+                                                    class="flex h-full w-full items-center justify-center rounded-lg bg-red-300 text-white dark:bg-red-400">
                                                     {{ auth()->user()->initials() }}
                                                 </span>
                                             </span>
@@ -88,11 +88,11 @@
                     @else
                         <!-- Before Login -->
                         <a href="{{ route('login') }}"
-                            class="text-sm font-medium text-black bg-purple-400 px-3 py-1.5 rounded-lg hover:bg-purple-500 transition">
+                            class="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-orange-100 transition">
                             Login
                         </a>
                         <a href="{{ route('register') }}"
-                            class="text-sm font-medium text-black bg-purple-400 px-3 py-1.5 rounded-lg hover:bg-purple-500 transition">
+                            class="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-orange-100 transition">
                             Register
                         </a>
                     @endauth
