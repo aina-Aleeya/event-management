@@ -196,6 +196,7 @@ class PesertaForm extends Component
 
         foreach ($this->pesertas as $p) {
 
+
             if (empty($p['nama_penuh']) || empty($p['ic'])) {
                 session()->flash('error', 'Sila isi nama penuh dan nombor IC untuk semua peserta.');
                 return;

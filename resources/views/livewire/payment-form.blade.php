@@ -2,17 +2,17 @@
     <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
 
         <!-- Sidebar: Event Info -->
-        <div class="md:col-span-1 bg-gradient-to-b from-red-100 to-white p-4 rounded-lg shadow-sm">
+        <div class="md:col-span-1 bg-gradient-to-b from-red-50 to-white p-5 rounded-xl shadow-sm flex flex-col items-center">
             <img src="{{ asset('storage/' . $registrations->first()->event->poster) }}"
                  alt="{{ $registrations->first()->event->title }}"
                  class="w-full h-56 object-cover rounded-lg shadow-md">
 
-            <h2 class="text-xl font-bold mt-4 text-gray-800">{{ $registrations->first()->event->title }}</h2>
-            <p class="text-sm text-gray-600 mt-1">{{ $registrations->first()->event->venue ?? 'No venue info' }}</p>
+            <h2 class="text-2xl font-bold mt-4 text-gray-800 text-center">{{ $registrations->first()->event->title }}</h2>
+            <p class="text-sm text-gray-600 mt-1 text-center">{{ $registrations->first()->event->venue ?? 'No venue info' }}</p>
 
-            <div class="border-t mt-4 pt-3">
+            <div class="border-t mt-6 pt-4 w-full text-center">
                 <p class="font-semibold text-gray-800">Total Amount</p>
-                <p class="text-green-600 font-bold text-lg">
+                <p class="text-red-300 font-bold text-xl mt-1">
                     RM {{ number_format($totalAmount, 2) }}
                 </p>
             </div>
@@ -24,7 +24,7 @@
                 <div class="flex justify-between items-center mb-4">
                     <h1 class="text-2xl font-bold text-gray-800">Confirm Your Participants</h1>
                     <button wire:click="addMember"
-                        class="bg-gray-200 hover:bg-gray-500 text-black px-4 py-2 rounded-lg shadow transition">
+                        class="bg-red-300 hover:bg-red-200 text-gray-900 px-3 py-1 rounded-lg shadow transition">
                         + Add Member
                     </button>
                 </div>
@@ -72,11 +72,11 @@
                     </div>
                     <div>
                         <button wire:click="payNow"
-                            class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow transition">
+                            class="bg-red-200 hover:bg-red-300 text-gray-900 px-3 py-1 rounded-lg shadow transition">
                             Pay Now
                         </button>
                         <button wire:click="payLater"
-                            class="ml-3 bg-gray-200 hover:bg-gray-300 text-gray-900 px-4 py-2 rounded-lg shadow transition">
+                            class="ml-3 bg-gray-200 hover:bg-gray-300 text-gray-900 px-3 py-1 rounded-lg shadow transition">
                             Pay Later
                         </button>
                     </div>

@@ -6,7 +6,7 @@
             <div x-show="active === {{ $index }}" x-transition:enter="transition ease-out duration-700"
                 x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
                 class="absolute inset-0">
-            <img src="{{ asset('storage/' . $event->poster) }}"
+            <img src="{{ asset('storage/' . $event->posters) }}"
                  alt="{{ $event->title }}"
                  class="w-full h-full object-cover object-center select-none"
                  loading="lazy" />

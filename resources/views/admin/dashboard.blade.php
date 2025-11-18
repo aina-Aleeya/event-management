@@ -1,36 +1,12 @@
-<x-layouts.app>
-    {{-- Page header --}}
-    <x-slot name="header">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Admin Dashboard
-            </h2>
-
-            {{-- Navigation Bar --}}
-            <nav class="flex flex-wrap gap-2">
-                <a href="" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition">
-                    Dashboard
-                </a>
-                <a href="" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-                    Events
-                </a>
-                <a href="" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-                    Participants
-                </a>
-                {{-- <a href="" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-                    Reports
-                </a> --}}
-            </nav>
-        </div>
-    </x-slot>
-
+<x-layouts.app.admin>
     <div class="max-w-7xl mx-auto px-6 py-8">
 
         {{-- Stats Overview --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="p-6 bg-white rounded-xl shadow hover:shadow-md transition duration-200">
                 <p class="text-sm text-gray-500">Total Events</p>
-                <p class="text-3xl font-bold">{{ count($events) }}</p>
+                {{-- <p class="text-3xl font-bold">{{ count($events) }}</p> --}}
+                <p class="text-3xl font-bold">{{ count($events ?? []) }}</p>
             </div>
             <div class="p-6 bg-white rounded-xl shadow hover:shadow-md transition duration-200">
                 <p class="text-sm text-gray-500">Total Participants</p>
@@ -99,4 +75,4 @@
             </div>
         </div>
     </div>
-</x-layouts.app>
+</x-layouts.app.admin>

@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+
 use Livewire\Component;
 use App\Models\Penyertaan;
 use Illuminate\Support\Facades\Auth;
@@ -25,12 +26,15 @@ class PaymentForm extends Component
     public function loadRegistrations()
     {
         $pendaftarId = auth()->check() ? auth()->id() : session('guest_id');
-
         $this->registrations = Penyertaan::with('peserta', 'event')
             ->where('pendaftar_id', $pendaftarId)
             ->where('status_bayaran', 'pending')
             ->when($this->eventId, fn($q) => $q->where('event_id', $this->eventId))
             ->get();
+
+        if ($this->registrations->isEmpty()) {
+            return redirect()->route('home'); 
+        }
 
         if ($this->registrations->isEmpty()) {
             return redirect()->route('home'); 

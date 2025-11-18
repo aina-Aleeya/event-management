@@ -1,8 +1,8 @@
 <x-layouts.app>
     <div class="max-w-4xl mx-auto p-6 bg-white shadow rounded-lg mt-6">
         {{-- Event Poster --}}
-        @if ($event->poster)
-            <img src="{{ asset('storage/' . $event->poster) }}" alt=alt="{{ $event->title }}"
+        @if ($event->posters)
+            <img src="{{ asset('storage/' . $event->posters) }}" alt=alt="{{ $event->title }}"
                 class="w-full max-h-96 object-contain rounded-lg mb-4">
         @endif
 

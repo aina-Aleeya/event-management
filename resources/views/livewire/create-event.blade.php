@@ -16,62 +16,107 @@
                 <div>
                     <label class="font-medium">Event Title</label>
                     <input type="text" wire:model="title" class="w-full border rounded-lg p-2">
-                    @error('title') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    @error('title')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <!-- Event Type -->
                 <div>
                     <label class="font-medium">Event Type</label>
-                    <input type="text" wire:model="event_type" placeholder="Marathon, Seminar, etc." class="w-full border rounded-lg p-2">
-                    @error('event_type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    <select wire:model="event_type" class="w-full border rounded-lg p-2">
+                        <option value="" selected>-- Select Event Type --</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Entertainments">Entertainments</option>
+                        <option value="Seminars">Seminars</option>
+                        <option value="Exhibitions">Exhibitions</option>
+                        <option value="Business">Business</option>
+                    </select>
+                    @error('event_type')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <!-- Venue -->
                 <div>
                     <label class="font-medium">Venue</label>
                     <input type="text" wire:model="venue" class="w-full border rounded-lg p-2">
-                    @error('venue') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    @error('venue')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <!-- City -->
                 <div>
                     <label class="font-medium">City</label>
                     <input type="text" wire:model="city" class="w-full border rounded-lg p-2">
-                    @error('city') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    @error('city')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <!-- Contact Email -->
                 <div>
                     <label class="font-medium">Contact Email</label>
                     <input type="email" wire:model="contact_email" class="w-full border rounded-lg p-2">
-                    @error('contact_email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    @error('contact_email')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <!-- Contact Phone -->
                 <div>
                     <label class="font-medium">Contact Phone</label>
                     <input type="text" wire:model="contact_phone" class="w-full border rounded-lg p-2">
-                    @error('contact_phone') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    @error('contact_phone')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
 
             <!-- DESCRIPTION (Rich Text Editor) -->
             <div class="mt-4" wire:ignore>
                 <label class="font-medium">Description</label>
-                <textarea id="description" rows="5" class="w-full border rounded-lg p-2" placeholder="Type your event description...">
+                <textarea id="description" rows="5" class="w-full border rounded-lg p-2"
+                    placeholder="Type your event description...">
                     {{ $description }}
                 </textarea>
-                @error('description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                @error('description')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
 
             <!-- POSTER -->
             <div class="mt-4">
-                <label class="font-medium">Poster</label>
-                <input type="file" wire:model="poster" class="w-full">
-                @if ($poster)
-                    <img src="{{ $poster->temporaryUrl() }}" class="mt-2 w-40 h-40 object-cover rounded-lg">
+                <label class="font-medium mb-1 block">Poster</label>
+
+                <!-- Styled Choose Files Button -->
+                <label
+                    class="inline-block px-4 py-2 bg-blue-500 text-white font-medium rounded-lg cursor-pointer hover:bg-blue-600 transition">
+                    Choose Files
+                    <input type="file" wire:model="posters" multiple class="hidden">
+                </label>
+
+                <!-- Preview Images -->
+                @if ($posters && count($posters) > 0)
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        @foreach ($posters as $index => $image)
+                            <div class="relative w-32 h-32 rounded-lg overflow-hidden border shadow-sm">
+                                <img src="{{ $image->temporaryUrl() }}" class="w-full h-full object-cover">
+
+                                <!-- Remove Button -->
+                                <button type="button" wire:click.prevent="removePoster({{ $index }})"
+                                    class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600">
+                                    ×
+                                </button>
+                            </div>
+                        @endforeach
+                    </div>
                 @endif
-                @error('poster') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+
+                @error('posters')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
         </div>
 
@@ -82,13 +127,17 @@
                 <div>
                     <label class="font-medium">Start Date</label>
                     <input type="date" wire:model="start_date" class="w-full border rounded-lg p-2">
-                    @error('start_date') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    @error('start_date')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div>
                     <label class="font-medium">End Date</label>
                     <input type="date" wire:model="end_date" class="w-full border rounded-lg p-2">
-                    @error('end_date') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    @error('end_date')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div>
@@ -161,7 +210,8 @@
     </form>
 
     <!-- TINYMCE SCRIPT -->
-    <script src="https://cdn.tiny.cloud/1/1qbsfz0jz8ba91vynqnrlwj6cmuforoc5nroznedh5wbpozf/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.tiny.cloud/1/1qbsfz0jz8ba91vynqnrlwj6cmuforoc5nroznedh5wbpozf/tinymce/6/tinymce.min.js"
+        referrerpolicy="origin"></script>
     <script>
         function initTinyMCE() {
             tinymce.remove(); // clear existing editors first
@@ -172,20 +222,20 @@
                 plugins: 'lists link image media table code',
                 toolbar: 'undo redo | bold italic underline | bullist numlist | link image media table | code',
                 placeholder: "Type your event description...",
-                setup: function (editor) {
-                    editor.on('Change KeyUp', function () {
+                setup: function(editor) {
+                    editor.on('Change KeyUp', function() {
                         @this.set('description', editor.getContent());
                     });
                 }
             });
         }
 
-        document.addEventListener('livewire:load', function () {
+        document.addEventListener('livewire:load', function() {
             initTinyMCE();
         });
 
-      
-        document.addEventListener('livewire:navigated', function () {
+
+        document.addEventListener('livewire:navigated', function() {
             initTinyMCE();
         });
     </script>
