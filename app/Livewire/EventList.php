@@ -14,9 +14,10 @@ class EventList extends Component
 
     public function render()
     {
-        $query = Event::latest();
-
-  
+        $query = Event::whereHas('status', function ($q) {
+            $q->where('status', 'approved');
+        })->latest();
+        
         if ($this->limit) {
             $events = $query->take($this->limit)->get();
         } 

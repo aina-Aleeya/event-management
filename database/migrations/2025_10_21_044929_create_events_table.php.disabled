@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->date('start_date');
             $table->date('end_date');
-            $table->string('poster')->nullable();
+            $table->string('posters')->nullable();
             $table->string('categories')->nullable();
             $table->string('qr_code')->nullable();
             $table->string('event_link')->nullable();

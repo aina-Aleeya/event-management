@@ -3,7 +3,7 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             @forelse ($events as $event)
-                <div onclick="window.location='{{ route('event.details', ['id' => $event->id]) }}'"
+                <div onclick="window.location='{{ route('ads.click', ['id' => $event->id]) }}'"
                     class="group relative flex flex-col bg-white rounded-xl shadow-md hover:shadow-lg 
                            border border-gray-200 transition duration-200 overflow-hidden cursor-pointer">
 

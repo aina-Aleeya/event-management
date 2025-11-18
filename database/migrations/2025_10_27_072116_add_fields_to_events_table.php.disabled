@@ -30,7 +30,7 @@ public function down()
 {
     Schema::table('events', function (Blueprint $table) {
         $table->dropColumn([
-            'event_type', 'vanue','address', 'city', 'contact_email', 'contact_phone',
+            'event_type', 'venue','address', 'city', 'contact_email', 'contact_phone',
             'start_time', 'end_time', 'registration_deadline', 'entry_fee', 'max_participants'
         ]);
     });
