@@ -1,12 +1,34 @@
-<x-layouts.app.admin>
-    <div class="max-w-7xl mx-auto px-6 py-8">
+<x-layouts.app>
+
+    {{-- Organizer Dashboard Header --}}
+    <div class="max-w-7xl mx-auto px-6 py-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Organizer Dashboard</h2>
 
         {{-- Stats Overview --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="p-6 bg-white rounded-xl shadow hover:shadow-md transition duration-200">
-                <p class="text-sm text-gray-500">Total Events</p>
-                {{-- <p class="text-3xl font-bold">{{ count($events) }}</p> --}}
-                <p class="text-3xl font-bold">{{ count($events ?? []) }}</p>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+            <!-- Total Events -->
+            <div class="bg-white shadow-lg rounded-lg h-24 flex flex-col justify-between p-3 border-t-4 border-red-600">
+                <div class="flex justify-between items-start">
+                    <div class="text-[10px] font-semibold text-gray-700">Total Events</div>
+                    <div class="text-red-600">
+                        <i class="fas fa-calendar-alt text-gray-400 text-sm"></i>
+                    </div>
+                </div>
+                <div class="text-xl font-bold text-red-700 leading-none">{{ count($events) }}</div>
+                <div class="text-[10px] text-gray-500">&nbsp;</div>
+            </div>
+
+            <!-- Total Participants -->
+            <div class="bg-white shadow-lg rounded-lg h-24 flex flex-col justify-between p-3 border-t-4 border-red-600">
+                <div class="flex justify-between items-start">
+                    <div class="text-[10px] font-semibold text-gray-700">Total Participants</div>
+                    <div class="text-red-600">
+                        <i class="fas fa-users text-gray-400 text-sm"></i>
+                    </div>
+                </div>
+                <div class="text-xl font-bold text-red-700 leading-none">{{ $participantSummary->sum('total') }}</div>
+                <div class="text-[10px] text-gray-500">&nbsp;</div>
             </div>
 
             <!-- Total Ticket Sold -->
@@ -90,4 +112,5 @@
             </div>
         </div>
     </div>
-</x-layouts.app.admin>
+
+</x-layouts.app>

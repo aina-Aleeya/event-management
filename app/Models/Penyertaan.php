@@ -13,6 +13,9 @@ class Penyertaan extends Pivot
         'peserta_id',
         'kategori',
         'unique_id',
+        'status_bayaran',
+        'group_token',
+        'pendaftar_id',
     ];
 
     public function peserta()
@@ -25,16 +28,40 @@ class Penyertaan extends Pivot
         return $this->belongsTo(Event::class);
     }
 
+    public function pendaftar()
+    {
+        return $this->belongsTo(User::class, 'pendaftar_id');
+    }
+
     public function getKategoriNamaAttribute()
     {
+        $kategori = strtoupper($this->kategori);
+
+        $type = str_starts_with($kategori, 'I') ? 'Individual' : (str_starts_with($kategori, 'G') ? 'Group' : '-');
+
+        $kodUmurJantina = substr($kategori, -2);
+        
         $mapping = [
-            'AM' => 'Adult-Male',
-            'AF' => 'Adult-Female',
-            'KB' => 'Kid-Boy',
-            'KG' => 'Kid-Girl',
-            'El' => 'Elderly',
+            'AM' => 'Adult Male',
+            'AF' => 'Adult Female',
+            'KB' => 'Kid Boy',
+            'KG' => 'Kid Girl',
+            'EL' => 'Elderly',
         ];
 
-        return $mapping[$this->kategori] ?? $this->kategori;
+        $kategoriUmur = $mapping[$kodUmurJantina] ?? $kodUmurJantina;
+
+        return  "{$type} - {$kategoriUmur}";
     }
+    public function getJumlahBayaranAttribute()
+{
+    $bilPeserta = self::where('event_id', $this->event_id)
+        ->where('kategori', $this->kategori)
+        ->count();
+
+    $hargaSeorang = $this->event->entry_fee ?? 0;
+
+    return $hargaSeorang * $bilPeserta;
+}
+
 }

@@ -1,34 +1,12 @@
-<x-layouts.app.admin>
-    {{-- Page header --}}
-    <x-slot name="header">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Participants — {{ $event->title }}
-            </h2>
+<x-layouts.app>
+    <div class="max-w-7xl mx-auto px-6 py-6">
 
-            {{-- Navigation Bar --}}
-            <nav class="flex flex-wrap gap-2">
-                <a href="" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition">
-                    Dashboard
-                </a>
-                <a href="" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-                    Events
-                </a>
-                <a href="" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-                    Participants
-                </a>
-                {{-- <a href="" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-                    Reports
-                </a> --}}
-            </nav>
-        </div>
-    </x-slot>
+        <!-- Table Card -->
+        <div class="bg-white rounded-xl shadow overflow-hidden">
 
-    <div class="max-w-7xl mx-auto px-6 py-8">
-
-        {{-- Table Card --}}
-        <div class="bg-white rounded-xl shadow p-6">
-            <h1 class="text-xl font-semibold mb-4">Participant List</h1>
+            <div class="p-4 border-b">
+                <h2 class="text-lg font-semibold">Participant Overview</h2>
+            </div>
 
             <div class="overflow-x-auto">
                 <table class="w-full whitespace-no-wrap">
@@ -125,4 +103,5 @@
         </div>
 
     </div>
-</x-layouts.app.admin>
+
+</x-layouts.app>

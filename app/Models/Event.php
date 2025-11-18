@@ -58,7 +58,7 @@ class Event extends Model
     {
         return $this->belongsToMany(Peserta::class, 'penyertaan', 'event_id', 'peserta_id')
             ->using(\App\Models\Penyertaan::class)
-            ->withPivot('kategori', 'unique_id')
+            ->withPivot('kategori', 'unique_id','status_bayaran')
             ->withTimestamps();
     }
 
