@@ -93,7 +93,7 @@
 
                     <div class="border-t border-black my-1"></div>
 
-                    <a href="{{ route('admin.dashboard') }}"
+                    <a href="{{ route('organiser.dashboard') }}"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
                         <i class="icon-fa-dashboard mr-2"></i>Organizer Dashboard
                     </a>

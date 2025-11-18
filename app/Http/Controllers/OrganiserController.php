@@ -7,7 +7,7 @@ use App\Models\Event;
 use App\Models\Peserta;
 use Illuminate\Http\Request;
 
-class AdminController extends Controller
+class OrganiserController extends Controller
 {
 public function dashboard()
 {
@@ -42,7 +42,7 @@ public function dashboard()
         ->where('penyertaan.status_bayaran', 'complete')
         ->sum(\DB::raw('events.entry_fee'));
 
-    return view('admin.dashboard', compact(
+    return view('organiser.dashboard', compact(
         'events',
         'participantSummary',
         'totalTicketSold',
@@ -56,14 +56,14 @@ public function dashboard()
         $event = Event::with('pesertas.user')->findOrFail($eventId);
         $participants = $event->pesertas;
 
-        return view('admin.participants', compact('event', 'participants'));
+        return view('organiser.participants', compact('event', 'participants'));
     }
 
     public function viewParticipant($pesertaId)
     {
         $peserta = Peserta::findOrFail($pesertaId);
 
-        return view('admin.participant-details', compact('peserta'));
+        return view('organiser.participant-details', compact('peserta'));
     }
 
     // public function viewParticipant($pesertaId)
@@ -91,6 +91,6 @@ public function dashboard()
             $finalGroups[$category] = $participants->chunk(5); // 5 per group
         }
 
-        return view('admin.groups', compact('event', 'finalGroups'));
+        return view('organiser.groups', compact('event', 'finalGroups'));
     }
 }

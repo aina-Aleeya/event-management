@@ -27,7 +27,7 @@
                             <tr class="text-gray-700">
                                 <!-- NAME + AVATAR -->
                                 <td class="px-4 py-3">
-                                    <a href="{{ route('admin.participant.view', $p->id) }}"
+                                    <a href="{{ route('organiser.participant.view', $p->id) }}"
                                         class="flex items-center text-sm hover:opacity-80 transition">
 
 
@@ -96,7 +96,7 @@
 
         <!-- Back Button -->
         <div class="mt-6">
-            <a href="{{ route('admin.events.report', $event->id) }}"
+            <a href="{{ route('organiser.events.report', $event->id) }}"
                 class="px-4 py-2 bg-red-300 text-black rounded-lg hover:bg-red-500 transition">
                 Generate Report
             </a>

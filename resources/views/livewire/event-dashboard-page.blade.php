@@ -89,7 +89,7 @@
                 @forelse($participants->take(5) as $p)
                   <tr class="text-gray-700">
                     <td class="px-4 py-3">
-                      <a href="{{ route('admin.participant.view', $p->id) }}"
+                      <a href="{{ route('organiser.participant.view', $p->id) }}"
                         class="flex items-center text-sm hover:opacity-80 transition">
                         @if($p->gambar)
                           <img class="w-9 h-9 mr-3 rounded-full object-cover" src="{{ asset('storage/' . $p->gambar) }}"
@@ -143,7 +143,7 @@
           </div>
 
           <div class="bg-body-tertiary p-0 card-footer mt-4 text-center">
-            <a href="{{ route('admin.participants', $event->id) }}"
+            <a href="{{ route('organiser.participants', $event->id) }}"
               class="w-full py-2 btn btn-link btn-sm text-blue-600 hover:text-blue-800 flex justify-center items-center gap-1">
               Show all participants
               <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
@@ -182,7 +182,7 @@
 
           <!-- View Leaderboard Link -->
           <div class="bg-body-tertiary p-0 card-footer mt-4 text-center">
-            <a href="{{ route('admin.event.leaderboard', $event->id) }}"
+            <a href="{{ route('organiser.event.leaderboard', $event->id) }}"
               class="w-full py-2 btn btn-link btn-sm text-blue-600 hover:text-blue-800 flex justify-center items-center gap-1">
               View Full Leaderboard →
               <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
@@ -196,7 +196,7 @@
 
         <!-- Action Buttons -->
         <div class="flex flex-wrap gap-3">
-          <a href="{{ route('admin.ranking.report', $event->id) }}"
+          <a href="{{ route('organiser.ranking.report', $event->id) }}"
             class="px-4 py-2 bg-red-400 text-white rounded-lg hover:bg-red-500">Fill Ranking</a>
         </div>
       </div>

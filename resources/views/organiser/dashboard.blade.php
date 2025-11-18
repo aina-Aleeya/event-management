@@ -98,7 +98,7 @@
                         @foreach ($participantSummary as $item)
                             <tr class="border-t hover:bg-gray-50 transition-colors">
                                 <td class="p-3">
-                                    <a href="{{ route('admin.event.dashboard', $item->event_id) }}"
+                                    <a href="{{ route('organiser.event.dashboard', $item->event_id) }}"
                                        class="text-blue-600 hover:text-blue-800 font-medium underline">
                                         {{ $item->title ?? 'N/A' }}
                                     </a>

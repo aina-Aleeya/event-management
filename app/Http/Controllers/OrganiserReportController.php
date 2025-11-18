@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-class AdminReportController extends Controller
+class OrganiserReportController extends Controller
 {
     public function generate(Event $event)
     {
