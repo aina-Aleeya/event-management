@@ -31,51 +31,24 @@ class AdminController extends Controller
             ->groupBy('events.id', 'events.title', 'events.event_type', 'pesertas.category')
             ->get();
 
-    // Total tickets sold (status_bayaran = 'complete')
-    $totalTicketSold = \DB::table('penyertaan')
-        ->join('events', 'penyertaan.event_id', '=', 'events.id')
-        ->where('events.user_id', $userId)
-        ->where('penyertaan.status_bayaran', 'complete')
-        ->count();
-
-    // Total sales using entry_fee from events table
-    $totalSales = \DB::table('penyertaan')
-        ->join('events', 'penyertaan.event_id', '=', 'events.id')
-        ->where('events.user_id', $userId)
-        ->where('penyertaan.status_bayaran', 'complete')
-        ->sum(\DB::raw('events.entry_fee'));
-
-    return view('organiser.dashboard', compact(
-        'events',
-        'participantSummary',
-        'totalTicketSold',
-        'totalSales'
-    ));
-}
-
+        return view('admin.dashboard', compact('events', 'participantSummary'));
+    }
 
     public function participants($eventId)
     {
         $event = Event::with('pesertas.user')->findOrFail($eventId);
         $participants = $event->pesertas;
 
-        return view('organiser.participants', compact('event', 'participants'));
+        return view('admin.participants', compact('event', 'participants'));
     }
 
     public function viewParticipant($pesertaId)
     {
-        $peserta = Peserta::findOrFail($pesertaId);
+        $peserta = Peserta::with(['events' => function ($query) {
+            $query->withPivot('unique_id', 'kategori');
+        }])->findOrFail($pesertaId);
 
         return view('admin.participant-details', compact('peserta'));
-    }
-
-    // public function viewParticipant($pesertaId)
-    // {
-    //     $peserta = Peserta::with(['events' => function ($query) {
-    //         $query->withPivot('category'); // load category from pivot table
-    //     }])->findOrFail($pesertaId);
-
-        return view('organiser.participant-details', compact('peserta'));
     }
 
     public function groups($eventId)
