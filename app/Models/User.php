@@ -11,6 +11,29 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class User extends Authenticatable
 {
+
+    // public function IsAdmin()
+    // {
+    //     return $this->role === 'admin';
+    // }
+
+    // public function roles()
+    // {
+    //     return $this->belongsToMany(Role::class, 'role_user');
+    // }
+
+    // public function hasRole($role)
+    // {
+    //     return $this->roles()->where('name', $role)->exists();
+    // }
+
+
+    // public function assignRole($roleName)
+    // {
+    //     $role = Role::firstOrCreate(['name' => $roleName]);
+    //     $this->roles()->syncWithoutDetaching([$role->id]);
+    // }
+
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
@@ -23,6 +46,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -58,7 +82,7 @@ class User extends Authenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
 }

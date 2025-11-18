@@ -23,10 +23,10 @@
 
             <!-- Right: Home, Event, User Menu -->
             <div class="flex items-center space-x-4">
-                <a href="{{ route('dashboard') }}" class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Home</a>
-                <a href="{{ route('events.page') }}" class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">
-                    Events
-                </a>
+                <a href="{{ route('admin.dashboard') }}"
+                class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Home</a>
+                <a href="{{ route('admin.event-approval') }}"
+                class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Event Approval</a>
 
 
                 <!-- Right: Auth / User Menu -->

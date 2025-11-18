@@ -6,15 +6,14 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             @forelse ($events as $event)
-                <div onclick="window.location='{{ route('event.details', ['id' => $event->id]) }}'"
+                <div onclick="window.location='{{ route('ads.click', ['id' => $event->id]) }}'"
                     class="group relative flex flex-col bg-white rounded-xl shadow-md hover:shadow-lg 
                            border border-gray-100 transition duration-200 overflow-hidden cursor-pointer">
 
                     {{-- Image Section --}}
                     <div class="relative w-full h-48 overflow-hidden">
-                        <img src="{{ $event->poster ? asset('storage/' . $event->poster) : asset('img/sample-event.jpg') }}"
-                            alt="{{ $event->title }}"
-                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102">
+                        <img src="{{ !empty($event->posters) ? asset('storage/' . $event->posters[0]) : asset('img/sample-event.jpg') }}"
+                        alt="{{ $event->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent"></div>
                     </div>
 
@@ -55,7 +54,6 @@
                                 <span class="text-gray-400">Free</span>
                             @endif
                         </p>
-
 
                         {{-- View Details Button --}}
                         <div class="flex items-center justify-end mt-auto">

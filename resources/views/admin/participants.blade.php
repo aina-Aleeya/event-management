@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-layouts.app.admin>
     {{-- Page header --}}
     <x-slot name="header">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -74,4 +74,4 @@
         </div>
 
     </div>
-</x-layouts.app>
+</x-layouts.app.admin>

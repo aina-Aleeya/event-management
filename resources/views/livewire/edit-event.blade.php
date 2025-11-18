@@ -1,5 +1,5 @@
 <div class="max-w-6xl mx-auto bg-white shadow-lg rounded-2xl p-8 mt-10 space-y-8">
-    <h2 class="text-3xl font-bold text-gray-800 mb-4">Create New Event</h2>
+    <h2 class="text-3xl font-bold text-gray-800 mb-4">Edit Event</h2>
 
     @if (session()->has('success'))
         <div class="bg-green-100 text-green-700 p-3 rounded-lg">
@@ -7,7 +7,7 @@
         </div>
     @endif
 
-    <form wire:submit.prevent="save" class="space-y-6">
+    <form wire:submit.prevent="update" class="space-y-6">
         <!-- BASIC INFO -->
         <div>
             <h3 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Basic Information</h3>
@@ -88,36 +88,39 @@
 
             <!-- POSTER -->
             <div class="mt-4">
-                <label class="font-medium mb-1 block">Poster</label>
+                <label class="font-medium">Poster</label>
+                <input type="file" wire:model="newPoster" class="w-full">
 
-                <!-- Styled Choose Files Button -->
-                <label
-                    class="inline-block px-4 py-2 bg-blue-500 text-white font-medium rounded-lg cursor-pointer hover:bg-blue-600 transition">
-                    Choose Files
-                    <input type="file" wire:model="posters" multiple class="hidden">
-                </label>
+                {{-- Show new upload first --}}
+                @if ($newPoster)
+                    <img src="{{ $newPoster->temporaryUrl() }}" class="mt-2 w-40 h-40 object-cover rounded-lg">
 
-                <!-- Preview Images -->
-                @if ($posters && count($posters) > 0)
-                    <div class="flex flex-wrap gap-2 mt-2">
-                        @foreach ($posters as $index => $image)
-                            <div class="relative w-32 h-32 rounded-lg overflow-hidden border shadow-sm">
-                                <img src="{{ $image->temporaryUrl() }}" class="w-full h-full object-cover">
-
-                                <!-- Remove Button -->
-                                <button type="button" wire:click.prevent="removePoster({{ $index }})"
-                                    class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600">
-                                    ×
-                                </button>
-                            </div>
-                        @endforeach
-                    </div>
+                    {{-- Otherwise show existing posters --}}
+                @elseif ($posters)
+                    @foreach ((array) $posters as $poster)
+                        <img src="{{ Storage::url($poster) }}" class="mt-2 w-40 h-40 object-cover rounded-lg">
+                    @endforeach
+                @else
+                    {{-- Optional placeholder if no poster --}}
+                    <img src="{{ asset('img/sample-event.jpg') }}" class="mt-2 w-40 h-40 object-cover rounded-lg">
                 @endif
 
-                @error('posters')
+                @error('newPoster')
                     <span class="text-red-500 text-sm">{{ $message }}</span>
                 @enderror
             </div>
+            {{-- <div class="mt-4">
+                <label class="font-medium">Poster</label>
+                <input type="file" wire:model="newPoster" class="w-full">
+                @if ($newPoster)
+                    <img src="{{ $newPoster->temporaryUrl() }}" class="mt-2 w-40 h-40 object-cover rounded-lg">
+                @elseif ($posters)
+                    <img src="{{ Storage::url($posters) }}" class="mt-2 w-40 h-40 object-cover rounded-lg">
+                @endif
+                @error('newPoster')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
+            </div> --}}
         </div>
 
         <!-- EVENT DATES -->
@@ -126,7 +129,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="font-medium">Start Date</label>
-                    <input type="date" wire:model="start_date" class="w-full border rounded-lg p-2">
+                    <input type="date" name="start_date" class="w-full border rounded-lg p-2"
+                        value="{{ old('start_date', $event->start_date ? $event->start_date->format('Y-m-d') : '') }}">
                     @error('start_date')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
@@ -134,7 +138,8 @@
 
                 <div>
                     <label class="font-medium">End Date</label>
-                    <input type="date" wire:model="end_date" class="w-full border rounded-lg p-2">
+                    <input type="date" name="end_date" class="w-full border rounded-lg p-2"
+                        value="{{ old('end_date', $event->end_date ? $event->end_date->format('Y-m-d') : '') }}">
                     @error('end_date')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
@@ -152,7 +157,8 @@
 
                 <div>
                     <label class="font-medium">Registration Deadline</label>
-                    <input type="date" wire:model="registration_deadline" class="w-full border rounded-lg p-2">
+                    <input type="date" name="registration_deadline" class="w-full border rounded-lg p-2"
+                        value="{{ old('registration_deadline', $event->registration_deadline ? $event->registration_deadline->format('Y-m-d') : '') }}">
                 </div>
             </div>
         </div>
@@ -191,20 +197,22 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="font-medium">Ads Start Date</label>
-                    <input type="date" wire:model="ads_start_date" class="w-full border rounded-lg p-2">
+                    <input type="date" name="ads_start_date" class="w-full border rounded-lg p-2"
+                        value="{{ old('ads_start_date', $event->ads_start_date ? $event->ads_start_date->format('Y-m-d') : '') }}">
                 </div>
 
                 <div>
                     <label class="font-medium">Ads End Date</label>
-                    <input type="date" wire:model="ads_end_date" class="w-full border rounded-lg p-2">
+                    <input type="date" name="ads_end_date" class="w-full border rounded-lg p-2"
+                        value="{{ old('ads_end_date', $event->ads_end_date ? $event->ads_end_date->format('Y-m-d') : '') }}">
                 </div>
             </div>
         </div>
 
         <!-- SUBMIT -->
         <div class="flex justify-end">
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-                Save Event
+            <button wire:click="update" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                Resubmit
             </button>
         </div>
     </form>

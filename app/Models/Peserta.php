@@ -31,4 +31,9 @@ class Peserta extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'group_peserta', 'peserta_id', 'group_id');
+    }
 }

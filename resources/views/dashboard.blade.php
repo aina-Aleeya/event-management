@@ -19,17 +19,20 @@
 
             @auth
                 <!-- If logged in -->
-                <a href="{{ route('create-event') }}" class="inline-block bg-purple-300 text-gray-900 font-semibold px-6 py-3 rounded-lg shadow-md 
+                <a href="{{ route('create-event') }}"
+                    class="inline-block bg-purple-300 text-gray-900 font-semibold px-6 py-3 rounded-lg shadow-md 
                           hover:bg-sky-300 transition duration-300 ease-in-out z-20">
                     Create Event
                 </a>
             @else
                 <!-- If not logged in -->
-                <button x-data @click="
+                <button x-data
+                    @click="
                             if (confirm('You need to login first to create an event')) {
                                 window.location = '{{ route('login') }}';
                             }
-                        " class="inline-block bg-purple-300 text-gray-900 font-semibold px-6 py-3 rounded-lg shadow-md 
+                        "
+                    class="inline-block bg-purple-300 text-gray-900 font-semibold px-6 py-3 rounded-lg shadow-md 
                                hover:bg-sky-300 transition duration-300 ease-in-out z-20">
                     Create Event
                 </button>

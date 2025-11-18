@@ -115,7 +115,7 @@ class PesertaForm extends Component
         //dd(request()->userAgent());
 
         $peserta = Peserta::updateOrCreate(['ic' => $this->ic], $validated);
-        $peserta->events()->syncWithoutDetaching([$this->idIklan]);
+        // $peserta->events()->syncWithoutDetaching([$this->idIklan]);
 
         $kategori = $this->tentukanKategori($this->tarikh_lahir, $this->jantina);
 

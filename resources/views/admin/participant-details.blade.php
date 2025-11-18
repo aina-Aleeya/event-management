@@ -1,12 +1,12 @@
-<x-layouts.app>
+<x-layouts.app.admin>
     {{-- Page Header --}}
-    <x-slot name="header">
+    {{-- <x-slot name="header">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Participant Details — {{ $peserta->nama_penuh }}
             </h2>
 
-            {{-- Navigation Bar --}}
+            
             <nav class="flex flex-wrap gap-2">
                 <a href="" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition">
                     Dashboard
@@ -17,12 +17,12 @@
                 <a href="" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
                     Participants
                 </a>
-                {{-- <a href="" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
+                <a href="" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
                     Reports
-                </a> --}}
+                </a>
             </nav>
         </div>
-    </x-slot>
+    </x-slot> --}}
 
     <div class="max-w-4xl mx-auto px-6 py-8">
         {{-- Content Card --}}
@@ -41,19 +41,23 @@
             </div>
 
             {{-- DETAILS GRID --}}
+            @php
+                $pivot = $peserta->events->first()?->pivot;
+            @endphp
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                 <div class="p-3 bg-gray-50 rounded-lg">
                     <p class="text-sm text-gray-500 font-semibold">User ID</p>
                     <p class="font-medium text-gray-800">
-                        {{ $peserta->unique_id }}
+                        {{ $pivot->unique_id ?? '-' }}
                     </p>
                 </div>
 
                 <div class="p-3 bg-gray-50 rounded-lg">
                     <p class="text-sm text-gray-500 font-semibold">Category</p>
                     <p class="font-medium text-gray-800">
-                        {{ $peserta->category ?? '-' }}
+                        {{ $pivot->kategori ?? '-' }}
                     </p>
                 </div>
 
@@ -107,4 +111,4 @@
             </div>
         </div>
     </div>
-</x-layouts.app>
+</x-layouts.app.admin>
