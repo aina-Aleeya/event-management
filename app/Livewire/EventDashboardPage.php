@@ -12,33 +12,31 @@ class EventDashboardPage extends Component
     public $event;
     public $participants;
 
-    // Dashboard summary data
     public $totalParticipants = 0;
     public $completedPayments = 0;
     public $pendingPayments = 0;
     public $totalRevenue = 0;
 
-    // Ranking data
+    public $clickCount = 0; 
+
     public $topRankings = [];
 
     public function mount(Event $event)
     {
         $this->event = $event;
 
-        // Fetch participants
         $this->participants = Penyertaan::with('peserta')
             ->where('event_id', $event->id)
             ->get();
 
-        // Calculate summary
         $this->totalParticipants = $this->participants->count();
         $this->completedPayments = $this->participants->where('status_bayaran', 'complete')->count();
         $this->pendingPayments = $this->participants->where('status_bayaran', '!=', 'complete')->count();
 
-        // Revenue (assume event table ada column entry_fee)
         $this->totalRevenue = ($event->entry_fee ?? 0) * $this->completedPayments;
 
-        // Get top 3 rankings
+        $this->clickCount = $event->click_count ?? 0; 
+
         $this->topRankings = RankingReport::with('penyertaan.peserta')
             ->where('event_id', $event->id)
             ->orderBy('ranking')
@@ -56,6 +54,7 @@ class EventDashboardPage extends Component
             'pendingPayments' => $this->pendingPayments,
             'totalRevenue' => $this->totalRevenue,
             'topRankings' => $this->topRankings,
+            'clickCount' => $this->clickCount,
         ]);
     }
 }

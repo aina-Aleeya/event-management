@@ -56,7 +56,7 @@
                         {{-- View Details Button --}}
                         <div class="flex items-center justify-end mt-auto">
                             <a href="{{ route('ads.click', ['id' => $event->id])  }}"
-                               class="text-xs font-semibold uppercase bg-red-700/20 text-red-700 px-3 py-1.5 rounded-md 
+                               class="text-xs font-semibold uppercase bg-red-700/20 text-black px-3 py-1.5 rounded-md 
                                       hover:bg-red-700 hover:text-white transition-all duration-150">
                                 View Details
                             </a>

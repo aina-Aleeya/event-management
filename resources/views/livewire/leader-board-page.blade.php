@@ -60,8 +60,6 @@
 
     </div>
 
-
-
     <!-- All Participants (excluding top 3) -->
     <div class="bg-gray-50 rounded-lg overflow-hidden shadow">
         @foreach($allParticipants as $p)

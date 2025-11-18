@@ -1,75 +1,107 @@
 <x-layouts.app>
-    {{-- Page header --}}
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"></div>
-    <div class="flex justify-end mb-3">
-        <a href="{{ route('admin.events.report', $event->id) }}"
-            class="px-2 py-1 bg-purple-300 text-gray-900 rounded-lg hover:bg-sky-300 transition">
-            Generate Report
-        </a>
-    </div>
+    <div class="max-w-7xl mx-auto px-6 py-6">
 
+        <!-- Table Card -->
+        <div class="bg-white rounded-xl shadow overflow-hidden">
 
-    <div class="max-w-7xl mx-auto px-6 py-8">
-
-        {{-- Table Card --}}
-        <div class="bg-white rounded-xl shadow p-6">
-            <h1 class="text-xl font-semibold mb-4">Participant List — {{ $event->title }}</h1>
+            <div class="p-4 border-b">
+                <h2 class="text-lg font-semibold">Participant Overview</h2>
+            </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full shadow-sm rounded-lg overflow-hidden">
-                    <thead class="bg-gray-100 text-gray-700 uppercase text-sm sticky top-0">
-                        <tr>
-                            <th class="p-3 text-left">Name</th>
-                            <th class="p-3 text-left">Category</th>
-                            <th class="p-3 text-left">Unique ID</th>
-                            <th class="p-3 text-left">Payment Status</th>
+                <table class="w-full whitespace-no-wrap">
+                    <thead>
+                        <tr
+                            class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
+                            <th class="px-4 py-3">Participant</th>
+                            <th class="px-4 py-3">Category</th>
+                            <th class="px-4 py-3">Unique ID</th>
+                            <th class="px-4 py-3">Payment</th>
+                            <th class="px-4 py-3">Date</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach ($participants as $p)
-                            <tr class="border-t hover:bg-gray-50 transition">
-                                <td class="p-3">
+
+                    <tbody class="bg-white divide-y">
+
+                        @forelse ($participants as $p)
+                            <tr class="text-gray-700">
+                                <!-- NAME + AVATAR -->
+                                <td class="px-4 py-3">
                                     <a href="{{ route('admin.participant.view', $p->id) }}"
-                                        class="text-blue-600 hover:text-blue-800 underline">
-                                        {{ $p->nama_penuh }}
+                                        class="flex items-center text-sm hover:opacity-80 transition">
+
+
+                                        @if($p->gambar)
+                                            <img class="w-9 h-9 mr-3 rounded-full object-cover"
+                                                src="{{ asset('storage/' . $p->gambar) }}" alt="{{ $p->nama_penuh }}">
+                                        @else
+
+                                            <div
+                                                class="relative w-9 h-9 mr-3 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 font-bold">
+                                                {{ strtoupper(substr($p->nama_penuh, 0, 1)) }}
+                                            </div>
+                                        @endif
+
+                                        <div>
+                                            <p class="font-semibold">{{ $p->nama_penuh }}</p>
+                                            <p class="text-xs text-gray-600">
+                                                Registered Participant
+                                            </p>
+                                        </div>
                                     </a>
                                 </td>
-                                <td class="p-3">{{ $p->pivot->kategori_nama }}</td>
-                                <td class="p-3 font-medium text-gray-700">{{ $p->pivot->unique_id }}</td>
-                                <td class="p-3">
+
+
+                                <!-- CATEGORY -->
+                                <td class="px-4 py-3 text-sm">
+                                    {{ $p->pivot->kategori_nama }}
+                                </td>
+
+                                <!-- UNIQUE ID -->
+                                <td class="px-4 py-3 text-sm font-medium text-gray-700">
+                                    {{ $p->pivot->unique_id }}
+                                </td>
+
+                                <!-- PAYMENT STATUS -->
+                                <td class="px-4 py-3 text-xs">
                                     @if ($p->pivot->status_bayaran === 'complete')
-                                        <span class="px-3 py-1 text-sm rounded-full bg-green-100 text-green-700 font-medium">
+                                        <span class="px-2 py-1 text-green-700 bg-green-100 rounded-full font-semibold">
                                             Completed
                                         </span>
                                     @else
-                                        <span class="px-3 py-1 text-sm rounded-full bg-yellow-100 text-yellow-700 font-medium">
+                                        <span class="px-2 py-1 text-orange-700 bg-orange-100 rounded-full font-semibold">
                                             Pending
                                         </span>
                                     @endif
                                 </td>
-                            </tr>
-                        @endforeach
 
-                        @if ($participants->isEmpty())
+                                <!-- DATE -->
+                                <td class="px-4 py-3 text-sm">
+                                    {{ $p->pivot->created_at ? $p->pivot->created_at->format('d/m/Y') : '-' }}
+                                </td>
+
+                            </tr>
+                        @empty
                             <tr>
-                                <td colspan="4" class="p-4 text-center text-gray-500">
+                                <td colspan="5" class="px-4 py-6 text-center text-gray-500">
                                     No participants have registered yet.
                                 </td>
                             </tr>
-                        @endif
+                        @endforelse
+
                     </tbody>
                 </table>
             </div>
+        </div>
 
-            {{-- Back Button --}}
-            <div class="mt-6">
-                <a href="{{ url()->previous() }}"
-                    class="px-4 py-2 bg-gray-600 text-white font-medium rounded-lg hover:bg-gray-700 transition">
-                    ← Back
-                </a>
-            </div>
-
+        <!-- Back Button -->
+        <div class="mt-6">
+            <a href="{{ route('admin.events.report', $event->id) }}"
+                class="px-4 py-2 bg-red-300 text-black rounded-lg hover:bg-red-500 transition">
+                Generate Report
+            </a>
         </div>
 
     </div>
+
 </x-layouts.app>

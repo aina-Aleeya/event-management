@@ -9,27 +9,47 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    public function dashboard()
-    {
-        $events = Event::select('id', 'title', 'click_count')->get();
+public function dashboard()
+{
+    $userId = auth()->id();
 
-        // $participantSummary = Peserta::select('event_id', 'category')
-        //     ->selectRaw('COUNT(*) as total')
-        //     // ->selectRaw('SUM(payment_status = 1) as paid_count')
-        //     ->groupBy('event_id', 'category')
-        //     ->get();
+    // Events for logged-in user
+    $events = Event::select('id', 'title', 'click_count', 'entry_fee')
+        ->where('user_id', $userId)
+        ->get();
 
-$participantSummary = \DB::table('penyertaan')
-    ->join('events', 'penyertaan.event_id', '=', 'events.id')
-    ->join('pesertas', 'penyertaan.peserta_id', '=', 'pesertas.id')
-    ->select('events.id as event_id', 'events.title', 'events.event_type')
-    ->selectRaw('COUNT(pesertas.id) as total')
-    ->groupBy('events.id', 'events.title', 'events.event_type')
-    ->get();
+    // Total participants per event
+    $participantSummary = \DB::table('penyertaan')
+        ->join('events', 'penyertaan.event_id', '=', 'events.id')
+        ->join('pesertas', 'penyertaan.peserta_id', '=', 'pesertas.id')
+        ->select('events.id as event_id', 'events.title', 'events.event_type')
+        ->selectRaw('COUNT(pesertas.id) as total')
+        ->where('events.user_id', $userId)
+        ->groupBy('events.id', 'events.title', 'events.event_type')
+        ->get();
 
+    // Total tickets sold (status_bayaran = 'complete')
+    $totalTicketSold = \DB::table('penyertaan')
+        ->join('events', 'penyertaan.event_id', '=', 'events.id')
+        ->where('events.user_id', $userId)
+        ->where('penyertaan.status_bayaran', 'complete')
+        ->count();
 
-        return view('admin.dashboard', compact('events', 'participantSummary'));
-    }
+    // Total sales using entry_fee from events table
+    $totalSales = \DB::table('penyertaan')
+        ->join('events', 'penyertaan.event_id', '=', 'events.id')
+        ->where('events.user_id', $userId)
+        ->where('penyertaan.status_bayaran', 'complete')
+        ->sum(\DB::raw('events.entry_fee'));
+
+    return view('admin.dashboard', compact(
+        'events',
+        'participantSummary',
+        'totalTicketSold',
+        'totalSales'
+    ));
+}
+
 
     public function participants($eventId)
     {

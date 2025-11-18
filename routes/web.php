@@ -12,6 +12,7 @@ use App\Livewire\SenaraiPeserta;
 use App\Livewire\RankingReportPage;
 use App\Livewire\EventDashboardPage;
 use App\Livewire\LeaderBoardPage;
+use App\Livewire\HistoryPage;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminReportController;
@@ -22,21 +23,15 @@ Route::get('/', function () {
 
 Route::view('dashboard', 'dashboard')->name('dashboard');
 
-//Route::get('/events/{id}', EventDetails::class)->name('event.details');
-
 Route::get('/events', EventPage::class)->name('events.page');
 
 Route::get('/daftar/{id}', PesertaForm::class)->name('peserta.form');
 
-Route::get('/events/{id}', EventDetails::class)
-    ->name('event.details');
-    
-Route::get('/ads/{id}/click', [EventController::class, 'trackClick'])
-    ->name('ads.click');
+Route::get('/events/{id}', EventDetails::class)->name('event.details');
 
-Route::get('/events/{id}/participants', SenaraiPeserta::class)->name('event.participants');
+Route::get('/ads/{id}/click', [EventController::class, 'trackClick'])->name('ads.click');
 
-Route::get('/payment/{group_token}', PaymentForm::class)->name('payment.form');
+Route::get('/payment/{event_id}', PaymentForm::class)->name('payment.form');
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
@@ -50,8 +45,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 
+
 Route::middleware(['auth'])->group(function () {
 
+    Route::get('/history', HistoryPage::class)->name('history');
+    Route::get('/history-participant/{eventId}', SenaraiPeserta::class)->name('history.participant');
+    Route::get('/payment/{id}', action: PaymentForm::class)->name('payment.form');
    
     Route::get('/payment/{id}', action: PaymentForm::class)->name('payment.form');
     Route::get('/create-event', CreateEvent::class)->name('create-event');

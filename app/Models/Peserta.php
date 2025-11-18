@@ -23,7 +23,7 @@ class Peserta extends Model
     public function events()
     {
         return $this->belongsToMany(Event::class, 'penyertaan', 'peserta_id', 'event_id')
-             ->using(\App\Models\Penyertaan::class)
+            ->using(\App\Models\Penyertaan::class)
             ->withPivot('kategori', 'unique_id')
             ->withTimestamps();
     }
