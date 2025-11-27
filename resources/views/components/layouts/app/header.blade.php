@@ -6,7 +6,7 @@
     @livewireStyles
 </head>
 
-<body class="min-h-screen bg-white dark:bg-zinc-800">
+<body class="min-h-screen bg-white">
 
 
     <div x-data="{ sidebarOpen: false }" class="relative min-h-screen">

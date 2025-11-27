@@ -33,6 +33,11 @@ class Penyertaan extends Pivot
         return $this->belongsTo(User::class, 'pendaftar_id');
     }
 
+    public function group()
+    {
+        return $this->belongsTo(Group::class, 'group_id');
+    }
+
     public function getKategoriNamaAttribute()
     {
         $kategori = strtoupper($this->kategori);

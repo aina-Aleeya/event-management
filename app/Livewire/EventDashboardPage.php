@@ -10,14 +10,15 @@ use App\Models\RankingReport;
 class EventDashboardPage extends Component
 {
     public $event;
+
     public $participants;
+    public $latestParticipants = [];
 
     public $totalParticipants = 0;
     public $completedPayments = 0;
     public $pendingPayments = 0;
     public $totalRevenue = 0;
-
-    public $clickCount = 0; 
+    public $clickCount = 0;
 
     public $topRankings = [];
 
@@ -35,7 +36,13 @@ class EventDashboardPage extends Component
 
         $this->totalRevenue = ($event->entry_fee ?? 0) * $this->completedPayments;
 
-        $this->clickCount = $event->click_count ?? 0; 
+        $this->clickCount = $event->click_count ?? 0;
+
+        $this->latestParticipants = $event->pesertas()
+            ->withPivot('kategori', 'unique_id', 'status_bayaran', 'created_at')
+            ->orderBy('penyertaan.created_at', 'asc') // lama daftar dulu
+            ->take(5)
+            ->get();
 
         $this->topRankings = RankingReport::with('penyertaan.peserta')
             ->where('event_id', $event->id)
@@ -49,6 +56,7 @@ class EventDashboardPage extends Component
         return view('livewire.event-dashboard-page', [
             'event' => $this->event,
             'participants' => $this->participants,
+            'latestParticipants' => $this->latestParticipants,
             'totalParticipants' => $this->totalParticipants,
             'completedPayments' => $this->completedPayments,
             'pendingPayments' => $this->pendingPayments,
