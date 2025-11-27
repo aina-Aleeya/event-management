@@ -1,14 +1,24 @@
 <div class="bg-white min-h-screen py-10">
-    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
+    <div
+        class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
 
         <!-- Sidebar: Event Info -->
-        <div class="md:col-span-1 bg-gradient-to-b from-red-50 to-white p-5 rounded-xl shadow-sm flex flex-col items-center">
-            <img src="{{ asset('storage/' . $registrations->first()->event->poster) }}"
-                 alt="{{ $registrations->first()->event->title }}"
-                 class="w-full h-56 object-cover rounded-lg shadow-md">
+        <div
+            class="md:col-span-1 bg-gradient-to-b from-red-50 to-white p-5 rounded-xl shadow-sm flex flex-col items-center">
+            @php
+                $event = $registrations->first()->event;
+                $firstPoster = is_array($event->posters) && count($event->posters) > 0 ? $event->posters[0] : null;
+            @endphp
 
-            <h2 class="text-2xl font-bold mt-4 text-gray-800 text-center">{{ $registrations->first()->event->title }}</h2>
-            <p class="text-sm text-gray-600 mt-1 text-center">{{ $registrations->first()->event->venue ?? 'No venue info' }}</p>
+            <img src="{{ $firstPoster ? asset('storage/' . $firstPoster) : asset('img/sample-event.jpg') }}"
+                alt="Event Poster" class="w-full h-full object-cover"
+            alt="{{ $registrations->first()->event->title }}"
+            class="w-full h-56 object-cover rounded-lg shadow-md"/>
+
+            <h2 class="text-2xl font-bold mt-4 text-gray-800 text-center">{{ $registrations->first()->event->title }}
+            </h2>
+            <p class="text-sm text-gray-600 mt-1 text-center">
+                {{ $registrations->first()->event->venue ?? 'No venue info' }}</p>
 
             <div class="border-t mt-6 pt-4 w-full text-center">
                 <p class="font-semibold text-gray-800">Total Amount</p>
@@ -28,8 +38,8 @@
                         + Add Member
                     </button>
                 </div>
-                
-                @if($registrations->isEmpty())
+
+                @if ($registrations->isEmpty())
                     <p class="text-gray-600">No participants yet.</p>
                 @else
                     <div class="overflow-x-auto">
@@ -45,7 +55,7 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach($registrations as $index => $reg)
+                                @foreach ($registrations as $index => $reg)
                                     <tr>
                                         <td class="px-4 py-2 text-center w-12">{{ $index + 1 }}</td>
                                         <td class="px-4 py-2 text-center">{{ $reg->peserta->nama_penuh ?? '-' }}</td>

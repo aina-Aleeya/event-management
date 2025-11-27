@@ -31,6 +31,7 @@
                         <option value="Seminars">Seminars</option>
                         <option value="Exhibitions">Exhibitions</option>
                         <option value="Business">Business</option>
+                        <option value="Others">Others</option>
                     </select>
                     @error('event_type')
                         <span class="text-red-500 text-sm">{{ $message }}</span>

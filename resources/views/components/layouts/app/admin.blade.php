@@ -27,6 +27,8 @@
                 class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Home</a>
                 <a href="{{ route('admin.event-approval') }}"
                 class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Event Approval</a>
+                <a href="{{ route('admin.grouping.index') }}"
+                class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Grouping System</a>
 
 
                 <!-- Right: Auth / User Menu -->
