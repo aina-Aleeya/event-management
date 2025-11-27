@@ -9,8 +9,11 @@ class RankingReport extends Model
 {
     use HasFactory;
 
-    // Add event_id to fillable
-    protected $fillable = ['event_id', 'penyertaan_id', 'ranking'];
+    protected $fillable = [
+        'event_id',
+        'penyertaan_id',
+        'ranking',
+    ];
 
     public function penyertaan()
     {

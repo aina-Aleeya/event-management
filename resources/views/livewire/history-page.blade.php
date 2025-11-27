@@ -1,4 +1,4 @@
-<div class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-2xl border border-gray-200">
+<div class="max-w-4xl mx-auto p-6">
     <h1 class="text-2xl font-semibold mb-4">History Event Registered</h1>
     <div class="mb-8">
         <table class="w-full border border-gray-300 rounded-lg mb-3">
@@ -11,8 +11,9 @@
             </thead>
             <tbody>
                 @foreach ($historyEvent as $hs)
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-2  text-center"><a href="{{ route('history.participant', ['eventId' => $hs->event_id]) }}" class="underline">{{$hs->title ?? '-'}}</a></td>
+                    <tr class="hover:bg-gray-50 cursor-pointer"
+                        onclick="window.location='{{ route('history.participant', ['eventId' => $hs->event_id]) }}'">
+                        <td class="p-2  text-center">{{$hs->title ?? '-'}}</td>
                         <td class="p-2  text-center">{{$hs->total ?? '0'}}</td>
                         <td class="p-2  text-center">
                             @if ($hs->pending_count > 0 && $hs->payment_status === 'Pending')

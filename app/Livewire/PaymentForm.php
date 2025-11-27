@@ -44,19 +44,21 @@ class PaymentForm extends Component
         $this->totalAmount = $this->registrations->count() * $fee;
     }
 
-    public function payNow()
-    {
-        foreach ($this->registrations as $reg) {
-            $reg->update(['status_bayaran' => 'complete']);
-        }
-        session()->flash('success', 'Payment completed successfully!');
-        if (Auth::check()) {
-            return redirect()->route('history.participant', ['eventId' => $this->eventId]);
-        }
-
-        // Kalau guest, trigger modal
-        $this->showModal = true;
+public function payNow()
+{
+    foreach ($this->registrations as $reg) {
+        $reg->update(['status_bayaran' => 'complete']);
     }
+
+    session()->flash('success', 'Payment completed successfully!');
+
+    if (Auth::check()) {
+        return redirect()->route('history.participant', ['eventId' => $this->eventId]);
+    }
+
+    // If guest, trigger modal
+    $this->showModal = true;
+}
 
     public function closeModal()
     {
@@ -64,14 +66,15 @@ class PaymentForm extends Component
         $this->loadRegistrations();
     }
 
-    public function payLater()
-    {
-        foreach ($this->registrations as $reg) {
-            $reg->update(['status_bayaran' => 'pending']);
-        }
-        session()->flash('success', 'Payment marked as pending. You can pay later.');
-        $this->loadRegistrations();
+public function payLater()
+{
+    foreach ($this->registrations as $reg) {
+        $reg->update(['status_bayaran' => 'pending']);
     }
+    session()->flash('success', 'Payment marked as pending. You can pay later.');
+    return redirect()->route('dashboard');
+}
+
 
     public function addMember()
 {
