@@ -14,7 +14,7 @@ class OrganiserReportController extends Controller
             $query->withPivot(['kategori', 'status_bayaran']);
         }]);
 
-        $pdf = Pdf::loadView('admin.report', [
+        $pdf = Pdf::loadView('organiser.report', [
             'event' => $event,
             'participants' => $event->pesertas,
         ]);

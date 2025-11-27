@@ -8,24 +8,21 @@
 
 <body class="min-h-screen bg-white dark:bg-zinc-800">
 
-
-    <div x-data="{ sidebarOpen: false }" class="relative min-h-screen">
+    <div x-data="{ sidebarOpen: false }" wire:ignore class="relative min-h-screen">
 
         <!-- Header Section -->
         <header class="fixed top-0 left-0 z-50 w-full bg-white shadow-md border-b border-gray-200">
             <div class="flex w-full items-center justify-between px-6 py-3">
 
-        <!-- Left: Logo + System Name -->
-        <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 hover:opacity-90 transition" wire:navigate>
-            <!-- Logo Circle with Gradient for Energy -->
-            <div class="flex aspect-square w-10 h-10 items-center justify-center rounded-full bg-gradient-to-tr from-purple-500 via-pink-500 to-white-500 text-white shadow-lg">
-                <x-app-logo-icon class="w-5 h-5 fill-current" />
-            </div>
-            <!-- System Name -->
-            <span class="font-sans font-bold text-black text-lg md:text-xl tracking-wide">
-                GreatEvent
-            </span>
-        </a>
+                <!-- Left: Logo + System Name -->
+                <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 hover:opacity-90 transition"
+                    wire:navigate>
+                    <div
+                        class="flex aspect-square w-10 h-10 items-center justify-center rounded-full bg-gradient-to-tr from-purple-500 via-pink-500 to-red-500 text-white shadow-lg">
+                        <x-app-logo-icon class="w-5 h-5 fill-current" />
+                    </div>
+                    <span class="font-sans font-bold text-black text-lg md:text-xl tracking-wide">GreatEvent</span>
+                </a>
 
                 <!-- Right: Menu / Auth -->
                 <div class="flex items-center space-x-4">
@@ -33,58 +30,24 @@
                         class="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition">Home</a>
                     <a href="{{ route('events.page') }}"
                         class="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition">Events</a>
-                    <a href="{{ route('history') }}"
-                        class="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition">History</a>
-
                     @auth
-                        <!-- User Dropdown -->
-                        <flux:dropdown position="top" align="end">
-                            <flux:profile class="cursor-pointer" :initials="auth()->user()->initials()" />
-
-                            <flux:menu class="bg-white dark:bg-gray-800">
-                                <flux:menu.radio.group>
-                                    <div class="p-0 text-sm font-normal">
-                                        <div class="flex items-center gap-2 px-2 py-2 text-start text-sm">
-                                            <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
-                                                <span
-                                                    class="flex h-full w-full items-center justify-center rounded-lg bg-red-300 text-white dark:bg-red-400">
-                                                    {{ auth()->user()->initials() }}
-                                                </span>
-                                            </span>
-
-                                            <div class="grid flex-1 text-start text-sm leading-tight">
-                                                <span
-                                                    class="truncate font-semibold text-gray-900 dark:text-white">{{ auth()->user()->name }}</span>
-                                                <span
-                                                    class="truncate text-xs text-gray-600 dark:text-gray-400">{{ auth()->user()->email }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </flux:menu.radio.group>
-
-                                <flux:menu.separator />
-
-                                <flux:menu.radio.group>
-                                    <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
-                                        {{ __('Settings') }}
-                                    </flux:menu.item>
-                                </flux:menu.radio.group>
-
-                                <flux:menu.separator />
-
-                                <form method="POST" action="{{ route('logout') }}" class="w-full">
-                                    @csrf
-                                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle"
-                                        class="w-full text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30">
-                                        {{ __('Log Out') }}
-                                    </flux:menu.item>
-                                </form>
-                            </flux:menu>
-                        </flux:dropdown>
+                        <!-- Sidebar Toggle Button -->
+                        <button @click="sidebarOpen = !sidebarOpen" 
+                            class="flex items-center gap-2 px-3 py-1.5 bg-white rounded-lg shadow hover:bg-gray-100 focus:outline-none">
+                            <span
+                                class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-red-300 text-white">
+                                {{ auth()->user()->initials() }}
+                            </span>
+                            <span class="font-semibold text-gray-900">{{ auth()->user()->name }}</span>
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
                     @else
                         <!-- Before Login -->
                         <a href="{{ route('login') }}"
-                            class="text-sm font-medium text-black bg-red-200 px-3 py-1.5 rounded-lg hover:bg-red-400 transition">Login</a>
+                            class="text-sm font-medium text-black bg-red-200 px-3 py-1.5 rounded-lg hover:bg-red-300 transition">Login</a>
                         <a href="{{ route('register') }}"
                             class="text-sm font-medium text-white bg-red-400 px-3 py-1.5 rounded-lg hover:bg-red-500 transition">Register</a>
                     @endauth
@@ -114,22 +77,26 @@
                 <nav class="flex-grow py-2 px-2 space-y-1">
                     <a href="{{ route('profile.edit') }}"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
-                        <i class="icon-fa-gear mr-2"></i>Settings
+                        <i class="fa-solid fa-gear mr-2"></i>Settings
                     </a>
                     <a href="{{ route('history') }}"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
-                        <i class="icon-fa-ticket mr-2"></i>My Ticket History
+                        <i class="fa-solid fa-ticket mr-2"></i>My Ticket History
                     </a>
                     <a href="{{ route('create-event') }}"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
-                        <i class="icon-fa-calendar mr-2"></i>Create Event
+                        <i class="fa-solid fa-calendar mr-2"></i>Create Event
                     </a>
 
                     <div class="border-t border-black my-1"></div>
 
                     <a href="{{ route('organiser.dashboard') }}"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
-                        <i class="icon-fa-dashboard mr-2"></i>Organizer Dashboard
+                        <i class="fa-solid fa-laptop-file mr-2"></i>Organizer Dashboard
+                    </a>
+                    <a href="{{ route('organiser.check-event') }}"
+                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
+                        <i class="fa-solid fa-clipboard-check mr-2"></i>My Event Status
                     </a>
                 </nav>
 
@@ -139,15 +106,16 @@
                         @csrf
                         <button type="submit"
                             class="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-md">
-                            <i class="icon-fa-sign-out mr-2"></i>Log out
+                            <i class="fa-solid fa-right-from-bracket mr-2"></i>Log out
                         </button>
                     </form>
                 </div>
+
             </aside>
         @endauth
 
         <!-- Page Content -->
-        <main class="pt-9">
+        <main class="pt-8.5">
             {{ $slot }}
         </main>
 
@@ -156,6 +124,18 @@
     @livewireScripts
     @fluxScripts
     @stack('scripts')
+
+    <script>
+        function sidebar() {
+            return {
+                sidebarOpen: localStorage.getItem('sidebarOpen') === 'true' || false,
+                toggle() {
+                    this.sidebarOpen = !this.sidebarOpen;
+                    localStorage.setItem('sidebarOpen', this.sidebarOpen);
+                }
+            }
+        }
+    </script>
 </body>
 
 </html>
