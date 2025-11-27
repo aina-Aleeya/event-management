@@ -44,6 +44,5 @@
                 <p class="text-gray-500">No events available for grouping.</p>
             @endforelse
         </div>
-
     </div>
 </x-layouts.app.admin>

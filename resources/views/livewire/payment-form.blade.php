@@ -1,14 +1,24 @@
 <div class="bg-white min-h-screen py-10">
-    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
+    <div
+        class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
 
         <!-- Sidebar: Event Info -->
-        <div class="md:col-span-1 bg-gradient-to-b from-red-50 to-white p-5 rounded-xl shadow-sm flex flex-col items-center">
-            <img src="{{ asset('storage/' . $registrations->first()->event->poster) }}"
-                 alt="{{ $registrations->first()->event->title }}"
-                 class="w-full h-56 object-cover rounded-lg shadow-md">
+        <div
+            class="md:col-span-1 bg-gradient-to-b from-red-50 to-white p-5 rounded-xl shadow-sm flex flex-col items-center">
+            @php
+                $event = $registrations->first()->event;
+                $firstPoster = is_array($event->posters) && count($event->posters) > 0 ? $event->posters[0] : null;
+            @endphp
 
-            <h2 class="text-2xl font-bold mt-4 text-gray-800 text-center">{{ $registrations->first()->event->title }}</h2>
-            <p class="text-sm text-gray-600 mt-1 text-center">{{ $registrations->first()->event->venue ?? 'No venue info' }}</p>
+            <img src="{{ $firstPoster ? asset('storage/' . $firstPoster) : asset('img/sample-event.jpg') }}"
+                alt="Event Poster" class="w-full h-full object-cover"
+            alt="{{ $registrations->first()->event->title }}"
+            class="w-full h-56 object-cover rounded-lg shadow-md"/>
+
+            <h2 class="text-2xl font-bold mt-4 text-gray-800 text-center">{{ $registrations->first()->event->title }}
+            </h2>
+            <p class="text-sm text-gray-600 mt-1 text-center">
+                {{ $registrations->first()->event->venue ?? 'No venue info' }}</p>
 
             <div class="border-t mt-6 pt-4 w-full text-center">
                 <p class="font-semibold text-gray-800">Total Amount</p>
@@ -28,8 +38,8 @@
                         + Add Member
                     </button>
                 </div>
-                
-                @if($registrations->isEmpty())
+
+                @if ($registrations->isEmpty())
                     <p class="text-gray-600">No participants yet.</p>
                 @else
                     <div class="overflow-x-auto">
@@ -45,13 +55,13 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach($registrations as $index => $reg)
+                                @foreach ($registrations as $index => $reg)
                                     <tr>
                                         <td class="px-4 py-2">{{ $index + 1 }}</td>
                                         <td class="px-4 py-2">{{ $reg->peserta->nama_penuh ?? '-' }}</td>
                                         <td class="px-4 py-2">{{ $reg->peserta->ic ?? '-' }}</td>
                                         <td class="px-4 py-2">{{ $reg->peserta->kelas ?? '-' }}</td>
-                                        <td class="px-4 py-2">{{ $reg->kategori_nama ?? $reg->kategori ?? '-' }}</td>
+                                        <td class="px-4 py-2">{{ $reg->kategori_nama ?? ($reg->kategori ?? '-') }}</td>
                                         <td class="px-4 py-2 text-center">
                                             <button wire:click="deleteParticipant({{ $reg->id }})"
                                                 class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg shadow text-sm transition">
@@ -89,10 +99,11 @@
                     </div>
                 @endif
 
-                @if($showModal)
+                @if ($showModal)
                     <div class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
                         <!-- Modal Content -->
-                        <div class="mt-10 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-80 text-center pointer-events-auto">
+                        <div
+                            class="mt-10 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-80 text-center pointer-events-auto">
                             <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">Please Login</h2>
                             <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm">
                                 You need to login to see participants registered list.
@@ -104,7 +115,7 @@
                                     Login
                                 </a>
                                 <button wire:click="closeModal"
-                                        class="bg-gray-200 hover:bg-gray-300 text-gray-900 px-4 py-2 rounded-lg transition">
+                                    class="bg-gray-200 hover:bg-gray-300 text-gray-900 px-4 py-2 rounded-lg transition">
                                     Stay as Guest
                                 </button>
                             </div>

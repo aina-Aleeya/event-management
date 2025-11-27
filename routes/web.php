@@ -63,8 +63,8 @@ Route::prefix('admin')->group(function() {
 //     });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/organiser/dashboard', OrganiserDashboard::class)
-        ->name('organiser.dashboard');
+    Route::get('/organiser/check-event', OrganiserDashboard::class)
+        ->name('organiser.check-event');
 });
 Route::get('/payment/{event_id}', PaymentForm::class)->name('payment.form');
 
