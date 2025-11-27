@@ -18,6 +18,10 @@ public function dashboard()
         ->where('user_id', $userId)
         ->get();
 
+    $events = Event::whereHas('status', function ($query) {
+            $query->where('status', 'approved');
+        })->get();
+
     // Total participants per event
     $participantSummary = \DB::table('penyertaan')
         ->join('events', 'penyertaan.event_id', '=', 'events.id')

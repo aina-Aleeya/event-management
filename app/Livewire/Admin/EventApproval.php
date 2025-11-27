@@ -46,30 +46,10 @@ class EventApproval extends Component
         session()->flash('message', 'Event rejected successfully.');
     }
 
-    // public function rejectEvent($eventId, $reason)
-    // {
-    //     $this->validate([
-    //         'reason.' . $eventId => 'required|string|min:5',
-    //     ], [
-    //         'reason.' . $eventId . '.required' => 'Please provide a reason for rejection.',
-    //         'reason.' . $eventId . '.min' => 'The reason must be at least 5 characters.',
-    //     ]);
-
-    //     EventStatus::where('event_id', $eventId)->update([
-    //         'status' => 'rejected',
-    //         'rejection_reason' => $reason,
-    //     ]);
-
-    //     // Optional: clear input after submission
-    //     unset($this->reason[$eventId]);
-
-    //     session()->flash('message', 'Event rejected successfully.');
-    // }
-
     public function render()
     {
         return view('livewire.admin.event-approval', [
             'pendingEvents' => Event::whereHas('status', fn($q) => $q->where('status', 'pending'))->get(),
-        ]);
+        ])->layout('components.layouts.app.admin');
     }
 }
