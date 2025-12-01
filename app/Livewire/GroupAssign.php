@@ -36,7 +36,6 @@ class GroupAssign extends Component
 
         // groups as array for blade
         $this->groups = $this->event->groups->map(function($g) {
-            // convert pesertas relation to array (Livewire can't access eloquent relations inside nested arrays reliably)
             $g->pesertas = $g->pesertas->map(function($p) {
                 return [
                     'id' => $p->id,
