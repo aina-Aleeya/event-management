@@ -165,7 +165,7 @@ class PesertaForm extends Component
     {
         $savedIds = [];
 
-        $groupToken = $this->groupToken ?? \Str::uuid()->toString();
+        $groupToken = $this->groupToken ?? str()->uuid();
 
         if (auth()->check()) {
             $pendaftarId = auth()->id();

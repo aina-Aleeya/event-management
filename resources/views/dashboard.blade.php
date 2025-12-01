@@ -1,6 +1,5 @@
 <x-layouts.app :title="__('Dashboard')">
 
-    <!-- Hero Section -->
 <!-- Hero Section -->
 <section
     class="relative flex flex-col md:flex-row items-center justify-between h-[75vh] overflow-hidden px-10 text-gray-800 bg-white">
