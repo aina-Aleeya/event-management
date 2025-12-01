@@ -27,6 +27,9 @@ class RankingReportPage extends Component
     }
     // Triggered when user types
 
+    // ----------------------------
+    // Triggered when user types
+    // ----------------------------
     public function updatedSearch($value, $key)
     {
         $slot = (int) $key;
@@ -49,6 +52,9 @@ class RankingReportPage extends Component
         $this->suggestions[$slot] = $this->getSuggestions($value);
     }
 
+    // ----------------------------
+    // Suggestion logic
+    // ----------------------------
     private function getSuggestions($search)
     {
         if (!$search)

@@ -92,13 +92,12 @@
             </div>
         </div>
 
-        {{-- Participant Summary --}}
-        <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-6">Participant Summary</h2>
-
+        {{-- Event Summary --}}
+        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+            <h2 class="text-lg font-semibold mb-4 text-gray-800">Event Summary</h2>
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-gray-100 text-gray-700 text-sm uppercase tracking-wide">
+                <table class="w-full table-auto text-sm border border-gray-200 rounded-lg overflow-hidden">
+                    <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
                         <tr>
                             <th class="p-3">Event</th>
                             <th class="p-3">Event Type</th>
@@ -107,10 +106,10 @@
                     </thead>
                     <tbody class="text-gray-800">
                         @foreach ($participantSummary as $item)
-                            <tr class="border-t hover:bg-gray-50 transition">
+                            <tr class="border-t hover:bg-gray-50 transition-colors">
                                 <td class="p-3">
-                                    <a href="{{ route('admin.participants', $item->event_id) }}"
-                                       class="text-indigo-600 hover:text-indigo-800 font-semibold hover:underline">
+                                    <a href="{{ route('organiser.event.dashboard', $item->event_id) }}"
+                                       class="text-blue-600 hover:text-blue-800 font-medium underline">
                                         {{ $item->title ?? 'N/A' }}
                                     </a>
                                 </td>

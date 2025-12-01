@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-layouts.app.admin>
   <div class="max-w-7xl mx-auto px-6 py-6">
 
     <h2 class="text-xl font-semibold text-gray-800 mb-4">
@@ -331,4 +331,4 @@
     </div>
 
 
-</x-layouts.app>
+</x-layouts.app.admin>

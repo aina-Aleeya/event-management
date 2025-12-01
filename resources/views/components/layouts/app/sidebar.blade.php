@@ -4,7 +4,7 @@
     @include('partials.head')
     @livewireStyles
 </head>
-<body class="min-h-screen bg-white dark:bg-zinc-800">
+<body class="min-h-screen bg-white">
 
     <!-- Sidebar (desktop & mobile) -->
     <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-teal-50 dark:bg-zinc-900 dark:border-zinc-700 text-gray-900 dark:text-gray-100">
