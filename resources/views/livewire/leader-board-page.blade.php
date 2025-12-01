@@ -1,81 +1,111 @@
-<div class="p-6 bg-white min-h-screen">
-    <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">
-        Leaderboard {{ $event->title ?? '' }}
-    </h2>
+<div class="max-w-4xl mx-auto px-4 py-10">
+    <!-- Title -->
+    <h1 class="text-3xl font-bold mb-6 text-center">
+        🏆 Leaderboard — {{ $event->title }}
+    </h1>
 
-    <!-- Podium Top 3 -->
-    <div class="flex items-end justify-center gap-4 mb-10">
-        @php
+    <!-- Category Switch -->
+    <div class="flex justify-center mb-6">
+        <div class="bg-gray-200 rounded-lg p-1 flex space-x-1">
+            <button wire:click="$set('category', 'Individu')" class="px-4 py-2 rounded-md text-sm font-semibold 
+            {{ $category === 'Individu' ? 'bg-red-500 text-white' : 'text-gray-700 hover:bg-gray-300' }}">
+                Individu
+            </button>
+            <button wire:click="$set('category', 'Berkumpulan')" class="px-4 py-2 rounded-md text-sm font-semibold 
+            {{ $category === 'Berkumpulan' ? 'bg-red-500 text-white' : 'text-gray-700 hover:bg-gray-300' }}">
+                Berkumpulan
+            </button>
+        </div>
+    </div>
 
-            $first = $topThree[0] ?? null;
-            $second = $topThree[1] ?? null;
-            $third = $topThree[2] ?? null;
+    <!-- TOP 3 PODIUM -->
+    <div class="flex justify-center items-end gap-4 my-10">
 
-            $podium = [
-                ['rank' => 2, 'data' => $second],
-                ['rank' => 1, 'data' => $first],
-                ['rank' => 3, 'data' => $third],
-            ];
-        @endphp
-
-        @forelse($podium as $p)
+        @foreach ($topThree as $index => $r)
             @php
-                $r = $p['data'];
-                $rank = $p['rank'];
-                if (!$r)
-                    continue;
+                $rank = $index + 1;
 
-                $peserta = $r->penyertaan->peserta ?? null;
-                $style = $this->getRankStyle($rank);
+                $styles = [
+                    1 => ['h' => 'h-40', 'color' => 'bg-yellow-400', 'label' => '1st'],
+                    2 => ['h' => 'h-32', 'color' => 'bg-gray-400', 'label' => '2nd'],
+                    3 => ['h' => 'h-28', 'color' => 'bg-orange-500', 'label' => '3rd'],
+                ];
             @endphp
 
-            <div class="flex flex-col items-center w-1/3 px-1">
-                <div class="relative mb-2">
-                    <img src="{{ $peserta && $peserta->gambar
-            ? asset('storage/' . $peserta->gambar)
-            : 'https://api.dicebear.com/8.x/adventurer/svg?seed=' . ($peserta->nama_penuh ?? 'unknown') }}"
-                        alt="{{ $peserta->nama_penuh ?? 'Unknown' }}"
-                        class="rounded-full object-cover border-4 border-[#0F101A] ring-4 {{ $style['ring'] }} shadow-lg {{ $style['avatar'] }}" />
-                    @if($rank == 1)
-                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 text-yellow-400 text-3xl transform rotate-12">
-                        </div>
-                    @endif
+            <div class="flex flex-col items-center">
+                <!-- Avatar -->
+                <div class="mb-3">
+                    <div class="w-20 h-20 rounded-full ring-4 ring-white overflow-hidden shadow">
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode($category === 'Individu' ? $r->penyertaan->peserta->nama_penuh : $r->group_name) }}&background=random"
+                            class="w-full h-full object-cover">
+                    </div>
                 </div>
 
-                <p class="font-bold {{ $style['nameText'] }} truncate max-w-full text-gray-800 text-center">
-                    {{ $peserta->nama_penuh ?? $r->penyertaan->group_token ?? 'Unknown' }}
+                <!-- Name -->
+                <p class="text-center font-semibold text-gray-800 w-28 truncate">
+                    @if ($category === 'Individu')
+                        {{ $r->penyertaan->peserta->nama_penuh }}
+                    @else
+                        {{ $r->group_name }}
+                    @endif
                 </p>
 
+                @if ($category === 'Berkumpulan')
+                    <p class="text-xs text-gray-500 text-center w-32">
+                        {{ $r->group_members }}
+                    </p>
+                @endif
+
+                <!-- Pillar -->
                 <div
-                    class="relative w-full {{ $style['height'] }} {{ $style['bg'] }} rounded-t-lg mt-3 flex items-center justify-center border-b-8 {{ $style['border'] }} shadow-2xl">
-                    <span class="text-5xl md:text-6xl font-black text-white/50">{{ $rank }}</span>
+                    class="{{ $styles[$rank]['h'] }} w-20 mt-4 {{ $styles[$rank]['color'] }} rounded-t-lg flex justify-center items-start pt-3 shadow">
+                    <span class="text-white text-xl font-bold opacity-60">
+                        {{ $styles[$rank]['label'] }}
+                    </span>
                 </div>
             </div>
 
-        @empty
-            <div class="text-gray-800 font-bold text-center w-full">
-                No ranking at this moment
-            </div>
-        @endforelse
-
-    </div>
-
-    <!-- All Participants (excluding top 3) -->
-    <div class="bg-gray-50 rounded-lg overflow-hidden shadow">
-        @foreach($allParticipants as $p)
-            @if(!$p->rankingReport || $p->rankingReport->ranking > 3)
-                <div class="flex items-center p-3 border-b border-gray-200 hover:bg-gray-100 transition">
-                    <div class="w-10 text-center font-bold text-gray-800">
-                        {{ $p->rankingReport->ranking ?? '-' }}
-                    </div>
-                    <img src="{{ $p->peserta && $p->peserta->gambar ? asset('storage/' . $p->peserta->gambar) : 'https://api.dicebear.com/8.x/adventurer/svg?seed=unknown' }}"
-                        alt="{{ $p->peserta->nama_penuh ?? $p->group_token ?? 'Unknown' }}"
-                        class="w-12 h-12 rounded-full border-2 border-gray-400 mx-3" />
-                    <div class="text-gray-800 font-semibold">
-                        {{ $p->peserta->nama_penuh ?? $p->group_token ?? 'Unknown' }}
-                    </div>
-                </div>
-            @endif
         @endforeach
     </div>
+
+    <!-- FULL RANK LIST -->
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-bold mb-4">
+            Ranking List — {{ $category }}
+        </h2>
+
+        <table class="w-full text-sm">
+            <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+                <tr>
+                    <th class="p-2 w-16">Rank</th>
+                    <th class="p-2">Name</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @forelse ($rankList as $r)
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-3 font-bold">#{{ $r->ranking }}</td>
+
+                        <td class="p-3">
+                            @if ($category === 'Individu')
+                                {{ $r->penyertaan->peserta->nama_penuh }}
+                            @else
+                                <div class="font-semibold">{{ $r->group_name }}</div>
+                                <div class="text-xs text-gray-500">{{ $r->group_members }}</div>
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="2" class="text-center p-4 text-gray-500">
+                            No ranking data yet.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+
 </div>

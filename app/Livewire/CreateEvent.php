@@ -126,6 +126,6 @@ class CreateEvent extends Component
 
     public function render()
     {
-        return view('livewire.create-event');
+        return view('livewire.create-event') ;
     }
 }

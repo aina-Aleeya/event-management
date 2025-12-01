@@ -12,7 +12,7 @@ use App\Models\Peserta;
 class RankingReportPage extends Component
 {
     public $eventId;
-    public $category = 'Individu'; // 'Individu' or 'Berkumpulan'
+    public $category = 'Individu';
     public $search = [];
     public $suggestions = [1 => [], 2 => [], 3 => []];
     public $ranking = [1 => null, 2 => null, 3 => null];
@@ -25,6 +25,7 @@ class RankingReportPage extends Component
         $this->eventId = is_object($event) ? $event->id : $event;
         $this->loadMiniLeaderboard();
     }
+    // Triggered when user types
 
     // ----------------------------
     // Triggered when user types
@@ -32,6 +33,22 @@ class RankingReportPage extends Component
     public function updatedSearch($value, $key)
     {
         $slot = (int) $key;
+
+        // Bila user padam input
+        if ($value === "" || $value === null) {
+
+            // Reset suggestion & ranking slot
+            $this->suggestions[$slot] = [];
+            $this->ranking[$slot] = null;
+            $this->rankingGroup[$slot] = null;
+            $this->selectedNames[$slot] = null;
+
+            // Reload mini leaderboard
+            $this->loadMiniLeaderboard();
+            return;
+        }
+
+        // Jika masih ada huruf → buat suggestion
         $this->suggestions[$slot] = $this->getSuggestions($value);
     }
 
@@ -42,24 +59,21 @@ class RankingReportPage extends Component
     {
         if (!$search)
             return [];
-    
+
         // Ambil penyertaan yang sudah menang supaya tak muncul lagi
         $alreadyRankedIds = RankingReport::where('event_id', $this->eventId)
             ->pluck('penyertaan_id')
             ->toArray();
-    
+
         /*
-        |--------------------------------------------------------------------------
         | 1) SUGGESTION UNTUK INDIVIDU
-        | - Hanya ambil kategori bermula dengan 'I' (I..., IAF, IAM, IKB, etc.)
-        |--------------------------------------------------------------------------
         */
         if ($this->category === 'Individu') {
-    
+
             return Penyertaan::with('peserta')
                 ->where('event_id', $this->eventId)
                 ->whereNotIn('id', $alreadyRankedIds)
-                ->where('kategori', 'like', 'I%')   // ❗ Filter utama: hanya kategori individu
+                ->where('kategori', 'like', 'I%')
                 ->whereHas('peserta', function ($q) use ($search) {
                     $q->where('nama_penuh', 'like', "%{$search}%");
                 })
@@ -72,54 +86,49 @@ class RankingReportPage extends Component
                 ->toArray();
         }
     
-    
-        /*
-        |--------------------------------------------------------------------------
-        | 2) SUGGESTION UNTUK BERKUMPULAN
-        | - Cari group_token daripada peserta yang match nama
-        | - Hanya ambil penyertaan kategori bermula 'G' (GAF, GAM, GKB, etc.)
-        |--------------------------------------------------------------------------
-        */
+        //2) SUGGESTION UNTUK BERKUMPULAN
     
         // STEP A: Cari group berdasarkan nama group
         $groupsByName = Group::with('pesertas')
-        ->where('event_id', $this->eventId)
-        ->where('name', 'like', "%{$search}%")
-        ->get();
+            ->where('event_id', $this->eventId)
+            ->where('name', 'like', "%{$search}%")
+            ->get();
 
         // STEP B: Cari group berdasarkan ahli group
-        $groupsByMember = Group::with(['pesertas' => function ($q) use ($search) {
-            $q->where('nama_penuh', 'like', "%{$search}%");
-        }])
-        ->where('event_id', $this->eventId)
-        ->get()
-        ->filter(fn($g) => $g->pesertas->isNotEmpty());
+        $groupsByMember = Group::with([
+            'pesertas' => function ($q) use ($search) {
+                $q->where('nama_penuh', 'like', "%{$search}%");
+            }
+        ])
+            ->where('event_id', $this->eventId)
+            ->get()
+            ->filter(fn($g) => $g->pesertas->isNotEmpty());
 
         // Gabungkan hasil keduanya + buang duplikat
         $groups = $groupsByName->merge($groupsByMember)->unique('id');
 
         if ($groups->isEmpty()) {
-        return [];
+            return [];
         }
 
         $results = [];
 
         foreach ($groups as $group) {
 
-        // Ambil semua ahli kumpulan (bukan yang match je)
-        $allPesertas = $group->pesertas()->get();
+            // Ambil semua ahli kumpulan (bukan yang match je)
+            $allPesertas = $group->pesertas()->get();
 
-        $namaAhli = $allPesertas->pluck('nama_penuh')->implode(', ');
+            $namaAhli = $allPesertas->pluck('nama_penuh')->implode(', ');
 
-        $results[] = [
-            'id'   => $group->id,
-            'name' => "{$group->name}: {$namaAhli}",
-        ];
+            $results[] = [
+                'id' => $group->id,
+                'name' => "{$group->name}: {$namaAhli}",
+            ];
         }
 
         return array_slice($results, 0, 10);
     }
-    
+
 
     public function selectSuggestion($id, $slot)
     {
@@ -127,83 +136,54 @@ class RankingReportPage extends Component
             // $id adalah group_id
             $group = Group::with('pesertas') // ambil peserta melalui pivot
                 ->find($id);
-    
-            if (!$group) return;
-    
+
+            if (!$group)
+                return;
+
             // Ambil semua ahli peserta dalam group
             $names = $group->pesertas->pluck('nama_penuh')->implode(', ');
-    
+
             $display = "{$group->name}: $names";
-    
+
             // Simpan group_id dalam rankingGroup
             $this->rankingGroup[$slot] = $group->id;
         } else {
             // Individu
             $penyertaan = Penyertaan::with('peserta')->find($id);
-            if (!$penyertaan) return;
-    
+            if (!$penyertaan)
+                return;
+
             $display = $penyertaan->peserta->nama_penuh;
-    
+
             // Simpan penyertaan_id dalam ranking
             $this->ranking[$slot] = $penyertaan->id;
         }
-    
+
         // Update UI
         $this->selectedNames[$slot] = $display;
         $this->search[$slot] = $display;
         $this->suggestions[$slot] = [];
     }
-    
-    public function categoryChanged()
-    {
-        // Clear semua UI state
-        $this->search = [];
-        $this->suggestions = [1 => [], 2 => [], 3 => []];
-        $this->ranking = [1 => null, 2 => null, 3 => null];
-        $this->rankingGroup = [1 => null, 2 => null, 3 => null];
-        $this->selectedNames = [];
-
-        // Reload mini leaderboard ikut kategori baru
-        $this->loadMiniLeaderboard();
-    }
 
     public function save()
     {
         foreach ([1, 2, 3] as $slot) {
-            if ($this->category === 'Berkumpulan') {
-                $groupId = $this->rankingGroup[$slot];
-                if (!$groupId) continue;
+            $penyertaanId = $this->ranking[$slot];
+            if (!$penyertaanId)
+                continue;
 
-                // Ambil semua penyertaan ahli group
-                $pesertas = Group::find($groupId)->pesertas;
-                foreach ($pesertas as $p) {
-                    RankingReport::updateOrCreate(
-                        [
-                            'event_id' => $this->eventId,
-                            'penyertaan_id' => $p->id,
-                        ],
-                        ['ranking' => $slot]
-                    );
-                }
-            } else { // Individu
-                $penyertaanId = $this->ranking[$slot];
-                if (!$penyertaanId) continue;
-
-                RankingReport::updateOrCreate(
-                    [
-                        'event_id' => $this->eventId,
-                        'penyertaan_id' => $penyertaanId,
-                    ],
-                    ['ranking' => $slot]
-                );
-            }
+            RankingReport::updateOrCreate(
+                [
+                    'event_id' => $this->eventId,
+                    'penyertaan_id' => $penyertaanId,
+                ],
+                ['ranking' => $slot]
+            );
         }
 
         session()->flash('success', 'Ranking saved successfully!');
         $this->loadMiniLeaderboard();
     }
-
-
 
     public function resetRanking()
     {
@@ -222,57 +202,65 @@ class RankingReportPage extends Component
         session()->flash('success', 'Ranking reset successfully!');
         $this->loadMiniLeaderboard();
     }
-    
 
-    public function loadMiniLeaderboard()
-{
-    $reports = RankingReport::with('penyertaan.peserta')
-        ->where('event_id', $this->eventId)
-        ->orderBy('ranking')
-        ->get();
+    public function changeCategory($category)
+    {
+        $this->category = $category;
 
-    if ($this->category === 'Individu') {
-        // Papar hanya individu
-        $this->miniLeaderboard = $reports->filter(fn($r) => substr($r->penyertaan->kategori,0,1) === 'I')
-            ->values();
-    } else {
-        $groupedReports = [];
+        // Reset semua UI state
+        $this->search = [];
+        $this->suggestions = [1 => [], 2 => [], 3 => []];
+        $this->ranking = [1 => null, 2 => null, 3 => null];
+        $this->rankingGroup = [1 => null, 2 => null, 3 => null];
+        $this->selectedNames = [];
 
-        foreach ($reports as $report) {
-
-            if (!str_starts_with($report->penyertaan->kategori, 'G')) continue;
-
-            // Ambil peserta dari penyertaan
-            $peserta = $report->penyertaan->peserta;
-
-            if (!$peserta) continue;
-
-            // Peserta mungkin ada lebih dari 1 group ikut event lain,
-            // jadi kita tapis ikut event semasa
-            $group = $peserta->groups()
-                ->where('groups.event_id', $this->eventId)
-                ->first();
-
-            if (!$group) continue;
-
-            // Kalau group belum dimasukkan, masukkan
-            if (!isset($groupedReports[$group->id])) {
-
-                $allMembers = $group->pesertas()->pluck('nama_penuh')->toArray();
-
-                $groupedReports[$group->id] = (object)[
-                    'ranking' => $report->ranking,
-                    'group' => $group,
-                    'namaAhli' => $allMembers,
-                ];
-            }
-        }
-
-        $this->miniLeaderboard = collect($groupedReports)->values();
-
+        // Reload mini leaderboard
+        $this->loadMiniLeaderboard();
     }
-}
+    public function loadMiniLeaderboard()
+    {
+        $reports = RankingReport::with('penyertaan.peserta')
+            ->where('event_id', $this->eventId)
+            ->orderBy('ranking')
+            ->get();
 
+        $this->miniLeaderboard = $reports->filter(function ($report) {
+            if (!$report->penyertaan)
+                return false;
+
+            $prefix = substr($report->penyertaan->kategori, 0, 1);
+
+            if ($this->category === 'Individu') {
+                return $prefix === 'I';
+            } else { // Berkumpulan
+                return $prefix === 'G';
+            }
+        })->map(function ($report) {
+            $prefix = substr($report->penyertaan->kategori, 0, 1);
+
+            if ($prefix === 'G') {
+
+                // 1) Cari rekod group peserta berdasarkan peserta_id dalam penyertaan
+                $gp = \DB::table('group_peserta')
+                    ->where('event_id', $this->eventId)
+                    ->where('peserta_id', $report->penyertaan->peserta_id)
+                    ->first();
+
+                if ($gp) {
+                    // 2) Ambil group dan ahli-ahlinya
+                    $group = Group::with('pesertas')->find($gp->group_id);
+
+                    if ($group) {
+                        $report->group_name = $group->name;
+                        $report->namaAhli = $group->pesertas->pluck('nama_penuh')->implode(', ');
+                        $report->group = $group;
+                    }
+                }
+            }
+
+            return $report;
+        })->values();
+    }
 
     public function render()
     {

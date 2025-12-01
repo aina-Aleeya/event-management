@@ -18,6 +18,8 @@ use App\Livewire\HistoryPage;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\OrganiserController;
 use App\Http\Controllers\OrganiserReportController;
+use App\Http\Controllers\RankingExportController;
+use App\Http\Controllers\ParticipantExportController;
 use App\Livewire\Admin\EventApproval;
 
 Route::get('/', function () {
@@ -52,32 +54,31 @@ Route::prefix('admin')->group(function() {
     Route::post('event/{event}/groups', [AdminController::class, 'storeGroup'])->name('admin.group.store');
     Route::post('event/{event}/groups/assign', [AdminController::class, 'assignToGroup'])->name('admin.group.assign');
     Route::post('event/{event}/groups/auto', [AdminController::class, 'autoGroup'])->name('admin.group.auto');
+    Route::get('/create-event', CreateEvent::class)->name('create-event');
 });
 
 
-// Route::middleware(['auth', 'admin'])
-//     ->prefix('admin')
-//     ->name('admin.')
-//     ->group(function () {
-//         Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
-//     });
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/organiser/dashboard', OrganiserDashboard::class)
-        ->name('organiser.dashboard');
-});
+
 Route::get('/payment/{event_id}', PaymentForm::class)->name('payment.form');
 
-Route::prefix('organiser')->name('organiser.')->group(function () {
-    Route::get('/dashboard', [OrganiserController::class, 'dashboard'])->name('dashboard');
-    Route::get('/participants/{event}', [OrganiserController::class, 'participants'])->name('participants');
-    Route::get('/groups/{event}', [OrganiserController::class, 'groups'])->name('groups');
-    Route::get('/participant/{peserta}', [OrganiserController::class, 'viewParticipant'])->name('participant.view');
-    Route::get('/events/{event}/report', [OrganiserReportController::class, 'generate'])->name('events.report');
-    Route::get('/ranking-report/{event}', RankingReportPage::class)->name('ranking.report');
-    Route::get('/events/{event}/dashboard', EventDashboardPage::class)->name('event.dashboard');
-    Route::get('/event/{event}/leaderboard', LeaderboardPage::class) ->name('event.leaderboard');
+Route::middleware(['auth'])->group(function () {
+    Route::prefix('organiser')->name('organiser.')->group(function () {
+        Route::get('/dashboard', [OrganiserController::class, 'dashboard'])->name('dashboard');
+        Route::get('/check-event', OrganiserDashboard::class)->name('check-event');
+        Route::get('/participants/{event}', [OrganiserController::class, 'participants'])->name('participants');
+        Route::get('/groups/{event}', [OrganiserController::class, 'groups'])->name('groups');
+        Route::get('/participant/{peserta}', [OrganiserController::class, 'viewParticipant'])->name('participant.view');
+        Route::get('/events/{event}/report', [OrganiserReportController::class, 'generate'])->name('events.report');
+        Route::get('/ranking-report/{event}', RankingReportPage::class)->name('ranking.report');
+        Route::get('/events/{event}/dashboard', EventDashboardPage::class)->name('event.dashboard');
+        Route::get('/event/{event}/leaderboard', LeaderboardPage::class)->name('event.leaderboard');
+        Route::get('/event/{event}/ranking/export', [RankingExportController::class, 'export'])->name('event.ranking.export');
+        Route::get('/event/{event}/participants/export', [ParticipantExportController::class, 'export'])->name('event.participants.export');
+
+    });
 });
+
 
 
 
@@ -86,7 +87,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/history', HistoryPage::class)->name('history');
     Route::get('/history-participant/{eventId}', SenaraiPeserta::class)->name('history.participant');
     Route::get('/payment/{id}', PaymentForm::class)->name('payment.form');
-    Route::get('/create-event', CreateEvent::class)->name('create-event');
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');

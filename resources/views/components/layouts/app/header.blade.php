@@ -6,10 +6,9 @@
     @livewireStyles
 </head>
 
-<body class="min-h-screen bg-white">
+<body class="min-h-screen bg-white text-black">
 
-
-    <div x-data="{ sidebarOpen: false }" class="relative min-h-screen">
+    <div x-data="sidebarComponent()" x-init="init()" wire:ignore class="relative min-h-screen">
 
         <!-- Header Section -->
         <header class="fixed top-0 left-0 z-50 w-full bg-white shadow-md border-b border-gray-200">
@@ -31,12 +30,9 @@
                         class="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition">Home</a>
                     <a href="{{ route('events.page') }}"
                         class="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition">Events</a>
-                    <a href="{{ route('history') }}"
-                        class="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition">History</a>
-
                     @auth
                         <!-- Sidebar Toggle Button -->
-                        <button @click="sidebarOpen = true"
+                        <button @click="sidebarOpen = !sidebarOpen" 
                             class="flex items-center gap-2 px-3 py-1.5 bg-white rounded-lg shadow hover:bg-gray-100 focus:outline-none">
                             <span
                                 class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-red-300 text-white">
@@ -44,19 +40,16 @@
                             </span>
                             <span class="font-semibold text-gray-900">{{ auth()->user()->name }}</span>
                             <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
                     @else
                         <!-- Before Login -->
                         <a href="{{ route('login') }}"
-                            class="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-orange-100 transition">
-                            Login
-                        </a>
+                            class="text-sm font-medium text-black bg-red-200 px-3 py-1.5 rounded-lg hover:bg-red-300 transition">Login</a>
                         <a href="{{ route('register') }}"
-                            class="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-orange-100 transition">
-                            Register
-                        </a>
+                            class="text-sm font-medium text-white bg-red-400 px-3 py-1.5 rounded-lg hover:bg-red-500 transition">Register</a>
                     @endauth
                 </div>
 
@@ -65,8 +58,16 @@
 
         <!-- Sidebar -->
         @auth
-            <aside x-show="sidebarOpen" @click.outside="sidebarOpen = false" x-transition
-                class="fixed top-0 right-0 h-full w-80 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out">
+            <aside x-show="sidebarOpen" 
+                   @click.outside="sidebarOpen = false" 
+                   x-transition:enter="transition ease-out duration-300"
+                   x-transition:enter-start="translate-x-full"
+                   x-transition:enter-end="translate-x-0"
+                   x-transition:leave="transition ease-in duration-200"
+                   x-transition:leave-start="translate-x-0"
+                   x-transition:leave-end="translate-x-full"
+                   x-cloak
+                   class="fixed top-0 right-0 h-full w-80 bg-white shadow-lg z-50">
 
                 <!-- Sidebar Header -->
                 <div class="p-6 border-b border-gray-200 flex items-center gap-4">
@@ -82,24 +83,28 @@
 
                 <!-- Sidebar Menu -->
                 <nav class="flex-grow py-2 px-2 space-y-1">
-                    <a href="{{ route('profile.edit') }}"
+                    <a href="{{ route('profile.edit') }}" @click="sidebarOpen = false"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
-                        <i class="icon-fa-gear mr-2"></i>Settings
+                        <i class="fa-solid fa-gear mr-2"></i>Settings
                     </a>
-                    <a href="{{ route('history') }}"
+                    <a href="{{ route('history') }}" @click="sidebarOpen = false"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
-                        <i class="icon-fa-ticket mr-2"></i>My Ticket History
+                        <i class="fa-solid fa-ticket mr-2"></i>My Ticket History
                     </a>
-                    <a href="{{ route('create-event') }}"
+                    <a href="{{ route('create-event') }}" @click="sidebarOpen = false"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
-                        <i class="icon-fa-calendar mr-2"></i>Create Event
+                        <i class="fa-solid fa-calendar mr-2"></i>Create Event
                     </a>
 
                     <div class="border-t border-black my-1"></div>
 
-                    <a href="{{ route('organiser.dashboard') }}"
+                    <a href="{{ route('organiser.dashboard') }}" @click="sidebarOpen = false"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
-                        <i class="icon-fa-dashboard mr-2"></i>Organizer Dashboard
+                        <i class="fa-solid fa-laptop-file mr-2"></i>Organizer Dashboard
+                    </a>
+                    <a href="{{ route('organiser.check-event') }}" @click="sidebarOpen = false"
+                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
+                        <i class="fa-solid fa-clipboard-check mr-2"></i>My Event Status
                     </a>
                 </nav>
 
@@ -109,15 +114,16 @@
                         @csrf
                         <button type="submit"
                             class="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-md">
-                            <i class="icon-fa-sign-out mr-2"></i>Log out
+                            <i class="fa-solid fa-right-from-bracket mr-2"></i>Log out
                         </button>
                     </form>
                 </div>
+
             </aside>
         @endauth
 
         <!-- Page Content -->
-        <main class="pt-9">
+        <main class="pt-8.5">
             {{ $slot }}
         </main>
 
@@ -126,6 +132,24 @@
     @livewireScripts
     @fluxScripts
     @stack('scripts')
+
+    <script>
+        function sidebarComponent() {
+            return {
+                sidebarOpen: false,
+                init() {
+                    // Close sidebar immediately when navigation starts
+                    window.addEventListener('livewire:navigating', () => {
+                        this.sidebarOpen = false;
+                    });
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 </body>
 
 </html>

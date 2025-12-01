@@ -6,7 +6,7 @@
     @livewireStyles
 </head>
 
-<body class="min-h-screen bg-white">
+<body class="min-h-screen bg-white text-black">
 
     <!-- Header Section -->
     <header

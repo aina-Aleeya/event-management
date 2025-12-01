@@ -10,8 +10,9 @@ use App\Models\RankingReport;
 class LeaderboardPage extends Component
 {
     public $eventId;
+    public $category = 'Individu'; // Default tab
     public $topThree = [];
-    public $allParticipants = [];
+    public $rankList = [];
 
     public function mount($event)
     {
@@ -19,60 +20,54 @@ class LeaderboardPage extends Component
         $this->loadLeaderboard();
     }
 
-    public function loadLeaderboard()
+    public function updatedCategory()
     {
-
-        $rankings = RankingReport::with('penyertaan.peserta')
-            ->whereHas('penyertaan', fn($q) => $q->where('event_id', $this->eventId))
-            ->orderBy('ranking')
-            ->get();
-
-        $this->topThree = $rankings->take(3);
-
-
-        $rankedPenyertaanIds = $rankings->pluck('penyertaan_id')->toArray();
-
-        $this->allParticipants = Penyertaan::with('peserta')
-            ->where('event_id', $this->eventId)
-            ->whereNotIn('id', $rankedPenyertaanIds)
-            ->get();
+        $this->loadLeaderboard();
     }
 
-    public function getRankStyle($rank)
-    {
-        $styles = [
-            1 => [
-                'height' => 'h-35 md:h-40',
-                'bg' => 'bg-[#F87171]', 
-                'border' => 'border-[#DC6A6A]',
-                'avatar' => 'w-20 h-20 md:w-24 md:h-24',
-                'ring' => 'ring-red-400',
-                'nameText' => 'text-base',
-            ],
-            2 => [
-                'height' => 'h-25 md:h-30',
-                'bg' => 'bg-[#F87171]',
-                'border' => 'border-[#DC6A6A]',
-                'avatar' => 'w-16 h-16 md:w-20 md:h-20',
-                'ring' => 'ring-red-400',
-                'nameText' => 'text-sm',
-            ],
-            3 => [
-                'height' => 'h-15 md:h-20',
-                'bg' => 'bg-[#F87171]', 
-                'border' => 'border-[#DC6A6A]',
-                'avatar' => 'w-14 h-14 md:w-18 md:h-18',
-                'ring' => 'ring-red-400',
-                'nameText' => 'text-sm',
-            ],
-        ];
+public function loadLeaderboard()
+{
+    $reports = RankingReport::with('penyertaan.peserta')
+        ->whereHas('penyertaan', fn($q) =>
+            $q->where('event_id', $this->eventId)
+              ->where('kategori', 'like', $this->category === 'Individu' ? 'I%' : 'G%')
+        )
+        ->orderBy('ranking')
+        ->get();
 
-        return $styles[$rank] ?? $styles[3];
+    if ($this->category === 'Berkumpulan') {
+        $reports = $reports->map(function($report) {
+
+            // Cari group peserta melalui pivot table
+            $gp = \DB::table('group_peserta')
+                ->where('event_id', $this->eventId)
+                ->where('peserta_id', $report->penyertaan->peserta_id)
+                ->first();
+
+            if ($gp) {
+                $group = \App\Models\Group::with('pesertas')->find($gp->group_id);
+                if ($group) {
+                    $report->group_name = $group->name;
+                    $report->group_members = $group->pesertas->pluck('nama_penuh')->implode(', ');
+                }
+            }
+
+            return $report;
+        });
     }
+
+    // TOP 3
+    $this->topThree = $reports->take(3);
+
+    // RANK LIST
+    $this->rankList = $reports->skip(3)->values();
+}
+
 
     public function render()
     {
         $event = Event::find($this->eventId);
+
         return view('livewire.leader-board-page', [
             'event' => $event,
         ]);
