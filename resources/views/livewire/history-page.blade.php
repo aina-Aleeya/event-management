@@ -1,4 +1,4 @@
-<div class="max-w-4xl mx-auto p-6">
+<div class="max-w-4xl mx-auto p-6 ">
     <h1 class="text-2xl font-semibold mb-4">History Event Registered</h1>
     <div class="mb-8">
         <table class="w-full border border-gray-300 rounded-lg mb-3">

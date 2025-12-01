@@ -1,5 +1,5 @@
 <div class="max-w-4xl mx-auto p-6 ">
-    <h1 class="text-2xl font-semibold mb-4">Registered Participant  List</h1>       
+    <h1 class="text-2xl text-black font-semibold mb-4">Registered Participant  List</h1>       
 
     @if($registrations->isEmpty())
         <p class="text-gray-500">Tiada peserta didaftarkan lagi.</p>

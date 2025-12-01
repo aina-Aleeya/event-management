@@ -6,9 +6,9 @@
     @livewireStyles
 </head>
 
-<body class="min-h-screen bg-white dark:bg-zinc-800">
+<body class="min-h-screen bg-white text-black">
 
-    <div x-data="{ sidebarOpen: false }" wire:ignore class="relative min-h-screen">
+    <div x-data="sidebarComponent()" x-init="init()" wire:ignore class="relative min-h-screen">
 
         <!-- Header Section -->
         <header class="fixed top-0 left-0 z-50 w-full bg-white shadow-md border-b border-gray-200">
@@ -58,8 +58,16 @@
 
         <!-- Sidebar -->
         @auth
-            <aside x-show="sidebarOpen" @click.outside="sidebarOpen = false" x-transition
-                class="fixed top-0 right-0 h-full w-80 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out">
+            <aside x-show="sidebarOpen" 
+                   @click.outside="sidebarOpen = false" 
+                   x-transition:enter="transition ease-out duration-300"
+                   x-transition:enter-start="translate-x-full"
+                   x-transition:enter-end="translate-x-0"
+                   x-transition:leave="transition ease-in duration-200"
+                   x-transition:leave-start="translate-x-0"
+                   x-transition:leave-end="translate-x-full"
+                   x-cloak
+                   class="fixed top-0 right-0 h-full w-80 bg-white shadow-lg z-50">
 
                 <!-- Sidebar Header -->
                 <div class="p-6 border-b border-gray-200 flex items-center gap-4">
@@ -75,26 +83,26 @@
 
                 <!-- Sidebar Menu -->
                 <nav class="flex-grow py-2 px-2 space-y-1">
-                    <a href="{{ route('profile.edit') }}"
+                    <a href="{{ route('profile.edit') }}" @click="sidebarOpen = false"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
                         <i class="fa-solid fa-gear mr-2"></i>Settings
                     </a>
-                    <a href="{{ route('history') }}"
+                    <a href="{{ route('history') }}" @click="sidebarOpen = false"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
                         <i class="fa-solid fa-ticket mr-2"></i>My Ticket History
                     </a>
-                    <a href="{{ route('create-event') }}"
+                    <a href="{{ route('create-event') }}" @click="sidebarOpen = false"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
                         <i class="fa-solid fa-calendar mr-2"></i>Create Event
                     </a>
 
                     <div class="border-t border-black my-1"></div>
 
-                    <a href="{{ route('organiser.dashboard') }}"
+                    <a href="{{ route('organiser.dashboard') }}" @click="sidebarOpen = false"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
                         <i class="fa-solid fa-laptop-file mr-2"></i>Organizer Dashboard
                     </a>
-                    <a href="{{ route('organiser.check-event') }}"
+                    <a href="{{ route('organiser.check-event') }}" @click="sidebarOpen = false"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
                         <i class="fa-solid fa-clipboard-check mr-2"></i>My Event Status
                     </a>
@@ -126,16 +134,22 @@
     @stack('scripts')
 
     <script>
-        function sidebar() {
+        function sidebarComponent() {
             return {
-                sidebarOpen: localStorage.getItem('sidebarOpen') === 'true' || false,
-                toggle() {
-                    this.sidebarOpen = !this.sidebarOpen;
-                    localStorage.setItem('sidebarOpen', this.sidebarOpen);
+                sidebarOpen: false,
+                init() {
+                    // Close sidebar immediately when navigation starts
+                    window.addEventListener('livewire:navigating', () => {
+                        this.sidebarOpen = false;
+                    });
                 }
             }
         }
     </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 </body>
 
 </html>

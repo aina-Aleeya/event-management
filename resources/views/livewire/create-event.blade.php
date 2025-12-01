@@ -1,3 +1,4 @@
+<x-layouts.app.admin>
 <div class="max-w-6xl mx-auto bg-white shadow-lg rounded-2xl p-8 mt-10 space-y-8">
     <h2 class="text-3xl font-bold text-gray-800 mb-4">Create New Event</h2>
 
@@ -241,3 +242,4 @@
         });
     </script>
 </div>
+</x-layouts.app.admin>
