@@ -17,14 +17,13 @@ class Peserta extends Model
         'tarikh_lahir',
         'ip_address',
         'user_agent',
-        'category',
     ];
 
     public function events()
     {
         return $this->belongsToMany(Event::class, 'penyertaan', 'peserta_id', 'event_id')
             ->using(\App\Models\Penyertaan::class)
-            ->withPivot('kategori', 'unique_id')
+            ->withPivot('unique_id','status_bayaran','categorizable_type','categorizable_id','created_at')
             ->withTimestamps();
     }
 

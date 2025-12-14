@@ -53,7 +53,7 @@
                                 </td>
 
                                 <!-- CATEGORY -->
-                                <td class="px-4 py-3 text-sm">{{ $p->pivot->kategori_nama }}</td>
+                                <td class="px-4 py-3 text-sm">{{ $p->pivot->category_name ?? '-'}}</td>
 
                                 <!-- UNIQUE ID -->
                                 <td class="px-4 py-3 text-sm font-medium text-gray-700">{{ $p->pivot->unique_id }}</td>
