@@ -11,7 +11,7 @@ class EventDetails extends Component
 
     public function mount($id)
     {
-        $this->event = Event::findOrFail($id);
+        $this->event = Event::with(['categories', 'customCategories'])->findOrFail($id);
     }
 
     public function render()

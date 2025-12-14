@@ -54,11 +54,7 @@ Route::prefix('admin')->group(function() {
     Route::post('event/{event}/groups', [AdminController::class, 'storeGroup'])->name('admin.group.store');
     Route::post('event/{event}/groups/assign', [AdminController::class, 'assignToGroup'])->name('admin.group.assign');
     Route::post('event/{event}/groups/auto', [AdminController::class, 'autoGroup'])->name('admin.group.auto');
-    Route::get('/create-event', CreateEvent::class)->name('create-event');
 });
-
-
-
 
 Route::get('/payment/{event_id}', PaymentForm::class)->name('payment.form');
 
@@ -79,10 +75,8 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
-
-
-
 Route::middleware(['auth'])->group(function () {
+    Route::get('/create-event', CreateEvent::class)->name('create-event');
 
     Route::get('/history', HistoryPage::class)->name('history');
     Route::get('/history-participant/{eventId}', SenaraiPeserta::class)->name('history.participant');

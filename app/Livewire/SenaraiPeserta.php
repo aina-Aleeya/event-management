@@ -18,7 +18,7 @@ class SenaraiPeserta extends Component
         $this->eventId = $eventId;
         $userId = Auth::id();
         
-        $this->registrations = Penyertaan::with(['event', 'peserta'])
+        $this->registrations = Penyertaan::with(['event', 'peserta', 'categorizable'])
             ->where('pendaftar_id', $userId)
             ->where('event_id', $eventId)
             ->orderBy('id')

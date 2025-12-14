@@ -26,7 +26,7 @@ class PaymentForm extends Component
     public function loadRegistrations()
     {
         $pendaftarId = auth()->check() ? auth()->id() : session('guest_id');
-        $this->registrations = Penyertaan::with('peserta', 'event')
+        $this->registrations = Penyertaan::with(['peserta', 'event', 'categorizable'])
             ->where('pendaftar_id', $pendaftarId)
             ->where('status_bayaran', 'pending')
             ->when($this->eventId, fn($q) => $q->where('event_id', $this->eventId))

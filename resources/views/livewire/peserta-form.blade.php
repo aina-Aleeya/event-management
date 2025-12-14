@@ -118,32 +118,37 @@
                     </div>
                 </div>
 
-                <!-- Kategori -->
-                <div>
-                    <label class="block text-gray-700 font-medium">Category</label>
-                    <div class="flex items-center space-x-6 mt-1">
-                        <label class="flex items-center space-x-2">
-                            <input 
-                                type="radio" 
-                                wire:model="pesertas.{{ $index }}.category" 
-                                value="Individu" 
-                                class="text-blue-500 focus:ring-blue-400"
-                            >
-                            <span>Individual</span>
-                        </label>
-
-                        <label class="flex items-center space-x-2">
-                            <input 
-                                type="radio" 
-                                wire:model="pesertas.{{ $index }}.category" 
-                                value="Berkumpulan" 
-                                class="text-blue-500 focus:ring-blue-400"
-                            >
-                            <span>Grouping</span>
-                        </label>
+                <!-- Categories -->
+                <div class="mt-4">
+                    <label class="block text-gray-700 font-medium mb-2">Categories *</label>
+                    <div class="border border-gray-300 rounded-lg p-3 bg-gray-50">
+                        @if(count($eventCategories) > 0)
+                            <div class="grid grid-cols-2 gap-2">
+                                @foreach($eventCategories as $category)
+                                    <label class="flex items-center space-x-2 hover:bg-white p-2 rounded cursor-pointer transition">
+                                        <input 
+                                            type="checkbox" 
+                                            wire:model="pesertas.{{ $index }}.selected_categories" 
+                                            value="{{ $category['id'] }}"
+                                            class="w-4 h-4 text-blue-500 focus:ring-blue-400 rounded"
+                                        >
+                                        <span class="text-sm">
+                                            {{ $category['name'] }}
+                                            @if($category['type'] === 'custom')
+                                                <span class="text-xs text-gray-500">(Custom)</span>
+                                            @endif
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-gray-500 text-sm">No categories available for this event.</p>
+                        @endif
                     </div>
+                    @error('pesertas.'.$index.'.selected_categories')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
-
             </div>
 
             <div class="text-right">
@@ -156,11 +161,7 @@
         <button type="button" wire:click="addPeserta" class="bg-blue-500 text-white py-2 px-4 rounded-lg">
         + Add Member
         </button>
-        @if (session()->has('maxPeserta'))
-            <p class="text-red-500 text-sm mt-2">
-                {{ session('maxPeserta') }}
-            </p>
-        @endif
+        
     </div>
 
         <div class="flex justify-between gap-3 mt-4">

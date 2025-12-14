@@ -11,11 +11,12 @@ class Penyertaan extends Pivot
     protected $fillable = [
         'event_id',
         'peserta_id',
-        'kategori',
         'unique_id',
         'status_bayaran',
         'group_token',
         'pendaftar_id',
+        'categorizable_id',      
+        'categorizable_type',    
     ];
 
     public function peserta()
@@ -37,36 +38,41 @@ class Penyertaan extends Pivot
     {
         return $this->belongsTo(Group::class, 'group_id');
     }
-
-    public function getKategoriNamaAttribute()
+    
+    // Polymorphic relationship - MUCH CLEARER!
+    public function categorizable()
     {
-        $kategori = strtoupper($this->kategori);
-
-        $type = str_starts_with($kategori, 'I') ? 'Individual' : (str_starts_with($kategori, 'G') ? 'Group' : '-');
-
-        $kodUmurJantina = substr($kategori, -2);
-        
-        $mapping = [
-            'AM' => 'Adult Male',
-            'AF' => 'Adult Female',
-            'KB' => 'Kid Boy',
-            'KG' => 'Kid Girl',
-            'EL' => 'Elderly',
-        ];
-
-        $kategoriUmur = $mapping[$kodUmurJantina] ?? $kodUmurJantina;
-
-        return  "{$type} - {$kategoriUmur}";
+        return $this->morphTo();
     }
+
+    // Easy accessor to get category name
+    public function getCategoryNameAttribute()
+    {
+        return $this->categorizable ? $this->categorizable->name : 'N/A';
+    }
+
+    // Easy checker methods
+    public function isDefaultCategory()
+    {
+        return $this->categorizable_type === 'App\Models\Category';
+    }
+
+    public function isCustomCategory()
+    {
+        return $this->categorizable_type === 'App\Models\CustomCategory';
+    }
+
+    
     public function getJumlahBayaranAttribute()
-{
-    $bilPeserta = self::where('event_id', $this->event_id)
-        ->where('kategori', $this->kategori)
-        ->count();
+    {
+        $bilPeserta = self::where('event_id', $this->event_id)
+            ->where('categorizable_id', $this->categorizable_id)
+            ->where('categorizable_type', $this->categorizable_type)
+            ->count();
 
-    $hargaSeorang = $this->event->entry_fee ?? 0;
+        $hargaSeorang = $this->event->entry_fee ?? 0;
 
-    return $hargaSeorang * $bilPeserta;
-}
+        return $hargaSeorang * $bilPeserta;
+    }
 
 }
