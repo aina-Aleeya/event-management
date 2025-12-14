@@ -24,7 +24,6 @@ class Event extends Model
         'start_time',
         'end_time',
         'registration_deadline',
-        'categories',
         'entry_fee',
         'max_participants',
         'organizer_name',
@@ -36,7 +35,6 @@ class Event extends Model
 
     protected $casts = [
         'posters' => 'array',
-        'categories' => 'array',
         'start_date' => 'date',
         'end_date' => 'date',
         'ads_start_date' => 'date',
@@ -71,4 +69,15 @@ class Event extends Model
     {
         return $this->hasMany(Group::class);
     }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'category_event','event_id', 'category_id');
+    }
+
+    public function customCategories()
+    {
+        return $this->hasMany(CustomCategory::class);
+    }
+
 }

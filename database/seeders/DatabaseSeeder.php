@@ -21,5 +21,9 @@ class DatabaseSeeder extends Seeder
         );
 
         $this->command->info('✅ Admin user created: admin@gmail.com / admin123');
+
+        $this->call([
+            CategorySeeder::class,
+        ]);
     }
 }

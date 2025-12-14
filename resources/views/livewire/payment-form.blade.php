@@ -107,7 +107,7 @@
                                         {{ $reg->peserta->kelas ?? '-' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                        {{ $reg->kategori_nama ?? $reg->kategori ?? '-' }}
+                                        {{ $reg->category_name ?? '-' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                         <button wire:click="deleteParticipant({{ $reg->id }})"

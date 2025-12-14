@@ -7,6 +7,7 @@ use Livewire\WithFileUploads;
 use App\Models\Event;
 use Illuminate\Support\Facades\Auth;
 use App\Models\EventStatus;
+use App\Models\Category;
 
 class CreateEvent extends Component
 {
@@ -23,7 +24,9 @@ class CreateEvent extends Component
     public $start_date, $end_date, $start_time, $end_time, $registration_deadline, $time_zone = 'Asia/Kuala_Lumpur';
 
     // Categories
-    public $categories = [];
+    public $selectedDefaultCategories = [];   // holds default category ids
+    public $customCategoryList = [];          // holds array of custom names (strings)
+    public $allCategories;
 
     // Advertisement
     public $ads_start_date, $ads_end_date, $featured = false;
@@ -45,14 +48,34 @@ class CreateEvent extends Component
         'start_time' => 'nullable',
         'end_time' => 'nullable',
         'registration_deadline' => 'nullable|date|before_or_equal:end_date',
-        'categories' => 'array',
+        'selectedDefaultCategories' => 'array',  // <-- ubah sini
+        'customCategoryList' => 'array',         // <-- dan sini
         'ads_start_date' => 'nullable|date',
         'ads_end_date' => 'nullable|date|after_or_equal:ads_start_date',
         'entry_fee' => 'nullable|numeric|min:0',
         'max_participants' => 'nullable|integer|min:1',
     ];
+    public function mount()
+    {
+        $this->allCategories = Category::all();
+    }
 
-    protected $listeners = ['updateDescription' => 'updateDescription'];
+    protected $listeners = [
+        'updateDescription' => 'updateDescription'
+        
+    ];
+
+    public function addCustomCategory()
+    {
+        $this->customCategoryList[] = '';
+    }
+
+    public function removeCustomCategory($index)
+    {
+        unset($this->customCategoryList[$index]);
+        $this->customCategoryList = array_values($this->customCategoryList);
+    }
+
 
     public function updateDescription($data)
     {
@@ -88,13 +111,12 @@ class CreateEvent extends Component
             'start_time' => $this->start_time,
             'end_time' => $this->end_time,
             'registration_deadline' => $this->registration_deadline,
-            'categories' => $this->categories,
             'ads_start_date' => $this->ads_start_date,
             'ads_end_date' => $this->ads_end_date,
             'entry_fee' => $this->entry_fee,
             'max_participants' => $this->max_participants,
         ]);
-
+            
         EventStatus::create([
             'event_id' => $event->id,
             'status'   => 'pending'
@@ -104,9 +126,21 @@ class CreateEvent extends Component
         $event->qr_code = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($event->event_link);
         $event->save();
 
-        // if (!Auth::user()->hasRole('organiser')) {
-        //     Auth::user()->assignRole('organiser');
-        // }
+        
+        
+
+        // Sync default categories (pivot)
+        if (!empty($this->selectedDefaultCategories)) {
+            $event->categories()->sync($this->selectedDefaultCategories);
+        }
+
+        // Create custom categories (hasMany)
+        foreach ($this->customCategoryList as $name) {
+            $name = trim($name);
+            if ($name === '') continue;
+            $event->customCategories()->create(['name' => $name]);
+        }
+
 
         session()->flash('message', 'Event submitted for admin approval.');
         return redirect()->route('organiser.dashboard');

@@ -26,7 +26,7 @@
                         <td class="p-2 border text-center">{{ $reg->peserta->nama_penuh ?? '-' }}</td>
                         <td class="p-2 border text-center">{{ $reg->peserta->ic ?? '-' }}</td>
                         <td class="p-2 border text-center">{{ $reg->peserta->kelas ?? '-' }}</td>
-                        <td class="p-2 border text-center">{{ $reg->kategori_nama ?? '-' }}</td>
+                        <td class="p-2 border text-center">{{ $reg->category_name ?? '-' }}</td>
                         <td class="p-2 border text-center">{{ ucfirst($reg->status_bayaran ?? '-') }}</td>
                     </tr>
                 @endforeach
