@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Peserta;
 use App\Models\Penyertaan;
 use App\Models\User;
+use App\Models\Event;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Carbon\Carbon;
@@ -23,12 +24,23 @@ class PesertaForm extends Component
     public $event;
     public $pendaftar_nama;
     public $pendaftar_email;
-    
+    public $eventCategories = [];
 
     public function mount($id)
     {
         $this->idIklan = $id;
-        $this->event = \App\Models\Event::find($id);
+        $this->event = Event::with(['categories', 'customCategories'])->find($id);
+
+        // Combine default and custom categories
+        $defaultCats = $this->event->categories->map(function($cat) {
+            return ['id' => 'default_' . $cat->id, 'name' => $cat->name, 'type' => 'default'];
+        });
+
+        $customCats = $this->event->customCategories->map(function($cat) {
+            return ['id' => 'custom_' . $cat->id, 'name' => $cat->name, 'type' => 'custom'];
+        });
+
+        $this->eventCategories = $defaultCats->merge($customCats)->toArray();
 
         $this->pesertas = [
             [
@@ -40,17 +52,13 @@ class PesertaForm extends Component
                 'jantina' => '',
                 'email' => '',
                 'gambar' => null,
-                'category' => '',
-                'kategori' => '',
+                'selected_categories' => [],
             ]
         ];
     }
 
     public function addPeserta(){
-        if (count($this->pesertas) >= 6) {
-            session()->flash('maxPeserta', 'Anda hanya boleh menambah maksimum 6 peserta sahaja.');
-            return;
-        }
+        
 
         $this->pesertas[] = [
             'nama_penuh' => '',
@@ -61,8 +69,7 @@ class PesertaForm extends Component
             'jantina' => '',
             'tarikh_lahir' => '',
             'gambar' => null,
-            'category' => '',
-            'kategori' => '',
+            'selected_categories' => [],
         ];
     }
 
@@ -108,29 +115,14 @@ class PesertaForm extends Component
             'jantina' => $peserta->jantina,
             'email' => $peserta->email,
             'gambar' => null,
-            'category' => '',
-            'kategori' => $this->tentukanKategori($peserta->tarikh_lahir, $peserta->jantina),
+            'selected_categories' => [],
         ];
 
         $this->suggestions[$index] = [];
         
     }
 
-    private function resetFormFields($index){
-        $this->pesertas[$index] = [
-            'nama_penuh' => '',
-            'nama_panggilan' => '',
-            'kelas' => '',
-            'email' => '',
-            'jantina' => '',
-            'ic' => '',
-            'tarikh_lahir' => '',
-            'gambar' => null,
-            'category' => '',
-        ];
     
-        $this->suggestions[$index] = [];
-    }
 
     public function updated($propertyName, $value){
         if (str_contains($propertyName, 'pesertas.') && str_contains($propertyName, '.ic')) {
@@ -150,11 +142,9 @@ class PesertaForm extends Component
                     $tarikh = sprintf('%04d-%02d-%02d', $tahun_penuh, $bulan, $hari);
                     $jantina_digit = substr($ic, -1);
                     $jantina = ($jantina_digit % 2 == 0) ? 'Perempuan' : 'Lelaki';
-                    $kategori = $this->tentukanKategori($tarikh, $jantina);
     
                     $this->pesertas[$index]['tarikh_lahir'] = $tarikh;
                     $this->pesertas[$index]['jantina'] = $jantina;
-                    $this->pesertas[$index]['kategori'] = $kategori;
                 }
             }
         }
@@ -163,16 +153,14 @@ class PesertaForm extends Component
 
     public function save()
     {
-        $savedIds = [];
-
-        $groupToken = $this->groupToken ?? str()->uuid();
+        $groupToken = $this->groupToken ?? \Str::uuid()->toString();
 
         if (auth()->check()) {
             $pendaftarId = auth()->id();
         } else {
             // Kalau tak login → wajib isi maklumat pendaftar
             if (empty($this->pendaftar_nama) || empty($this->pendaftar_email)) {
-                session()->flash('error', 'Sila isi nama dan email pendaftar.');
+                session()->flash('error', 'Please fill in registrant name and email.');
                 return;
             }
     
@@ -195,10 +183,12 @@ class PesertaForm extends Component
             ->first();
 
         foreach ($this->pesertas as $p) {
-
-
             if (empty($p['nama_penuh']) || empty($p['ic'])) {
-                session()->flash('error', 'Sila isi nama penuh dan nombor IC untuk semua peserta.');
+                session()->flash('error', 'Please fill in full name and MyKad number for all participants.');
+                return;
+            }
+            if (empty($p['selected_categories'])) {
+                session()->flash('error', 'Please select at least one category for each participant.');
                 return;
             }
 
@@ -211,7 +201,6 @@ class PesertaForm extends Component
                 'ic' => $p['ic'] ?? '',
                 'tarikh_lahir' => $p['tarikh_lahir'] ?? '',
                 'gambar' => null,
-                'category' => $p['category'],
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
             ];
@@ -227,80 +216,55 @@ class PesertaForm extends Component
 
             $peserta = Peserta::updateOrCreate(['ic' => $p['ic']], $validated);
 
-            $kategoriUmur = $p['kategori']; // KB/KG/AM/AF/EL
-            $categoryType = $p['category'] === 'Individu' ? 'I' : 'G';
-            $gabung = $categoryType . $kategoriUmur; // Contoh: IAM / GAF
+            // Create penyertaan for each selected category
+            foreach ($p['selected_categories'] as $categoryId) {
+                // Parse: "default_1" or "custom_5"
+                [$type, $id] = explode('_', $categoryId);
 
-            $existing = Penyertaan::where('event_id', $this->idIklan)
-                ->where('peserta_id', $peserta->id)
-                ->first();
+                // Determine the model class (CLEAR!)
+                $categorizableType = $type === 'default' 
+                    ? \App\Models\Category::class 
+                    : \App\Models\CustomCategory::class;
+
+                $existing = Penyertaan::where('event_id', $this->idIklan)
+                    ->where('peserta_id', $peserta->id)
+                    ->where('categorizable_id', $id)
+                    ->where('categorizable_type', $categorizableType)
+                    ->first();
 
                 if ($existing) {
-                    // Kemas kini group token & pendaftar
                     $existing->update([
                         'group_token' => $groupToken,
                         'pendaftar_id' => $pendaftarId,
                         'status_bayaran' => 'pending',
                     ]);
-        
-                    // Tambah unique_id kalau belum ada
-                    if (empty($existing->unique_id)) {
-                        $lastEntry = Penyertaan::where('event_id', $this->idIklan)
-                            ->where('kategori', $gabung)
-                            ->orderByDesc('id')
-                            ->first();
-        
-                        $number = $lastEntry ? intval(substr($lastEntry->unique_id, -4)) + 1 : 1;
-                        $uniqueId = $gabung . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
-                        $existing->update([
-                            'kategori' => $gabung,
-                            'unique_id' => $uniqueId,
-                        ]);
-                    }
-        
-                    $savedIds[] = $existing->id;
-        
                 } else {
-                    // Cipta penyertaan baru
                     $lastEntry = Penyertaan::where('event_id', $this->idIklan)
-                        ->where('kategori', $gabung)
+                        ->where('categorizable_type', $categorizableType)
+                        ->where('categorizable_id', $id)
                         ->orderByDesc('id')
                         ->first();
-        
-                    $number = $lastEntry ? intval(substr($lastEntry->unique_id, -4)) + 1 : 1;
-                    $uniqueId = $gabung . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
-        
-                    $penyertaan = Penyertaan::create([
+
+                    $number = $lastEntry ? intval($lastEntry->unique_id) + 1 : 1;
+
+                    Penyertaan::create([
                         'event_id' => $this->idIklan,
                         'peserta_id' => $peserta->id,
-                        'kategori' => $gabung,
-                        'unique_id' => $uniqueId,
+                        'categorizable_id' => $id,                    // Just the ID: 1, 5, etc
+                        'categorizable_type' => $categorizableType,   // Full class name
+                        'unique_id' => str_pad($number, 4, '0', STR_PAD_LEFT),
                         'group_token' => $groupToken,
                         'status_bayaran' => 'pending',
                         'pendaftar_id' => $pendaftarId,
                     ]);
-        
-                    $savedIds[] = $penyertaan->id;
                 }
             }
+        }
+
 
         $this->dispatch('show-success', $this->idIklan);
     }
 
-
-
-    private function tentukanKategori($tarikhLahir, $jantina)
-    {
-        $umur = Carbon::parse($tarikhLahir)->age;
-
-        if ($umur <= 12) {
-            return $jantina === 'Lelaki' ? 'KB' : 'KG';
-        } elseif ($umur >= 60) {
-            return 'EL';
-        } else {
-            return $jantina === 'Lelaki' ? 'AM' : 'AF';
-        }
-    }
 
     public function render()
     {

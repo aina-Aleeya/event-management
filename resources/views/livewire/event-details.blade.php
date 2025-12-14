@@ -113,18 +113,21 @@
                 </div>
 
                 {{-- CATEGORIES --}}
-                @if (!empty($event->categories))
-                    @php
-                        $categories = is_array($event->categories)
-                            ? $event->categories
-                            : explode(',', $event->categories);
-                    @endphp
+                @if ($event->categories->count() > 0 || $event->customCategories->count() > 0)
                     <div class="bg-white p-6 rounded-2xl border shadow-sm">
                         <h4 class="text-lg font-semibold text-gray-800 mb-3">Categories</h4>
                         <div class="flex flex-wrap gap-2">
-                            @foreach ($categories as $cat)
-                                <span class="px-3 py-1.5 bg-gray-200 text-gray-700 text-sm rounded-full">
-                                    {{ trim($cat) }}
+                            {{-- Default Categories --}}
+                            @foreach ($event->categories as $category)
+                                <span class="px-3 py-1.5 bg-blue-100 text-blue-700 text-sm rounded-full">
+                                    {{ $category->name }}
+                                </span>
+                            @endforeach
+
+                            {{-- Custom Categories --}}
+                            @foreach ($event->customCategories as $customCategory)
+                                <span class="px-3 py-1.5 bg-green-100 text-green-700 text-sm rounded-full">
+                                    {{ $customCategory->name }}
                                 </span>
                             @endforeach
                         </div>

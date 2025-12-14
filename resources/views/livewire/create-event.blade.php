@@ -1,4 +1,4 @@
-<x-layouts.app.admin>
+
 <div class="max-w-6xl mx-auto bg-white shadow-lg rounded-2xl p-8 mt-10 space-y-8">
     <h2 class="text-3xl font-bold text-gray-800 mb-4">Create New Event</h2>
 
@@ -159,17 +159,77 @@
             </div>
         </div>
 
-        <div>
-            <h3 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Categories</h3>
-            <div class="flex flex-wrap gap-4">
-                @foreach (['Adult Male', 'Adult Female', 'Kids', 'Senior', 'Open'] as $cat)
-                    <label class="flex items-center space-x-2">
-                        <input type="checkbox" wire:model="categories" value="{{ $cat }}">
-                        <span>{{ $cat }}</span>
-                    </label>
-                @endforeach
+        
+            <!-- Categories -->
+            <div>
+                <h3 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Categories</h3>
+
+                <!-- Default Categories -->
+                <div class="space-y-2 mb-4">
+                    <p class="font-medium text-sm text-gray-600 mb-2">Available Categories:</p>
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        @foreach ($allCategories as $category)
+                            <label class="flex items-center p-2 hover:bg-gray-50 rounded-lg cursor-pointer border border-gray-200">
+                                <input 
+                                    type="checkbox" 
+                                    wire:model="selectedDefaultCategories" 
+                                    value="{{ $category->id }}"
+                                    class="mr-2 w-4 h-4 text-blue-600"
+                                >
+                                <span class="text-sm">{{ $category->name }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Selected Default Categories Display -->
+                @if(count($selectedDefaultCategories) > 0)
+                    <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                        <p class="font-medium text-sm text-gray-600 mb-2">
+                            Selected ({{ count($selectedDefaultCategories) }}):
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach($selectedDefaultCategories as $id)
+                                @php
+                                    $cat = $allCategories->firstWhere('id', $id);
+                                @endphp
+                                @if($cat)
+                                    <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">
+                                        {{ $cat->name }}
+                                    </span>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Custom Categories -->
+                <div class="mt-4">
+                    <label class="font-semibold">Custom Categories</label>
+
+                    <div class="space-y-2 mt-2">
+                        @foreach($customCategoryList as $index => $value)
+                            <div class="flex items-center gap-2">
+                                <input type="text" class="border p-2 rounded w-full"
+                                    wire:model="customCategoryList.{{ $index }}"
+                                    placeholder="Enter category name">
+
+                                <button class="px-2 py-1 bg-red-500 text-white rounded"
+                                        wire:click.prevent="removeCustomCategory({{ $index }})">
+                                    X
+                                </button>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <button class="mt-2 px-3 py-1 bg-blue-600 text-white rounded"
+                            wire:click.prevent="addCustomCategory">
+                        + Add Custom Category
+                    </button>
+                </div>
             </div>
-        </div>
+
 
         <!-- OPTIONAL -->
         <div>
@@ -242,4 +302,4 @@
         });
     </script>
 </div>
-</x-layouts.app.admin>
+
