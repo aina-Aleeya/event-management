@@ -67,7 +67,6 @@ class AdminController extends Controller
         return view('admin.groups', compact('event', 'participants'));
     }
 
-
     public function storeGroup(Request $request, $eventId)
     {
         $request->validate([

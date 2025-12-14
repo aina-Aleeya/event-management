@@ -128,3 +128,8 @@ Route::post('/admin/events/{event}/assign', [AdminController::class, 'assignToGr
 Route::get('/admin/grouping', [AdminController::class, 'groupingIndex'])
     ->name('admin.grouping.index');
 
+Route::get('/admin/events/{event}/grouping/{category}', [AdminController::class, 'groupingByCategory'])
+    ->name('admin.grouping.category');
+
+Route::post('/admin/groups/{event}/move', [GroupController::class, 'moveParticipant'])->name('admin.group.move');
+Route::post('/admin/groups/{event}/remove', [GroupController::class, 'removeParticipant'])->name('admin.group.remove');
