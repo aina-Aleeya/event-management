@@ -39,7 +39,7 @@ class EventDashboardPage extends Component
         $this->clickCount = $event->click_count ?? 0;
 
         $this->latestParticipants = $event->pesertas()
-            ->withPivot('kategori', 'unique_id', 'status_bayaran', 'created_at')
+            ->withPivot('unique_id','status_bayaran', 'categorizable_type', 'categorizable_id', 'created_at')
             ->orderBy('penyertaan.created_at', 'asc') // lama daftar dulu
             ->take(5)
             ->get();
@@ -52,26 +52,26 @@ class EventDashboardPage extends Component
     }
     public $rankingCategory = 'Individu';
 
-    // Top 3 Individu
-    public function getTopIndividualProperty()
-    {
-        return RankingReport::with('penyertaan.peserta')
-            ->where('event_id', $this->event->id)
-            ->orderBy('ranking')
-            ->get()
-            ->filter(fn($r) => substr($r->penyertaan->kategori, 0, 1) === 'I')
-            ->take(3);
-    }
+// Top 3 Individu
+public function getTopIndividualProperty()
+{
+    return RankingReport::with('penyertaan.peserta')
+        ->where('event_id', $this->event->id)
+        ->orderBy('ranking')
+        ->get()
+        ->filter(fn($r) => $r->penyertaan->categorizable_type === \App\Models\Category::class)
+        ->take(3);
+}
 
-    // Top 3 Berkumpulan
-    public function getTopGroupProperty()
-    {
-        $reports = RankingReport::with('penyertaan.peserta')
-            ->where('event_id', $this->event->id)
-            ->get()
-            ->filter(fn($r) => substr($r->penyertaan->kategori, 0, 1) === 'G')
-            ->sortBy('ranking') // pastikan ikut ranking DB
-            ->take(3);
+// Top 3 Berkumpulan
+public function getTopGroupProperty()
+{
+    $reports = RankingReport::with('penyertaan.peserta')
+        ->where('event_id', $this->event->id)
+        ->get()
+        ->filter(fn($r) => $r->penyertaan->categorizable_type === \App\Models\CustomCategory::class)
+        ->sortBy('ranking') // pastikan ikut ranking DB
+        ->take(3);
 
         return $reports->map(function ($report) {
             $gp = \DB::table('group_peserta')
