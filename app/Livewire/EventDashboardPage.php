@@ -73,42 +73,39 @@ public function getTopGroupProperty()
         ->sortBy('ranking') // pastikan ikut ranking DB
         ->take(3);
 
-    return $reports->map(function($report) {
-        $gp = \DB::table('group_peserta')
-            ->where('event_id', $this->event->id)
-            ->where('peserta_id', $report->penyertaan->peserta_id)
-            ->first();
+        return $reports->map(function ($report) {
+            $gp = \DB::table('group_peserta')
+                ->where('event_id', $this->event->id)
+                ->where('peserta_id', $report->penyertaan->peserta_id)
+                ->first();
 
-        if ($gp) {
-            $group = \App\Models\Group::with('pesertas')->find($gp->group_id);
-            if ($group) {
-                $report->group_name = $group->name;
-                $report->group_members = $group->pesertas->pluck('nama_penuh')->implode(', ');
+            if ($gp) {
+                $group = \App\Models\Group::with('pesertas')->find($gp->group_id);
+                if ($group) {
+                    $report->group_name = $group->name;
+                    $report->group_members = $group->pesertas->pluck('nama_penuh')->implode(', ');
+                }
             }
-        }
 
-        return $report;
-    });
-}
+            return $report;
+        });
+    }
 
-
-
-
-public function render()
-{
-    return view('livewire.event-dashboard-page', [
-        'event' => $this->event,
-        'participants' => $this->participants,
-        'latestParticipants' => $this->latestParticipants,
-        'totalParticipants' => $this->totalParticipants,
-        'completedPayments' => $this->completedPayments,
-        'pendingPayments' => $this->pendingPayments,
-        'totalRevenue' => $this->totalRevenue,
-        'topRankings' => $this->topRankings,
-        'clickCount' => $this->clickCount,
-        'topIndividual' => $this->topIndividual,
-        'topGroup' => $this->topGroup,
-    ]);
-}
-
+    public function render()
+    {
+        return view('livewire.admin.event-dashboard-page', [
+            'event' => $this->event,
+            'participants' => $this->participants,
+            'latestParticipants' => $this->latestParticipants,
+            'totalParticipants' => $this->totalParticipants,
+            'completedPayments' => $this->completedPayments,
+            'pendingPayments' => $this->pendingPayments,
+            'totalRevenue' => $this->totalRevenue,
+            'topRankings' => $this->topRankings,
+            'clickCount' => $this->clickCount,
+            'topIndividual' => $this->topIndividual,
+            'topGroup' => $this->topGroup,
+        ])
+        ->layout('components.layouts.app.admin');
+    }
 }

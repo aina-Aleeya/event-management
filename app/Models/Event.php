@@ -60,11 +60,6 @@ class Event extends Model
             ->withTimestamps();
     }
 
-    public function status()
-    {
-        return $this->hasOne(EventStatus::class);
-    }
-
     public function groups()
     {
         return $this->hasMany(Group::class);

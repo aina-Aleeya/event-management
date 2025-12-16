@@ -15,7 +15,7 @@
 
             <!-- Left: Logo + System Name -->
             <div class="flex items-center">
-                <a href="{{ route('dashboard') }}" class="flex items-center space-x-2 hover:opacity-80 transition"
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-2 hover:opacity-80 transition"
                     wire:navigate>
                     <x-app-logo class="size-8 text-purple-400" />
                 </a>
@@ -25,8 +25,6 @@
             <div class="flex items-center space-x-4">
                 <a href="{{ route('admin.dashboard') }}"
                 class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Home</a>
-                <a href="{{ route('admin.event-approval') }}"
-                class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Event Approval</a>
                 <a href="{{ route('admin.grouping.index') }}"
                 class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Grouping System</a>
 
@@ -93,9 +91,45 @@
             </div>
     </header>
 
+    <!-- Breadcrumbs Section -->
+    @php
+        use App\Helpers\BreadcrumbHelper;
+        $autoBreadcrumbs = BreadcrumbHelper::generate();
+        $showBreadcrumbs = isset($breadcrumbs) || View::hasSection('breadcrumbs') || !empty($autoBreadcrumbs);
+    @endphp
+    
+    @if($showBreadcrumbs)
+    <nav class="fixed top-14 left-0 z-40 w-full bg-white border-b border-gray-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 py-3">
+            <ol class="flex items-center space-x-2 text-sm text-gray-600">
+                <li>
+                    <a href="{{ route('admin.dashboard') }}" class="hover:text-purple-600 transition flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+
+                {{-- Manual breadcrumbs from slot --}}
+                @isset($breadcrumbs)
+                    {{ $breadcrumbs }}
+                @else
+                    {{-- Try section --}}
+                    @if(View::hasSection('breadcrumbs'))
+                        @yield('breadcrumbs')
+                    @else
+                        {{-- Auto-generated breadcrumbs --}}
+                        {!! BreadcrumbHelper::render() !!}
+                    @endif
+                @endisset
+            </ol>
+        </div>
+    </nav>
+    @endif
 
     <!-- Page Content -->
-    <main class="pt-9 p-4">
+    <main class="pt-28 p-4">
         {{ $slot }}
     </main>
 

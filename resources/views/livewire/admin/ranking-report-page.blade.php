@@ -107,7 +107,7 @@
                             Published Leaderboard
                         </h3>
 
-                        <a href="{{ route('organiser.event.ranking.export', $event->id) }}"
+                        <a href="{{ route('admin.event.ranking.export', $event->id) }}"
                             class="inline-flex items-center px-2 py-1 bg-green-600 border border-transparent rounded-md shadow-sm text-xs font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
                             <i class="fas fa-file-excel mr-1"></i>
                             Export
