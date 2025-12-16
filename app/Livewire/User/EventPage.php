@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\User;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -17,7 +17,7 @@ class EventPage extends Component
 
        
 
-        return view('livewire.event-page', [
+        return view('livewire.user.event-page', [
             'banners' => $banners,
 
         ]);

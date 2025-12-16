@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\User;
 
 
 use Livewire\Component;
@@ -106,6 +106,6 @@ public function payLater()
 
     public function render()
     {
-        return view('livewire.payment-form');
+        return view('livewire.user.payment-form');
     }
 }

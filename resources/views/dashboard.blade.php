@@ -1,6 +1,5 @@
 <x-layouts.app :title="__('Dashboard')">
 
-
 <!-- Hero Section -->
 <section
     class="relative flex flex-col md:flex-row items-center justify-between h-[75vh] overflow-hidden px-10 text-gray-800 bg-white">
@@ -18,26 +17,6 @@
             Connect with people through shared experiences. Whether you’re joining an exciting event or planning
             your own, our platform helps you connect, create, and celebrate with people who share your passions.
         </p>
-
-        @auth
-            <!-- If logged in -->
-            <a href="{{ route('create-event') }}"
-               class="inline-block bg-red-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg 
-                      hover:bg-red-800 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-out z-20">
-                + Create Event
-            </a>
-        @else
-            <!-- If not logged in -->
-            <button x-data @click="
-                    if (confirm('You need to login first to create an event')) {
-                        window.location = '{{ route('login') }}';
-                    }
-                "
-                class="inline-block bg-red-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg 
-                       hover:bg-red-800 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-out z-20">
-                + Create Event
-            </button>
-        @endauth
     </div>
 </section>
 
@@ -69,7 +48,7 @@
 
     <!-- Search and Event List -->
 
-    <livewire:event-list :limit="4" />
+    <livewire:user.event-list :limit="4" />
 
 </x-layouts.app>
 

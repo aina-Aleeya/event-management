@@ -5,7 +5,6 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Event;
-use App\Models\EventStatus;
 use Illuminate\Support\Facades\Auth;
 
 class EditEvent extends Component
@@ -109,18 +108,12 @@ class EditEvent extends Component
             'ads_end_date' => $this->ads_end_date ? \Carbon\Carbon::parse($this->ads_end_date) : null,
         ]);
 
-        // Reset status to pending for re-approval
-        $status = EventStatus::firstOrNew(['event_id' => $this->event->id]);
-        $status->status = 'pending';
-        $status->rejection_reason = null;
-        $status->save();
-
         session()->flash('message', 'Event updated and resubmitted for admin approval.');
-        return redirect()->route('organiser.dashboard');
+        return redirect()->route('admin.dashboard');
     }
 
     public function render()
     {
-        return view('livewire.edit-event');
+        return view('livewire.admin.edit-event');
     }
 }

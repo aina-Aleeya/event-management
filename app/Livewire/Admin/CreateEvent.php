@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Event;
 use Illuminate\Support\Facades\Auth;
-use App\Models\EventStatus;
 use App\Models\Category;
 
 class CreateEvent extends Component
@@ -48,13 +47,14 @@ class CreateEvent extends Component
         'start_time' => 'nullable',
         'end_time' => 'nullable',
         'registration_deadline' => 'nullable|date|before_or_equal:end_date',
-        'selectedDefaultCategories' => 'array',  // <-- ubah sini
-        'customCategoryList' => 'array',         // <-- dan sini
+        'selectedDefaultCategories' => 'array',
+        'customCategoryList' => 'array',
         'ads_start_date' => 'nullable|date',
         'ads_end_date' => 'nullable|date|after_or_equal:ads_start_date',
         'entry_fee' => 'nullable|numeric|min:0',
         'max_participants' => 'nullable|integer|min:1',
     ];
+
     public function mount()
     {
         $this->allCategories = Category::all();
@@ -62,7 +62,6 @@ class CreateEvent extends Component
 
     protected $listeners = [
         'updateDescription' => 'updateDescription'
-        
     ];
 
     public function addCustomCategory()
@@ -76,10 +75,17 @@ class CreateEvent extends Component
         $this->customCategoryList = array_values($this->customCategoryList);
     }
 
-
     public function updateDescription($data)
     {
         $this->description = $data['value'] ?? '';
+    }
+
+    public function updatedPosters()
+    {
+        // This validates each file as it's uploaded
+        $this->validate([
+            'posters.*' => 'image|max:2048',
+        ]);
     }
 
     public function save()
@@ -93,8 +99,6 @@ class CreateEvent extends Component
                 $posterPaths[] = $image->store('event_posters', 'public');
             }
         }
-
-        $posterJson = json_encode($posterPaths);
 
         $event = Event::create([
             'user_id' => Auth::id(),
@@ -116,18 +120,10 @@ class CreateEvent extends Component
             'entry_fee' => $this->entry_fee,
             'max_participants' => $this->max_participants,
         ]);
-            
-        EventStatus::create([
-            'event_id' => $event->id,
-            'status'   => 'pending'
-        ]);
 
         $event->event_link = url('/events/' . $event->id);
         $event->qr_code = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($event->event_link);
         $event->save();
-
-        
-        
 
         // Sync default categories (pivot)
         if (!empty($this->selectedDefaultCategories)) {
@@ -141,25 +137,22 @@ class CreateEvent extends Component
             $event->customCategories()->create(['name' => $name]);
         }
 
-
-        session()->flash('message', 'Event submitted for admin approval.');
-        return redirect()->route('organiser.dashboard');
-
-        // session()->flash('success', 'Event created successfully!');
-
-        $this->reset();
-        $this->dispatch('refreshTinyMCE');
+        session()->flash('success', 'Event created successfully!');
+        return redirect()->route('admin.dashboard');
     }
 
     public function removePoster($index)
     {
-        $posters = $this->posters;
-        unset($posters[$index]);
-        $this->posters = array_values($posters); // reindex array
+        if (isset($this->posters[$index])) {
+            unset($this->posters[$index]);
+            $this->posters = array_values($this->posters);
+        }
     }
 
     public function render()
     {
-        return view('livewire.create-event') ;
+        // Return WITHOUT layout - the blade file already has the layout
+        return view('livewire.admin.create-event')
+            ->layout('components.layouts.app.admin');
     }
 }

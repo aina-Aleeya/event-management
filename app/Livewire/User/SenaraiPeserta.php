@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\User;
 
 use Livewire\Component;
 use App\Models\Peserta;
@@ -27,6 +27,6 @@ class SenaraiPeserta extends Component
 
     public function render()
     {
-        return view('livewire.senarai-peserta');
+        return view('livewire.user.senarai-peserta');
     }
 }

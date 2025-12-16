@@ -1,155 +1,88 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="light">
+<header class="fixed top-0 left-0 z-50 w-full bg-white  border-b border-gray-200">
+    
+    <div class="flex w-full items-center justify-between px-6 py-3">
 
-<head>
-    @include('partials.head')
-    @livewireStyles
-</head>
-
-<body class="min-h-screen bg-white text-black">
-
-    <div x-data="sidebarComponent()" x-init="init()" wire:ignore class="relative min-h-screen">
-
-        <!-- Header Section -->
-        <header class="fixed top-0 left-0 z-50 w-full bg-white shadow-md border-b border-gray-200">
-            <div class="flex w-full items-center justify-between px-6 py-3">
-
-                <!-- Left: Logo + System Name -->
-                <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 hover:opacity-90 transition"
-                    wire:navigate>
-                    <div
-                        class="flex aspect-square w-10 h-10 items-center justify-center rounded-full bg-gradient-to-tr from-purple-500 via-pink-500 to-red-500 text-white shadow-lg">
-                        <x-app-logo-icon class="w-5 h-5 fill-current" />
-                    </div>
-                    <span class="font-sans font-bold text-black text-lg md:text-xl tracking-wide">GreatEvent</span>
-                </a>
-
-                <!-- Right: Menu / Auth -->
-                <div class="flex items-center space-x-4">
-                    <a href="{{ route('dashboard') }}"
-                        class="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition">Home</a>
-                    <a href="{{ route('events.page') }}"
-                        class="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition">Events</a>
-                    @auth
-                        <!-- Sidebar Toggle Button -->
-                        <button @click="sidebarOpen = !sidebarOpen" 
-                            class="flex items-center gap-2 px-3 py-1.5 bg-white rounded-lg shadow hover:bg-gray-100 focus:outline-none">
-                            <span
-                                class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-red-300 text-white">
-                                {{ auth()->user()->initials() }}
-                            </span>
-                            <span class="font-semibold text-gray-900">{{ auth()->user()->name }}</span>
-                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                    @else
-                        <!-- Before Login -->
-                        <a href="{{ route('login') }}"
-                            class="text-sm font-medium text-black bg-red-200 px-3 py-1.5 rounded-lg hover:bg-red-300 transition">Login</a>
-                        <a href="{{ route('register') }}"
-                            class="text-sm font-medium text-white bg-red-400 px-3 py-1.5 rounded-lg hover:bg-red-500 transition">Register</a>
-                    @endauth
-                </div>
-
+        {{-- Logo --}}
+        <a href="{{ route('dashboard') }}"
+           class="flex items-center space-x-3 hover:opacity-90 transition"
+           wire:navigate>
+            <div
+                class="flex w-10 h-10 items-center justify-center rounded-full
+                       bg-gradient-to-tr from-purple-500 via-pink-500 to-red-500
+                       text-white shadow-lg">
+                <x-app-logo-icon class="w-5 h-5 fill-current" />
             </div>
-        </header>
+            <span class="font-bold text-lg tracking-wide">GreatEvent</span>
+        </a>
 
-        <!-- Sidebar -->
-        @auth
-            <aside x-show="sidebarOpen" 
-                   @click.outside="sidebarOpen = false" 
-                   x-transition:enter="transition ease-out duration-300"
-                   x-transition:enter-start="translate-x-full"
-                   x-transition:enter-end="translate-x-0"
-                   x-transition:leave="transition ease-in duration-200"
-                   x-transition:leave-start="translate-x-0"
-                   x-transition:leave-end="translate-x-full"
-                   x-cloak
-                   class="fixed top-0 right-0 h-full w-80 bg-white shadow-lg z-50">
+        {{-- Right Menu --}}
+        <div class="flex items-center space-x-4">
+            <a href="{{ route('dashboard') }}"
+               class="px-4 py-2 font-medium rounded-lg hover:bg-gray-100">
+                Home
+            </a>
 
-                <!-- Sidebar Header -->
-                <div class="p-6 border-b border-gray-200 flex items-center gap-4">
-                    <div
-                        class="w-16 h-16 rounded-full bg-red-400 flex items-center justify-center text-white text-3xl font-bold">
+            <a href="{{ route('events.page') }}"
+               class="px-4 py-2 font-medium rounded-lg hover:bg-gray-100">
+                Events
+            </a>
+
+            
+
+            @auth
+            <!-- Divider -->
+            <div class="h-6 w-px bg-gray-700"></div>
+                <div class="relative" x-data="{ userMenuOpen: false }">
+                    <button @click="userMenuOpen = !userMenuOpen"
+                                class="flex items-center gap-2 px-4 py-2 font-medium rounded-lg hover:bg-gray-100">
+                    <span class="inline-flex h-8 w-8 items-center justify-center
+                                rounded-full bg-red-300 text-white">
                         {{ auth()->user()->initials() }}
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-600">Welcome back,</p>
-                        <h2 class="text-lg font-bold text-gray-900">{{ auth()->user()->name }}</h2>
+                    </span>
+                    <span class="font-semibold">{{ auth()->user()->name }}</span>
+                    <i class="fa-solid fa-chevron-down text-gray-500 text-xs"></i>
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div x-show="userMenuOpen" 
+                        @click.outside="userMenuOpen = false"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 translate-y-1"
+                        x-transition:enter-end="opacity-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 translate-y-0"
+                        x-transition:leave-end="opacity-0 translate-y-1"
+                        x-cloak
+                        class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+
+                        {{-- Dropdown Items --}}
+                        <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-gray-700 hover:bg-red-50">
+                            <i class="fa-solid fa-gear mr-2"></i> Settings
+                        </a>
+
+                        <a href="{{ route('history') }}" class="block px-4 py-2 text-gray-700 hover:bg-red-50">
+                            <i class="fa-solid fa-ticket mr-2"></i> History Events
+                        </a>
+
+                        <div class="border-t my-1"></div>
+
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">
+                                <i class="fa-solid fa-right-from-bracket mr-2"></i> Log out
+                            </button>
+                        </form>
                     </div>
                 </div>
+                @else
+                    <!-- Before Login -->
+                    <a href="{{ route('login') }}"
+                        class="text-sm font-medium text-black bg-red-200 px-3 py-1.5 rounded-lg hover:bg-red-300 transition">Login</a>
+                    <a href="{{ route('register') }}"
+                        class="text-sm font-medium text-white bg-red-400 px-3 py-1.5 rounded-lg hover:bg-red-500 transition">Register</a>
+            @endauth
 
-                <!-- Sidebar Menu -->
-                <nav class="flex-grow py-2 px-2 space-y-1">
-                    <a href="{{ route('profile.edit') }}" @click="sidebarOpen = false"
-                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
-                        <i class="fa-solid fa-gear mr-2"></i>Settings
-                    </a>
-                    <a href="{{ route('history') }}" @click="sidebarOpen = false"
-                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
-                        <i class="fa-solid fa-ticket mr-2"></i>My Ticket History
-                    </a>
-                    <a href="{{ route('create-event') }}" @click="sidebarOpen = false"
-                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
-                        <i class="fa-solid fa-calendar mr-2"></i>Create Event
-                    </a>
-
-                    <div class="border-t border-black my-1"></div>
-
-                    <a href="{{ route('organiser.dashboard') }}" @click="sidebarOpen = false"
-                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
-                        <i class="fa-solid fa-laptop-file mr-2"></i>Organizer Dashboard
-                    </a>
-                    <a href="{{ route('organiser.check-event') }}" @click="sidebarOpen = false"
-                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
-                        <i class="fa-solid fa-clipboard-check mr-2"></i>My Event Status
-                    </a>
-                </nav>
-
-                <!-- Sidebar Logout -->
-                <div class="p-2 border-t border-black">
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit"
-                            class="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-md">
-                            <i class="fa-solid fa-right-from-bracket mr-2"></i>Log out
-                        </button>
-                    </form>
-                </div>
-
-            </aside>
-        @endauth
-
-        <!-- Page Content -->
-        <main class="pt-8.5">
-            {{ $slot }}
-        </main>
+        </div>
 
     </div>
-
-    @livewireScripts
-    @fluxScripts
-    @stack('scripts')
-
-    <script>
-        function sidebarComponent() {
-            return {
-                sidebarOpen: false,
-                init() {
-                    // Close sidebar immediately when navigation starts
-                    window.addEventListener('livewire:navigating', () => {
-                        this.sidebarOpen = false;
-                    });
-                }
-            }
-        }
-    </script>
-
-    <style>
-        [x-cloak] { display: none !important; }
-    </style>
-</body>
-
-</html>
+</header>

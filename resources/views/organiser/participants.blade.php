@@ -8,7 +8,7 @@
             <div class="p-4 border-b flex items-center justify-between">
                 <h2 class="text-lg font-semibold">Participant Overview</h2>
 
-                <a href="{{ route('organiser.event.participants.export', $event->id) }}"
+                <a href="{{ route('admin.event.participants.export', $event->id) }}"
                     class="inline-flex items-center px-2 py-1 bg-green-600 border border-transparent rounded-md shadow-sm text-xs font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
                     <i class="fas fa-file-excel mr-1"></i>
                     Export to Excel
@@ -34,7 +34,7 @@
                             <tr class="text-gray-700">
                                 <!-- NAME + AVATAR -->
                                 <td class="px-4 py-3">
-                                    <a href="{{ route('organiser.participant.view', $p->id) }}"
+                                    <a href="{{ route('admin.participant.view', $p->id) }}"
                                         class="flex items-center text-sm hover:opacity-80 transition">
                                         @if($p->gambar)
                                             <img class="w-9 h-9 mr-3 rounded-full object-cover"

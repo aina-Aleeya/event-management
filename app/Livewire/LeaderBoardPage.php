@@ -70,6 +70,7 @@ public function loadLeaderboard()
 
         return view('livewire.leader-board-page', [
             'event' => $event,
-        ]);
+        ])
+        ->layout('components.layouts.app.admin');
     }
 }
