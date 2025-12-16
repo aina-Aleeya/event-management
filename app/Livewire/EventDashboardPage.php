@@ -93,7 +93,7 @@ public function getTopGroupProperty()
 
     public function render()
     {
-        return view('livewire.event-dashboard-page', [
+        return view('livewire.admin.event-dashboard-page', [
             'event' => $this->event,
             'participants' => $this->participants,
             'latestParticipants' => $this->latestParticipants,
@@ -105,6 +105,7 @@ public function getTopGroupProperty()
             'clickCount' => $this->clickCount,
             'topIndividual' => $this->topIndividual,
             'topGroup' => $this->topGroup,
-        ]);
+        ])
+        ->layout('components.layouts.app.admin');
     }
 }

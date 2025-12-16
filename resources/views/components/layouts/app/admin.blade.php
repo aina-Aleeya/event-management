@@ -15,7 +15,7 @@
 
             <!-- Left: Logo + System Name -->
             <div class="flex items-center">
-                <a href="{{ route('dashboard') }}" class="flex items-center space-x-2 hover:opacity-80 transition"
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-2 hover:opacity-80 transition"
                     wire:navigate>
                     <x-app-logo class="size-8 text-purple-400" />
                 </a>
@@ -25,8 +25,6 @@
             <div class="flex items-center space-x-4">
                 <a href="{{ route('admin.dashboard') }}"
                 class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Home</a>
-                <a href="{{ route('admin.event-approval') }}"
-                class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Event Approval</a>
                 <a href="{{ route('admin.grouping.index') }}"
                 class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Grouping System</a>
 
@@ -94,7 +92,13 @@
     </header>
 
     <!-- Breadcrumbs Section -->
-    @if(isset($breadcrumbs) || View::hasSection('breadcrumbs'))
+    @php
+        use App\Helpers\BreadcrumbHelper;
+        $autoBreadcrumbs = BreadcrumbHelper::generate();
+        $showBreadcrumbs = isset($breadcrumbs) || View::hasSection('breadcrumbs') || !empty($autoBreadcrumbs);
+    @endphp
+    
+    @if($showBreadcrumbs)
     <nav class="fixed top-14 left-0 z-40 w-full bg-white border-b border-gray-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-6 py-3">
             <ol class="flex items-center space-x-2 text-sm text-gray-600">
@@ -107,10 +111,17 @@
                     </a>
                 </li>
 
+                {{-- Manual breadcrumbs from slot --}}
                 @isset($breadcrumbs)
                     {{ $breadcrumbs }}
                 @else
-                    @yield('breadcrumbs')
+                    {{-- Try section --}}
+                    @if(View::hasSection('breadcrumbs'))
+                        @yield('breadcrumbs')
+                    @else
+                        {{-- Auto-generated breadcrumbs --}}
+                        {!! BreadcrumbHelper::render() !!}
+                    @endif
                 @endisset
             </ol>
         </div>

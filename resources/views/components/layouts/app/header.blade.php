@@ -91,21 +91,15 @@
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
                         <i class="fa-solid fa-ticket mr-2"></i>My Ticket History
                     </a>
-                    <a href="{{ route('create-event') }}" @click="sidebarOpen = false"
-                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
-                        <i class="fa-solid fa-calendar mr-2"></i>Create Event
-                    </a>
 
-                    <div class="border-t border-black my-1"></div>
-
-                    <a href="{{ route('organiser.dashboard') }}" @click="sidebarOpen = false"
+                    {{-- <a href="{{ route('organiser.dashboard') }}" @click="sidebarOpen = false"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
                         <i class="fa-solid fa-laptop-file mr-2"></i>Organizer Dashboard
-                    </a>
-                    <a href="{{ route('organiser.check-event') }}" @click="sidebarOpen = false"
+                    </a> --}}
+                    {{-- <a href="{{ route('organiser.check-event') }}" @click="sidebarOpen = false"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 rounded-md">
                         <i class="fa-solid fa-clipboard-check mr-2"></i>My Event Status
-                    </a>
+                    </a> --}}
                 </nav>
 
                 <!-- Sidebar Logout -->

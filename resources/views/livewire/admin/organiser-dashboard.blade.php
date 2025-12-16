@@ -1,7 +1,7 @@
 <div class="max-w-6xl mx-auto p-6">
     <div class="flex justify-between items-center">
         <h1 class="text-xl font-bold">Organiser Dashboard</h1>
-        <a href="{{ route('create-event') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">+ Create
+        <a href="{{ route('admin.create-event') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">+ Create
             Event</a>
     </div>
     <div class="max-w-7xl mx-auto p-6">

@@ -265,6 +265,7 @@ class RankingReportPage extends Component
     public function render()
     {
         $event = Event::find($this->eventId);
-        return view('livewire.ranking-report-page', ['event' => $event]);
+        return view('livewire.admin.ranking-report-page', ['event' => $event])
+        ->layout('components.layouts.app.admin');
     }
 }

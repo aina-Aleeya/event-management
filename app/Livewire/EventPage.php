@@ -12,10 +12,7 @@ class EventPage extends Component
 
     public function render()
     {
-        
         $banners = Event::latest()->take(4)->get();
-
-       
 
         return view('livewire.event-page', [
             'banners' => $banners,

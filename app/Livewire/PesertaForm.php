@@ -31,12 +31,12 @@ class PesertaForm extends Component
         $this->idIklan = $id;
         $this->event = Event::with(['categories', 'customCategories'])->find($id);
 
-        // Combine default and custom categories
-        $defaultCats = $this->event->categories->map(function($cat) {
+        // Ensure we have collections to work with (handle null/empty cases)
+        $defaultCats = collect($this->event->categories ?? [])->map(function ($cat) {
             return ['id' => 'default_' . $cat->id, 'name' => $cat->name, 'type' => 'default'];
         });
 
-        $customCats = $this->event->customCategories->map(function($cat) {
+        $customCats = collect($this->event->customCategories ?? [])->map(function ($cat) {
             return ['id' => 'custom_' . $cat->id, 'name' => $cat->name, 'type' => 'custom'];
         });
 
@@ -57,8 +57,9 @@ class PesertaForm extends Component
         ];
     }
 
-    public function addPeserta(){
-        
+    public function addPeserta()
+    {
+
 
         $this->pesertas[] = [
             'nama_penuh' => '',
@@ -73,7 +74,8 @@ class PesertaForm extends Component
         ];
     }
 
-    public function removePeserta($index){
+    public function removePeserta($index)
+    {
         unset($this->pesertas[$index]);
         $this->pesertas = array_values($this->pesertas);
     }
@@ -87,7 +89,7 @@ class PesertaForm extends Component
             $this->suggestions[$index] = Peserta::where('nama_penuh', 'like', "%{$value}%")
                 ->where('user_agent', request()->userAgent())
                 ->get()
-                ->map(function($item) {
+                ->map(function ($item) {
                     return [
                         'id' => $item->id,
                         'nama_penuh' => $item->nama_penuh,
@@ -95,7 +97,7 @@ class PesertaForm extends Component
                     ];
                 })
                 ->toArray();
-        }else {
+        } else {
             // kosongkan suggestion kalau input < 2 huruf
             $this->suggestions[$index] = [];
         }
@@ -119,36 +121,35 @@ class PesertaForm extends Component
         ];
 
         $this->suggestions[$index] = [];
-        
     }
 
-    
 
-    public function updated($propertyName, $value){
+
+    public function updated($propertyName, $value)
+    {
         if (str_contains($propertyName, 'pesertas.') && str_contains($propertyName, '.ic')) {
             // Dapatkan index
             preg_match('/pesertas\.(\d+)\.ic/', $propertyName, $matches);
             $index = $matches[1] ?? null;
-    
+
             if ($index !== null) {
                 $ic = preg_replace('/\D/', '', $value);
-    
+
                 if (strlen($ic) == 12) {
                     $tahun = substr($ic, 0, 2);
                     $bulan = substr($ic, 2, 2);
                     $hari  = substr($ic, 4, 2);
                     $tahun_penuh = ($tahun < date('y')) ? '20' . $tahun : '19' . $tahun;
-    
+
                     $tarikh = sprintf('%04d-%02d-%02d', $tahun_penuh, $bulan, $hari);
                     $jantina_digit = substr($ic, -1);
                     $jantina = ($jantina_digit % 2 == 0) ? 'Perempuan' : 'Lelaki';
-    
+
                     $this->pesertas[$index]['tarikh_lahir'] = $tarikh;
                     $this->pesertas[$index]['jantina'] = $jantina;
                 }
             }
         }
-
     }
 
     public function save()
@@ -163,7 +164,7 @@ class PesertaForm extends Component
                 session()->flash('error', 'Please fill in registrant name and email.');
                 return;
             }
-    
+
             // Cipta atau ambil guest user
             $guest = User::firstOrCreate(
                 ['email' => $this->pendaftar_email],
@@ -173,7 +174,7 @@ class PesertaForm extends Component
                     'role' => 'guest',
                 ]
             );
-    
+
             $pendaftarId = $guest->id;
             session(['guest_id' => $pendaftarId]);
         }
@@ -222,8 +223,8 @@ class PesertaForm extends Component
                 [$type, $id] = explode('_', $categoryId);
 
                 // Determine the model class (CLEAR!)
-                $categorizableType = $type === 'default' 
-                    ? \App\Models\Category::class 
+                $categorizableType = $type === 'default'
+                    ? \App\Models\Category::class
                     : \App\Models\CustomCategory::class;
 
                 $existing = Penyertaan::where('event_id', $this->idIklan)
