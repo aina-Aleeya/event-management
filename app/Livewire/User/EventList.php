@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\User;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -26,6 +26,6 @@ class EventList extends Component
             $events = $query->paginate(12);
         }
 
-        return view('livewire.event-list', compact('events'));
+        return view('livewire.user.event-list', compact('events'));
     }
 }

@@ -4,19 +4,21 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             @forelse ($events as $event)
                 <div onclick="window.location='{{ route('ads.click', ['id' => $event->id]) }}'"
-                    class="group relative flex flex-col bg-white rounded-xl shadow-md hover:shadow-lg 
+                    class="group relative flex flex-col bg-white rounded-xl hover:shadow-lg 
                            border border-gray-200 transition duration-200 overflow-hidden cursor-pointer">
 
                     {{-- Image Section --}}
                     <div class="relative w-full h-48 overflow-hidden">
-                        <img src="{{ $event->poster ? asset('storage/' . $event->poster) : asset('img/sample-event.jpg') }}"
-                             alt="{{ $event->title }}"
-                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102">
+                        <img 
+                            src="{{ !empty($event->posters) ? asset('storage/' . $event->posters[0]) : asset('img/sample-event.jpg') }}"
+                            alt="{{ $event->title }}"
+                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
+                        >
                         <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent"></div>
                     </div>
 
                     {{-- Calendar Box --}}
-                    <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md rounded-lg text-center shadow-md w-14 border border-gray-200">
+                    <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md rounded-lg text-center w-14 border border-gray-200">
                         @if($event->start_date)
                             <div class="text-red-700 font-bold text-sm uppercase">
                                 {{ \Carbon\Carbon::parse($event->start_date)->format('M') }}
