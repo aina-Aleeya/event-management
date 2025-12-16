@@ -65,7 +65,7 @@
 
     {{-- Livewire components --}}
     <livewire:header-search />
-    <livewire:event-list />
+    <livewire:user.event-list />
 
     <script>
         function carousel(totalSlides) {

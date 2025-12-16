@@ -67,29 +67,4 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->name('scoresheet.export-all-groups');
 });
 
-// User Routes - Protected by auth
-Route::middleware(['auth'])->group(function () {
-    // User History
-    Route::get('/history', HistoryPage::class)->name('history');
-    Route::get('/history-participant/{eventId}', SenaraiPeserta::class)->name('history.participant');
 
-    // Payment
-    Route::get('/payment/{id}', PaymentForm::class)->name('payment.form');
-
-    // Settings
-    Route::redirect('settings', 'settings/profile');
-    Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
-    Volt::route('settings/password', 'settings.password')->name('password.edit');
-    Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
-
-    Volt::route('settings/two-factor', 'settings.two-factor')
-        ->middleware(
-            when(
-                Features::canManageTwoFactorAuthentication()
-                    && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
-                ['password.confirm'],
-                [],
-            ),
-        )
-        ->name('two-factor.show');
-});
