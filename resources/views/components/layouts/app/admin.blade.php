@@ -129,7 +129,7 @@
     @endif
 
     <!-- Page Content -->
-    <main class="pt-28 p-4">
+    <main class="pt-20">
         {{ $slot }}
     </main>
 

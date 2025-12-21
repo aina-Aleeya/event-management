@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Scoresheet - All Groups - {{ $event->title }}</title>
@@ -9,12 +10,12 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: Arial, sans-serif;
-            font-size: 11px;
-            line-height: 1.3;
-            padding: 15mm;
+            font-size: 10px;
+            line-height: 1.2;
+            padding: 10mm;
         }
 
         .page-break {
@@ -23,27 +24,27 @@
 
         .header {
             text-align: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
             border-bottom: 3px solid #333;
         }
 
         .header h1 {
-            font-size: 22px;
-            margin-bottom: 5px;
+            font-size: 20px;
+            margin-bottom: 3px;
             text-transform: uppercase;
         }
 
         .header h2 {
-            font-size: 18px;
+            font-size: 16px;
             color: #666;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
 
         .event-info {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             background-color: #f5f5f5;
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #ddd;
         }
 
@@ -52,7 +53,7 @@
         }
 
         .event-info td {
-            padding: 3px 10px;
+            padding: 2px 8px;
         }
 
         .event-info-label {
@@ -62,21 +63,21 @@
 
         .group-info {
             background-color: #e8e8e8;
-            padding: 8px 10px;
-            margin-bottom: 15px;
+            padding: 6px 8px;
+            margin-bottom: 10px;
             border: 2px solid #333;
             text-align: center;
         }
 
         .group-name {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             display: inline-block;
-            margin-right: 20px;
+            margin-right: 15px;
         }
 
         .group-category {
-            font-size: 14px;
+            font-size: 12px;
             color: #555;
             display: inline-block;
         }
@@ -84,20 +85,20 @@
         .score-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .score-table th,
         .score-table td {
             border: 2px solid #333;
-            padding: 8px;
+            padding: 6px;
             text-align: center;
         }
 
         .score-table th {
             background-color: #d0d0d0;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .score-table .participant-name {
@@ -107,14 +108,14 @@
 
         .score-table .score-cell {
             background-color: #fff;
-            min-height: 35px;
-            width: 80px;
+            min-height: 28px;
+            width: 70px;
         }
 
         .score-table .average-cell {
             background-color: #ffe8a1;
             font-weight: bold;
-            width: 80px;
+            width: 70px;
         }
 
         .score-table tbody tr:nth-child(even) {
@@ -122,20 +123,20 @@
         }
 
         .remarks-section {
-            margin-top: 20px;
+            margin-top: 10px;
             border: 2px solid #333;
-            padding: 10px;
-            min-height: 60px;
+            padding: 8px;
+            min-height: 40px;
         }
 
         .remarks-label {
             font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 12px;
+            margin-bottom: 3px;
+            font-size: 11px;
         }
 
         .signature-section {
-            margin-top: 20px;
+            margin-top: 10px;
             display: table;
             width: 100%;
         }
@@ -143,34 +144,61 @@
         .signature-box {
             display: table-cell;
             width: 33.33%;
-            padding: 10px;
+            padding: 5px;
             text-align: center;
+            vertical-align: top;
         }
 
         .signature-line {
             border-top: 2px solid #333;
-            margin-top: 50px;
-            padding-top: 8px;
+            margin-top: 30px;
+            padding-top: 5px;
             font-weight: bold;
+            font-size: 10px;
+        }
+
+        /* QR Code styling - COMPACT */
+        .qr-code-container {
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .qr-code-container img {
+            width: 60px;
+            height: 60px;
+            display: block;
+            margin: 0 auto;
+            border: 1px solid #333;
+            padding: 3px;
+            background-color: #fff;
+        }
+
+        .qr-code-container p {
+            font-size: 7px;
+            margin-top: 3px;
+            font-weight: bold;
+            color: #333;
         }
 
         .footer {
-            margin-top: 20px;
+            margin-top: 10px;
             text-align: center;
-            font-size: 10px;
+            font-size: 9px;
             color: #666;
         }
 
         .no-participants {
             text-align: center;
-            padding: 30px;
+            padding: 20px;
             color: #888;
             font-style: italic;
             border: 2px dashed #ccc;
             background-color: #f9f9f9;
+            font-size: 11px;
         }
     </style>
 </head>
+
 <body>
     @foreach($groups as $index => $group)
         <div class="header">
@@ -244,6 +272,20 @@
                     <div class="signature-line">
                         Date
                     </div>
+                    <!-- QR Code with Clickable Link -->
+                    <div class="qr-code-container">
+                        @if(!empty($group->qr_code_path) && file_exists($group->qr_code_path))
+                            <img src="{{ $group->qr_code_path }}" alt="QR Code">
+                            <p>SCAN TO SUBMIT</p>
+                            <!-- Clickable Link for Testing -->
+                            <a href="{{ url('/markah/' . $group->token) }}"
+                                style="display: block; margin-top: 5px; font-size: 7px; color: #0066cc; text-decoration: none; word-break: break-all;">
+                                {{ url('/markah/' . $group->token) }}
+                            </a>
+                        @else
+                            <p style="color: #999; font-size: 7px;">QR Code unavailable</p>
+                        @endif
+                    </div>
                 </div>
             </div>
         @else
@@ -264,4 +306,5 @@
         @endif
     @endforeach
 </body>
+
 </html>

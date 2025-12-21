@@ -14,11 +14,10 @@ class EventPage extends Component
 
     public function render()
     {
-        // Get 4 latest events for banner carousel
-        $banners = Event::latest()->take(4)->get();
         
-        // Get paginated events (4 per page) - this is handled by the EventList component
-        // So we don't need to pass events here anymore
+        $banners = Event::latest()->take(4)->get();
+
+       
 
         return view('livewire.user.event-page', [
             'banners' => $banners,
