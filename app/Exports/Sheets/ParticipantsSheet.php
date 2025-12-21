@@ -40,7 +40,7 @@ class ParticipantsSheet implements FromArray, WithHeadings, WithTitle, WithEvent
 
             $data[] = [
                 $p->nama_penuh,
-                $p->pivot->kategori_nama,
+                $p->pivot->category_name,
                 $p->pivot->unique_id,
                 $payment,
                 $date,

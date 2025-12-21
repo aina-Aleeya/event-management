@@ -9,15 +9,24 @@ use App\Livewire\LeaderBoardPage;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\RankingExportController;
 use App\Http\Controllers\ParticipantExportController;
+use App\Http\Controllers\RankingController;
+use App\Http\Controllers\MarkahController;
 use App\Livewire\Admin\CreateEvent;
 use App\Http\Controllers\ScoresheetController;
 
-require __DIR__.'/user.php';
+require __DIR__ . '/user.php';
 
 // Public Routes
 Route::get('/', function () {
     return view('dashboard');
 })->name('home');
+
+// Score Submission Routes
+Route::get('/markah/{token}', [App\Http\Controllers\MarkahController::class, 'form'])
+    ->name('markah.form');
+
+Route::post('/markah/{token}', [App\Http\Controllers\MarkahController::class, 'submit'])
+    ->name('markah.submit');
 
 Route::view('dashboard', 'dashboard')->name('dashboard');
 
@@ -37,6 +46,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/participants/{event}', [AdminController::class, 'participants'])->name('participants');
     Route::get('/participant/{peserta}', [AdminController::class, 'viewParticipant'])->name('participant.view');
     Route::get('/event/{event}/participants/export', [ParticipantExportController::class, 'export'])->name('event.participants.export');
+    Route::get('/event/{event}/participants/pdf', [ParticipantExportController::class, 'exportParticipantsPdf'])->name('event.participants.pdf');
 
     // Grouping System
     Route::get('/grouping', [AdminController::class, 'groupingIndex'])->name('grouping.index');
@@ -52,6 +62,17 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/ranking-report/{event}', RankingReportPage::class)->name('ranking.report');
     Route::get('/event/{event}/leaderboard', LeaderboardPage::class)->name('event.leaderboard');
     Route::get('/event/{event}/ranking/export', [RankingExportController::class, 'export'])->name('event.ranking.export');
+
+    //Ranking (baru)
+    Route::get('/ranking/{event}', [RankingController::class, 'show'])
+        ->name('ranking.show');
+
+    // Export routes (baru)
+    Route::get('/ranking/{event}/export-sheet', [App\Http\Controllers\RankingExportController::class, 'exportSheet'])
+        ->name('ranking.export.sheet');
+    
+    Route::get('/ranking/{event}/export-pdf', [App\Http\Controllers\RankingExportController::class, 'exportPdf'])
+        ->name('ranking.export.pdf');
 
     // Scoresheet Export
     Route::get(

@@ -41,5 +41,6 @@
                 <a href="{{ route('payment.form', ['event_id' => $eventId]) }}">Pay</a>
             @endif
         </div>
+        @endif
     </div>
 </div>

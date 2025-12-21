@@ -29,13 +29,7 @@ class RankingReportExport implements WithMultipleSheets
             ->whereHas('penyertaan', fn($q) => $q->where('kategori', 'like', 'G%'))
             ->exists();
 
-        if ($hasIndividu) {
-            $sheets['Individu'] = new Sheets\IndividuRankingSheet($this->event);
-        }
 
-        if ($hasGroup) {
-            $sheets['Berkumpulan'] = new Sheets\GroupRankingSheet($this->event);
-        }
 
         return $sheets;
     }
