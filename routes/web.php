@@ -1,23 +1,18 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
-use Livewire\Volt\Volt;
-use App\Livewire\EventDetails;
-use App\Livewire\EventPage;
-use App\Livewire\PesertaForm;
+use App\Livewire\OrganiserDashboard;
 use App\Http\Controllers\AdminController;
-use App\Livewire\PaymentForm;
-use App\Livewire\SenaraiPeserta;
 use App\Livewire\RankingReportPage;
 use App\Livewire\EventDashboardPage;
 use App\Livewire\LeaderBoardPage;
-use App\Livewire\HistoryPage;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\RankingExportController;
 use App\Http\Controllers\ParticipantExportController;
 use App\Livewire\Admin\CreateEvent;
 use App\Http\Controllers\ScoresheetController;
+
+require __DIR__.'/user.php';
 
 // Public Routes
 Route::get('/', function () {
@@ -25,12 +20,6 @@ Route::get('/', function () {
 })->name('home');
 
 Route::view('dashboard', 'dashboard')->name('dashboard');
-
-Route::get('/events', [EventPage::class, 'render'])->name('events.page');
-
-Route::get('/daftar/{id}', PesertaForm::class)->name('peserta.form');
-
-Route::get('/events/{id}', EventDetails::class)->name('event.details');
 
 Route::get('/ads/{id}/click', [EventController::class, 'trackClick'])->name('ads.click');
 
@@ -76,31 +65,4 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         [ScoresheetController::class, 'exportAllGroups']
     )
         ->name('scoresheet.export-all-groups');
-});
-
-// User Routes - Protected by auth
-Route::middleware(['auth'])->group(function () {
-    // User History
-    Route::get('/history', HistoryPage::class)->name('history');
-    Route::get('/history-participant/{eventId}', SenaraiPeserta::class)->name('history.participant');
-
-    // Payment
-    Route::get('/payment/{id}', PaymentForm::class)->name('payment.form');
-
-    // Settings
-    Route::redirect('settings', 'settings/profile');
-    Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
-    Volt::route('settings/password', 'settings.password')->name('password.edit');
-    Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
-
-    Volt::route('settings/two-factor', 'settings.two-factor')
-        ->middleware(
-            when(
-                Features::canManageTwoFactorAuthentication()
-                    && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
-                ['password.confirm'],
-                [],
-            ),
-        )
-        ->name('two-factor.show');
 });

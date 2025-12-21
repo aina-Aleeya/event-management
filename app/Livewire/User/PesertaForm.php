@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\User;
 
 use App\Models\Peserta;
 use App\Models\Penyertaan;
@@ -269,6 +269,6 @@ class PesertaForm extends Component
 
     public function render()
     {
-        return view('livewire.peserta-form');
+        return view('livewire.user.peserta-form');
     }
 }

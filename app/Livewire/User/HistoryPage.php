@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\User;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +34,6 @@ class HistoryPage extends Component
 
     public function render()
     {
-        return view('livewire.history-page');
+        return view('livewire.user.history-page');
     }
 }

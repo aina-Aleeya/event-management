@@ -163,6 +163,13 @@
                         <p class="text-gray-400 text-sm mt-2">Create an event first to start organizing participants.</p>
                     </div>
                 @endforelse
+
+                {{-- Pagination Links --}}
+                @if($events->hasPages())
+                    <div class="flex justify-center mt-8">
+                        {{ $events->links() }}
+                    </div>
+                @endif
             </div>
         </div>
     </div>

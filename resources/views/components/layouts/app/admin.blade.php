@@ -24,7 +24,7 @@
             <!-- Right: Home, Event, User Menu -->
             <div class="flex items-center space-x-4">
                 <a href="{{ route('admin.dashboard') }}"
-                class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Home</a>
+                class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Dashboard</a>
                 <a href="{{ route('admin.grouping.index') }}"
                 class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Grouping System</a>
 

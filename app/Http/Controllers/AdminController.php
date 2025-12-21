@@ -75,7 +75,7 @@ class AdminController extends Controller
 
     public function groupingIndex()
     {
-        $events = Event::all();
+        $events = Event::paginate(5);
 
         // Add category information to each event's participants
         foreach ($events as $event) {

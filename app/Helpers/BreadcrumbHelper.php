@@ -18,11 +18,9 @@ class BreadcrumbHelper
         
         $breadcrumbs = [];
 
-        // Map route names to breadcrumb configurations
         switch ($routeName) {
             // Dashboard
             case 'admin.dashboard':
-                // No additional breadcrumbs - just shows "Dashboard"
                 break;
 
             // Create Event
@@ -36,12 +34,7 @@ class BreadcrumbHelper
                 // Handle both ID and model instance
                 $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
                 $event = $eventId ? Event::find($eventId) : null;
-                
                 if ($event) {
-                    $breadcrumbs[] = [
-                        'label' => 'Events',
-                        'url' => route('admin.dashboard')
-                    ];
                     $breadcrumbs[] = ['label' => $event->title];
                 }
                 break;
@@ -53,10 +46,6 @@ class BreadcrumbHelper
                 $event = $eventId ? Event::find($eventId) : null;
                 
                 if ($event) {
-                    $breadcrumbs[] = [
-                        'label' => 'Events',
-                        'url' => route('admin.dashboard')
-                    ];
                     $breadcrumbs[] = [
                         'label' => $event->title,
                         'url' => route('admin.event.dashboard', $event->id)
@@ -72,25 +61,16 @@ class BreadcrumbHelper
                 $peserta = $pesertaId ? Peserta::find($pesertaId) : null;
                 
                 if ($peserta) {
-                    // Try to get the event from referrer or session
-                    $eventId = session('last_event_id');
-                    if ($eventId) {
-                        $event = Event::find($eventId);
-                        if ($event) {
-                            $breadcrumbs[] = [
-                                'label' => 'Events',
-                                'url' => route('admin.dashboard')
-                            ];
-                            $breadcrumbs[] = [
-                                'label' => $event->title,
-                                'url' => route('admin.event.dashboard', $event->id)
-                            ];
-                            $breadcrumbs[] = [
-                                'label' => 'Participants',
-                                'url' => route('admin.participants', $event->id)
-                            ];
-                        }
+                    if ($peserta->event) {
+                        $breadcrumbs[] = [
+                            'label' => $peserta->event->title,
+                            'url' => route('admin.event.dashboard', $peserta->event->id)
+                        ];
                     }
+                    $breadcrumbs[] = [
+                        'label' => 'Participants',
+                        'url' => url()->previous()
+                    ];
                     $breadcrumbs[] = ['label' => $peserta->nama_penuh];
                 }
                 break;
@@ -163,6 +143,79 @@ class BreadcrumbHelper
 
             default:
                 // No breadcrumbs for unknown routes
+                break;
+
+            //USER
+            case 'events.page':
+                $breadcrumbs[] = ['label' => 'Events'];
+                break;
+
+            case 'event.details':
+                $eventParam = $parameters['id'] ?? null;
+                $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
+                $event = $eventId ? Event::find($eventId) : null;
+
+                if ($event) {
+                    $breadcrumbs[] = [
+                        'label' => 'Events',
+                        'url' => route('events.page')
+                    ];
+                    $breadcrumbs[] = ['label' => $event->title];
+                }
+                break;
+            
+            case 'peserta.form':
+                $eventParam = $parameters['id'] ?? null;
+                $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
+                $event = $eventId ? Event::find($eventId) : null;
+
+                if ($event) {
+                    $breadcrumbs[] = [
+                        'label' => 'Events',
+                        'url' => route('events.page')
+                    ];
+                    $breadcrumbs[] = [
+                        'label' => $event->title,
+                        'url' => route('event.details', $event->id)
+                    ];
+                    $breadcrumbs[] = ['label' => 'Registration'];
+                }
+                break;
+
+            case 'history':
+                $breadcrumbs[] = ['label' => 'Event History'];
+                break;
+            
+            case 'history.participant':
+                $eventParam = $parameters['eventId'] ?? null;
+                $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
+                $event = $eventId ? Event::find($eventId) : null;
+
+                if ($event) {
+                    $breadcrumbs[] = [
+                        'label' => 'Event History',
+                        'url' => route('history')
+                    ];
+                    $breadcrumbs[] = ['label' => $event->title];
+                }
+                break;
+
+            case 'payment.form':
+                $eventParam = $parameters['event_id'] ?? null;
+                $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
+                $event = $eventId ? Event::find($eventId) : null;
+
+                if ($event) {
+                    $breadcrumbs[] = [
+                        'label' => 'Event History',
+                        'url' => route('history')
+                    ];
+                    $breadcrumbs[] = [
+                        'label' => $event->title,
+                        'url' => route('event.details', $event->id)
+                    ];
+                    $breadcrumbs[] = ['label' => 'Payment'];
+                }
                 break;
         }
 
