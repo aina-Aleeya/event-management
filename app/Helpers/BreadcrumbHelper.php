@@ -95,8 +95,6 @@ class BreadcrumbHelper
                 }
                 break;
 
-
-
             // Participant Details
             case 'admin.participant.view':
                 $pesertaParam = $parameters['peserta'] ?? null;
@@ -120,26 +118,45 @@ class BreadcrumbHelper
 
             // Grouping Index
             case 'admin.grouping.index':
-                $breadcrumbs[] = ['label' => 'Grouping System'];
+                $breadcrumbs[] = ['label' => 'Groups'];
                 break;
 
-            // Groups by Event
+            // Groups by Event (context-aware breadcrumbs)
             case 'admin.groups':
                 $eventParam = $parameters['event'] ?? null;
                 $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
                 $event = $eventId ? Event::find($eventId) : null;
                 $category = request('category');
-
+                $from = request('from', 'event-dashboard'); // Default context
+                
                 if ($event) {
-                    $breadcrumbs[] = [
-                        'label' => 'Grouping System',
-                        'url' => route('admin.grouping.index')
-                    ];
-                    $breadcrumbs[] = [
-                        'label' => $event->title,
-                        'url' => route('admin.groups', $event->id)
-                    ];
-
+                    if ($from === 'grouping-system') {
+                        // Path: Dashboard > Grouping System > Event > Category
+                        $breadcrumbs[] = [
+                            'label' => 'Groups',
+                            'url' => route('admin.grouping.index')
+                        ];
+                        $breadcrumbs[] = [
+                            'label' => $event->title,
+                            'url' => route('admin.groups', [
+                                'event' => $event->id, 
+                                'from' => 'grouping-system'
+                            ])
+                        ];
+                    } else {
+                        // Path: Dashboard > Event Name > Grouping Category
+                        $breadcrumbs[] = [
+                            'label' => $event->title,
+                            'url' => route('admin.event.dashboard', $event->id)
+                        ];
+                        $breadcrumbs[] = [
+                            'label' => 'Grouping Category',
+                            'url' => route('admin.event.grouping', [
+                                'event' => $event->id
+                            ])
+                        ];
+                    }
+                    
                     if ($category) {
                         $breadcrumbs[] = ['label' => $category];
                     }
