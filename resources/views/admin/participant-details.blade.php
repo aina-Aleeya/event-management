@@ -57,7 +57,7 @@
                 <div class="p-3 bg-gray-50 rounded-lg">
                     <p class="text-sm text-gray-500 font-semibold">Category</p>
                     <p class="font-medium text-gray-800">
-                        {{ $pivot->kategori ?? '-' }}
+                        {{ $pivot->kategori_nama ?? '-' }}
                     </p>
                 </div>
 

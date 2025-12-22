@@ -12,6 +12,7 @@ use App\Livewire\User\HistoryPage;
 
 Route::get('/events', EventPage::class)->name('events.page');
 
+
 Route::get('/daftar/{id}', PesertaForm::class)->name('peserta.form');
 
 Route::get('/events/{id}', EventDetails::class)->name('event.details');

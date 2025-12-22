@@ -6,59 +6,80 @@
     @livewireStyles
 </head>
 
-<body class="min-h-screen bg-white text-black">
+<body class="min-h-screen bg-gray-50 text-gray-900">
 
-    <!-- Header Section -->
-    <header
-        class="fixed top-0 left-0 z-50 w-full bg-purple-200/70 backdrop-blur-md border-b border-purple-300/50 shadow-md transition-all duration-300">
-        <div class="flex w-full items-center justify-between px-6 py-2 text-gray-900">
+    <!-- Header Navigation -->
+    <header class="fixed top-0 left-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="relative flex items-center justify-between h-16">
 
-            <!-- Left: Logo + System Name -->
-            <div class="flex items-center">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-2 hover:opacity-80 transition"
-                    wire:navigate>
-                    <x-app-logo class="size-8 text-purple-400" />
-                </a>
-            </div>
+                <!-- Left: Logo + System Name -->
+                <div class="flex items-center gap-8">
+                    <a href="{{ route('admin.dashboard') }}" 
+                       class="flex items-center gap-3 hover:opacity-80 transition group"
+                       wire:navigate>
+                        <x-app-logo class="w-8 h-8 text-purple-600 group-hover:text-purple-700 transition" />
+                    </a>
+                </div>
 
-            <!-- Right: Home, Event, User Menu -->
-            <div class="flex items-center space-x-4">
-                <a href="{{ route('admin.dashboard') }}"
-                class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Home</a>
-                <a href="{{ route('admin.grouping.index') }}"
-                class="px-3 py-1.5 rounded-lg hover:bg-blue-200 transition">Grouping System</a>
+                <!-- Center: Navigation Links (Absolutely Positioned) -->
+                <nav class="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
+                    <a href="{{ route('admin.dashboard') }}"
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                            Dashboard
+                        </div>
+                    </a>
+                    <a href="{{ route('admin.grouping.index') }}"
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition-all {{ request()->routeIs('admin.grouping.*') || request()->routeIs('admin.groups') ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                            Groups
+                        </div>
+                    </a>
+                </nav>
 
-
-                <!-- Right: Auth / User Menu -->
-                <div class="flex items-center space-x-4">
+                <!-- Right: User Menu -->
+                <div class="flex items-center gap-3">
                     @auth
                         <!-- User Dropdown -->
                         <flux:dropdown position="top" align="end">
-                            <flux:profile class="cursor-pointer" :initials="auth()->user()->initials()" />
+                            <flux:button variant="ghost" size="sm" class="!p-0">
+                                <div class="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition">
+                                    <div class="hidden sm:block text-right">
+                                        <p class="text-sm font-semibold text-gray-900">{{ auth()->user()->name }}</p>
+                                        <p class="text-xs text-gray-500">Administrator</p>
+                                    </div>
+                                    <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold shadow-md">
+                                        {{ auth()->user()->initials() }}
+                                    </div>
+                                </div>
+                            </flux:button>
 
-                            <flux:menu class="bg-white dark:bg-gray-800">
-                                <flux:menu.radio.group>
-                                    <div class="p-0 text-sm font-normal">
-                                        <div class="flex items-center gap-2 px-2 py-2 text-start text-sm">
-                                            <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
-                                                <span
-                                                    class="flex h-full w-full items-center justify-center rounded-lg bg-purple-300 text-white dark:bg-purple-400">
-                                                    {{ auth()->user()->initials() }}
-                                                </span>
-                                            </span>
-
-                                            <div class="grid flex-1 text-start text-sm leading-tight">
-                                                <span
-                                                    class="truncate font-semibold text-gray-900 dark:text-white">{{ auth()->user()->name }}</span>
-                                                <span
-                                                    class="truncate text-xs text-gray-600 dark:text-gray-400">{{ auth()->user()->email }}</span>
-                                            </div>
+                            <flux:menu class="bg-white dark:bg-gray-800 min-w-[240px]">
+                                <!-- User Info -->
+                                <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                            {{ auth()->user()->initials() }}
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                                                {{ auth()->user()->name }}
+                                            </p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                                {{ auth()->user()->email }}
+                                            </p>
                                         </div>
                                     </div>
-                                </flux:menu.radio.group>
+                                </div>
 
-                                <flux:menu.separator />
-
+                                <!-- Menu Items -->
                                 <flux:menu.radio.group>
                                     <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
                                         {{ __('Settings') }}
@@ -67,6 +88,7 @@
 
                                 <flux:menu.separator />
 
+                                <!-- Logout -->
                                 <form method="POST" action="{{ route('logout') }}" class="w-full">
                                     @csrf
                                     <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle"
@@ -79,17 +101,32 @@
                     @else
                         <!-- Before Login -->
                         <a href="{{ route('login') }}"
-                            class="text-sm font-medium text-black bg-purple-400 px-3 py-1.5 rounded-lg hover:bg-purple-500 transition">
+                            class="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition shadow-sm">
                             Login
                         </a>
                         <a href="{{ route('register') }}"
-                            class="text-sm font-medium text-black bg-purple-400 px-3 py-1.5 rounded-lg hover:bg-purple-500 transition">
+                            class="inline-flex items-center px-4 py-2 bg-white text-purple-600 text-sm font-medium rounded-lg border border-purple-600 hover:bg-purple-50 transition">
                             Register
                         </a>
                     @endauth
                 </div>
             </div>
+        </div>
     </header>
+
+    <!-- Mobile Navigation -->
+    <div class="md:hidden fixed top-16 left-0 right-0 z-40 bg-white border-b border-gray-200 shadow-sm">
+        <nav class="flex items-center gap-1 px-6 py-2 overflow-x-auto">
+            <a href="{{ route('admin.dashboard') }}"
+               class="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100' }}">
+                Dashboard
+            </a>
+            <a href="{{ route('admin.grouping.index') }}"
+               class="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all {{ request()->routeIs('admin.grouping.*') || request()->routeIs('admin.groups') ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100' }}">
+                Groups
+            </a>
+        </nav>
+    </div>
 
     <!-- Breadcrumbs Section -->
     @php
@@ -99,15 +136,16 @@
     @endphp
     
     @if($showBreadcrumbs)
-    <nav class="fixed top-14 left-0 z-40 w-full bg-white border-b border-gray-200 shadow-sm">
+    <nav class="fixed top-16 md:top-16 left-0 z-40 w-full bg-gray-50 border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-6 py-3">
             <ol class="flex items-center space-x-2 text-sm text-gray-600">
                 <li>
-                    <a href="{{ route('admin.dashboard') }}" class="hover:text-purple-600 transition flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a href="{{ route('admin.dashboard') }}" 
+                       class="flex items-center gap-1 hover:text-purple-600 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                         </svg>
-                        Dashboard
+                        <span>Dashboard</span>
                     </a>
                 </li>
 
@@ -129,7 +167,7 @@
     @endif
 
     <!-- Page Content -->
-    <main class="pt-28 p-4">
+    <main class="pt-16 {{ $showBreadcrumbs ? 'md:pt-[112px]' : '' }}">
         {{ $slot }}
     </main>
 

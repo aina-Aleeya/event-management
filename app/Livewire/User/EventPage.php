@@ -10,6 +10,8 @@ class EventPage extends Component
 {
     use WithPagination;
 
+    protected $paginationTheme = 'tailwind'; // Use Tailwind pagination styling
+
     public function render()
     {
         
@@ -19,7 +21,6 @@ class EventPage extends Component
 
         return view('livewire.user.event-page', [
             'banners' => $banners,
-
         ]);
     }
 }

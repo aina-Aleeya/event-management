@@ -15,14 +15,12 @@ class BreadcrumbHelper
     {
         $routeName = Route::currentRouteName();
         $parameters = Route::current()->parameters();
-        
+
         $breadcrumbs = [];
 
-        // Map route names to breadcrumb configurations
         switch ($routeName) {
             // Dashboard
             case 'admin.dashboard':
-                // No additional breadcrumbs - just shows "Dashboard"
                 break;
 
             // Create Event
@@ -36,12 +34,8 @@ class BreadcrumbHelper
                 // Handle both ID and model instance
                 $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
                 $event = $eventId ? Event::find($eventId) : null;
-                
+
                 if ($event) {
-                    $breadcrumbs[] = [
-                        'label' => 'Events',
-                        'url' => route('admin.dashboard')
-                    ];
                     $breadcrumbs[] = ['label' => $event->title];
                 }
                 break;
@@ -51,7 +45,23 @@ class BreadcrumbHelper
                 $eventParam = $parameters['event'] ?? null;
                 $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
                 $event = $eventId ? Event::find($eventId) : null;
-                
+
+                if ($event) {
+                    $breadcrumbs[] = [
+                        'label' => $event->title,
+                        'url' => route('admin.event.dashboard', $event->id)
+                    ];
+                    $breadcrumbs[] = ['label' => 'Participants'];
+                }
+                break;
+
+            // Event Dashboard
+            case 'admin.ranking.show':
+                $eventParam = $parameters['event'] ?? null;
+                // Handle both ID and model instance
+                $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
+                $event = $eventId ? Event::find($eventId) : null;
+
                 if ($event) {
                     $breadcrumbs[] = [
                         'label' => 'Events',
@@ -61,7 +71,27 @@ class BreadcrumbHelper
                         'label' => $event->title,
                         'url' => route('admin.event.dashboard', $event->id)
                     ];
-                    $breadcrumbs[] = ['label' => 'Participants'];
+                    $breadcrumbs[] = ['label' => 'View Ranking'];
+                }
+                break;
+
+            // Event Dashboard
+            case 'admin.ranking.show':
+                $eventParam = $parameters['event'] ?? null;
+                // Handle both ID and model instance
+                $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
+                $event = $eventId ? Event::find($eventId) : null;
+
+                if ($event) {
+                    $breadcrumbs[] = [
+                        'label' => 'Events',
+                        'url' => route('admin.dashboard')
+                    ];
+                    $breadcrumbs[] = [
+                        'label' => $event->title,
+                        'url' => route('admin.event.dashboard', $event->id)
+                    ];
+                    $breadcrumbs[] = ['label' => 'View Ranking'];
                 }
                 break;
 
@@ -70,52 +100,62 @@ class BreadcrumbHelper
                 $pesertaParam = $parameters['peserta'] ?? null;
                 $pesertaId = $pesertaParam instanceof Peserta ? $pesertaParam->id : $pesertaParam;
                 $peserta = $pesertaId ? Peserta::find($pesertaId) : null;
-                
+
                 if ($peserta) {
-                    // Try to get the event from referrer or session
-                    $eventId = session('last_event_id');
-                    if ($eventId) {
-                        $event = Event::find($eventId);
-                        if ($event) {
-                            $breadcrumbs[] = [
-                                'label' => 'Events',
-                                'url' => route('admin.dashboard')
-                            ];
-                            $breadcrumbs[] = [
-                                'label' => $event->title,
-                                'url' => route('admin.event.dashboard', $event->id)
-                            ];
-                            $breadcrumbs[] = [
-                                'label' => 'Participants',
-                                'url' => route('admin.participants', $event->id)
-                            ];
-                        }
+                    if ($peserta->event) {
+                        $breadcrumbs[] = [
+                            'label' => $peserta->event->title,
+                            'url' => route('admin.event.dashboard', $peserta->event->id)
+                        ];
                     }
+                    $breadcrumbs[] = [
+                        'label' => 'Participants',
+                        'url' => url()->previous()
+                    ];
                     $breadcrumbs[] = ['label' => $peserta->nama_penuh];
                 }
                 break;
 
             // Grouping Index
             case 'admin.grouping.index':
-                $breadcrumbs[] = ['label' => 'Grouping System'];
+                $breadcrumbs[] = ['label' => 'Groups'];
                 break;
 
-            // Groups by Event
+            // Groups by Event (context-aware breadcrumbs)
             case 'admin.groups':
                 $eventParam = $parameters['event'] ?? null;
                 $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
                 $event = $eventId ? Event::find($eventId) : null;
                 $category = request('category');
+                $from = request('from', 'event-dashboard'); // Default context
                 
                 if ($event) {
-                    $breadcrumbs[] = [
-                        'label' => 'Grouping System',
-                        'url' => route('admin.grouping.index')
-                    ];
-                    $breadcrumbs[] = [
-                        'label' => $event->title,
-                        'url' => route('admin.groups', $event->id)
-                    ];
+                    if ($from === 'grouping-system') {
+                        // Path: Dashboard > Grouping System > Event > Category
+                        $breadcrumbs[] = [
+                            'label' => 'Groups',
+                            'url' => route('admin.grouping.index')
+                        ];
+                        $breadcrumbs[] = [
+                            'label' => $event->title,
+                            'url' => route('admin.groups', [
+                                'event' => $event->id, 
+                                'from' => 'grouping-system'
+                            ])
+                        ];
+                    } else {
+                        // Path: Dashboard > Event Name > Grouping Category
+                        $breadcrumbs[] = [
+                            'label' => $event->title,
+                            'url' => route('admin.event.dashboard', $event->id)
+                        ];
+                        $breadcrumbs[] = [
+                            'label' => 'Grouping Category',
+                            'url' => route('admin.event.grouping', [
+                                'event' => $event->id
+                            ])
+                        ];
+                    }
                     
                     if ($category) {
                         $breadcrumbs[] = ['label' => $category];
@@ -128,7 +168,7 @@ class BreadcrumbHelper
                 $eventParam = $parameters['event'] ?? null;
                 $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
                 $event = $eventId ? Event::find($eventId) : null;
-                
+
                 if ($event) {
                     $breadcrumbs[] = [
                         'label' => 'Events',
@@ -147,7 +187,7 @@ class BreadcrumbHelper
                 $eventParam = $parameters['event'] ?? null;
                 $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
                 $event = $eventId ? Event::find($eventId) : null;
-                
+
                 if ($event) {
                     $breadcrumbs[] = [
                         'label' => 'Events',
@@ -164,6 +204,79 @@ class BreadcrumbHelper
             default:
                 // No breadcrumbs for unknown routes
                 break;
+
+            //USER
+            case 'events.page':
+                $breadcrumbs[] = ['label' => 'Events'];
+                break;
+
+            case 'event.details':
+                $eventParam = $parameters['id'] ?? null;
+                $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
+                $event = $eventId ? Event::find($eventId) : null;
+
+                if ($event) {
+                    $breadcrumbs[] = [
+                        'label' => 'Events',
+                        'url' => route('events.page')
+                    ];
+                    $breadcrumbs[] = ['label' => $event->title];
+                }
+                break;
+            
+            case 'peserta.form':
+                $eventParam = $parameters['id'] ?? null;
+                $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
+                $event = $eventId ? Event::find($eventId) : null;
+
+                if ($event) {
+                    $breadcrumbs[] = [
+                        'label' => 'Events',
+                        'url' => route('events.page')
+                    ];
+                    $breadcrumbs[] = [
+                        'label' => $event->title,
+                        'url' => route('event.details', $event->id)
+                    ];
+                    $breadcrumbs[] = ['label' => 'Registration'];
+                }
+                break;
+
+            case 'history':
+                $breadcrumbs[] = ['label' => 'Event History'];
+                break;
+            
+            case 'history.participant':
+                $eventParam = $parameters['eventId'] ?? null;
+                $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
+                $event = $eventId ? Event::find($eventId) : null;
+
+                if ($event) {
+                    $breadcrumbs[] = [
+                        'label' => 'Event History',
+                        'url' => route('history')
+                    ];
+                    $breadcrumbs[] = ['label' => $event->title];
+                }
+                break;
+
+            case 'payment.form':
+                $eventParam = $parameters['event_id'] ?? null;
+                $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
+                $event = $eventId ? Event::find($eventId) : null;
+
+                if ($event) {
+                    $breadcrumbs[] = [
+                        'label' => 'Event History',
+                        'url' => route('history')
+                    ];
+                    $breadcrumbs[] = [
+                        'label' => $event->title,
+                        'url' => route('event.details', $event->id)
+                    ];
+                    $breadcrumbs[] = ['label' => 'Payment'];
+                }
+                break;
         }
 
         return $breadcrumbs;
@@ -175,7 +288,7 @@ class BreadcrumbHelper
     public static function render()
     {
         $breadcrumbs = self::generate();
-        
+
         if (empty($breadcrumbs)) {
             return '';
         }
@@ -186,7 +299,7 @@ class BreadcrumbHelper
             $html .= '<svg class="w-4 h-4 text-gray-400 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">';
             $html .= '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>';
             $html .= '</svg>';
-            
+
             if (isset($breadcrumb['url'])) {
                 $html .= '<a href="' . $breadcrumb['url'] . '" class="hover:text-purple-600 transition">';
                 $html .= e($breadcrumb['label']);
@@ -194,7 +307,7 @@ class BreadcrumbHelper
             } else {
                 $html .= '<span class="text-gray-900 font-medium">' . e($breadcrumb['label']) . '</span>';
             }
-            
+
             $html .= '</li>';
         }
 

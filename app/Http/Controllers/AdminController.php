@@ -73,9 +73,29 @@ class AdminController extends Controller
         return view('admin.participant-details', compact('peserta'));
     }
 
-    public function groupingIndex()
+    public function groupingIndex(Request $request)
     {
-        $events = Event::all();
+        // Get search parameter
+        $search = $request->input('search');
+
+        // Query events with search filter
+        $query = Event::query();
+
+        if ($search) {
+            $query->where('title', 'like', '%' . $search . '%');
+        }
+
+        $events = $query->paginate(5);
+
+        // Calculate totals for stats cards (across all matching events)
+        $allEventsQuery = Event::query();
+        if ($search) {
+            $allEventsQuery->where('title', 'like', '%' . $search . '%');
+        }
+        $allEvents = $allEventsQuery->get();
+
+        $totalParticipants = 0;
+        $totalGroups = 0;
 
         // Add category information to each event's participants
         foreach ($events as $event) {
@@ -105,7 +125,20 @@ class AdminController extends Controller
             $event->pesertas = collect($participants);
         }
 
-        return view('admin.grouping_index', compact('events'));
+        // Calculate totals for all matching events
+        foreach ($allEvents as $event) {
+            $participantCount = \DB::table('penyertaan')
+                ->where('penyertaan.event_id', $event->id)
+                ->count();
+            $totalParticipants += $participantCount;
+
+            $groupCount = \DB::table('groups')
+                ->where('event_id', $event->id)
+                ->count();
+            $totalGroups += $groupCount;
+        }
+
+        return view('admin.grouping_index', compact('events', 'totalParticipants', 'totalGroups'));
     }
 
     public function groups($eventId)
@@ -306,6 +339,121 @@ class AdminController extends Controller
         }
 
         return redirect($redirectUrl)->with('success', 'Participants auto-grouped successfully');
+    }
+
+    public function eventGrouping($eventId)
+    {
+        $event = Event::with(['groups', 'pesertas'])->findOrFail($eventId);
+
+        // Get all categories for this event
+        $categories = \DB::table('penyertaan')
+            ->join('pesertas', 'penyertaan.peserta_id', '=', 'pesertas.id')
+            ->leftJoin('categories', function ($join) {
+                $join->on('penyertaan.categorizable_id', '=', 'categories.id')
+                    ->where('penyertaan.categorizable_type', '=', \App\Models\Category::class);
+            })
+            ->leftJoin('custom_categories', function ($join) {
+                $join->on('penyertaan.categorizable_id', '=', 'custom_categories.id')
+                    ->where('penyertaan.categorizable_type', '=', \App\Models\CustomCategory::class);
+            })
+            ->where('penyertaan.event_id', $eventId)
+            ->select(\DB::raw('COALESCE(categories.name, custom_categories.name) as category'))
+            ->distinct()
+            ->pluck('category')
+            ->sort();
+
+        // Add category to pesertas
+        $pesertas = \DB::table('penyertaan')
+            ->join('pesertas', 'penyertaan.peserta_id', '=', 'pesertas.id')
+            ->leftJoin('categories', function ($join) {
+                $join->on('penyertaan.categorizable_id', '=', 'categories.id')
+                    ->where('penyertaan.categorizable_type', '=', \App\Models\Category::class);
+            })
+            ->leftJoin('custom_categories', function ($join) {
+                $join->on('penyertaan.categorizable_id', '=', 'custom_categories.id')
+                    ->where('penyertaan.categorizable_type', '=', \App\Models\CustomCategory::class);
+            })
+            ->where('penyertaan.event_id', $eventId)
+            ->select(
+                'pesertas.*',
+                \DB::raw('COALESCE(categories.name, custom_categories.name) as category')
+            )
+            ->get()
+            ->map(function ($item) {
+                $peserta = new Peserta((array)$item);
+                $peserta->id = $item->id;
+                $peserta->category = $item->category;
+                return $peserta;
+            });
+
+        $event->pesertas = collect($pesertas);
+
+        return view('admin.event-grouping', compact('event', 'categories'));
+    }
+
+    public function eventCategoryGrouping($eventId, $category)
+    {
+        $event = Event::with(['groups.pesertas'])->findOrFail($eventId);
+
+        // Get all participants for this event and category
+        $allParticipantsQuery = \DB::table('penyertaan')
+            ->join('pesertas', 'penyertaan.peserta_id', '=', 'pesertas.id')
+            ->leftJoin('categories', function ($join) {
+                $join->on('penyertaan.categorizable_id', '=', 'categories.id')
+                    ->where('penyertaan.categorizable_type', '=', \App\Models\Category::class);
+            })
+            ->leftJoin('custom_categories', function ($join) {
+                $join->on('penyertaan.categorizable_id', '=', 'custom_categories.id')
+                    ->where('penyertaan.categorizable_type', '=', \App\Models\CustomCategory::class);
+            })
+            ->where('penyertaan.event_id', $eventId)
+            ->select(
+                'pesertas.*',
+                \DB::raw('COALESCE(categories.name, custom_categories.name) as category')
+            )
+            ->whereRaw('COALESCE(categories.name, custom_categories.name) = ?', [$category]);
+
+        $allParticipants = $allParticipantsQuery->get()->map(function ($item) {
+            $peserta = new Peserta((array)$item);
+            $peserta->id = $item->id;
+            $peserta->category = $item->category;
+            return $peserta;
+        });
+
+        // Get assigned participant IDs
+        $assignedIds = \DB::table('group_peserta')
+            ->where('event_id', $eventId)
+            ->pluck('peserta_id')
+            ->toArray();
+
+        // Filter unassigned participants
+        $participants = $allParticipants->whereNotIn('id', $assignedIds)->values();
+
+        // Filter groups that have participants from this category
+        $filteredGroups = $event->groups->filter(function ($group) use ($category, $eventId) {
+            // Add category to each participant in the group
+            foreach ($group->pesertas as $peserta) {
+                $categoryData = \DB::table('penyertaan')
+                    ->leftJoin('categories', function ($join) {
+                        $join->on('penyertaan.categorizable_id', '=', 'categories.id')
+                            ->where('penyertaan.categorizable_type', '=', \App\Models\Category::class);
+                    })
+                    ->leftJoin('custom_categories', function ($join) {
+                        $join->on('penyertaan.categorizable_id', '=', 'custom_categories.id')
+                            ->where('penyertaan.categorizable_type', '=', \App\Models\CustomCategory::class);
+                    })
+                    ->where('penyertaan.event_id', $eventId)
+                    ->where('penyertaan.peserta_id', $peserta->id)
+                    ->select(\DB::raw('COALESCE(categories.name, custom_categories.name) as category'))
+                    ->first();
+
+                $peserta->category = $categoryData->category ?? 'Uncategorized';
+            }
+
+            return $group->pesertas->where('category', $category)->count() > 0;
+        });
+
+        return view('admin.event-category-grouping', compact('event', 'category', 'participants', 'allParticipants', 'filteredGroups'));
     }
 
     public function moveParticipant(Request $request, $eventId)
