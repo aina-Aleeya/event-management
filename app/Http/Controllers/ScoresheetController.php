@@ -12,48 +12,48 @@ class ScoresheetController extends Controller
     /**
      * Export scoresheet for a specific group
      */
-public function exportGroup($eventId, $groupId)
-{
-    $event = Event::findOrFail($eventId);
-    $group = Group::with('pesertas')->findOrFail($groupId);
+    public function exportGroup($eventId, $groupId)
+    {
+        $event = Event::findOrFail($eventId);
+        $group = Group::with('pesertas')->findOrFail($groupId);
 
-    // Debug: Check if QR code exists
-    if (empty($group->qr_code)) {
-        // Generate QR code if missing
-        $url = url('/markah/' . $group->token);
-        $group->qr_code = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($url);
-        $group->save();
-    }
+        // Debug: Check if QR code exists
+        if (empty($group->qr_code)) {
+            // Generate QR code if missing
+            $url = url('/markah/' . $group->token);
+            $group->qr_code = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($url);
+            $group->save();
+        }
 
-    // Get category for each participant
-    foreach ($group->pesertas as $peserta) {
-        $categoryData = \DB::table('penyertaan')
-            ->leftJoin('categories', function($join) {
-                $join->on('penyertaan.categorizable_id', '=', 'categories.id')
-                     ->where('penyertaan.categorizable_type', '=', \App\Models\Category::class);
-            })
-            ->leftJoin('custom_categories', function($join) {
-                $join->on('penyertaan.categorizable_id', '=', 'custom_categories.id')
-                     ->where('penyertaan.categorizable_type', '=', \App\Models\CustomCategory::class);
-            })
-            ->where('penyertaan.event_id', $eventId)
-            ->where('penyertaan.peserta_id', $peserta->id)
-            ->select(\DB::raw('COALESCE(categories.name, custom_categories.name) as category'))
-            ->first();
+        // Get category for each participant
+        foreach ($group->pesertas as $peserta) {
+            $categoryData = \DB::table('penyertaan')
+                ->leftJoin('categories', function($join) {
+                    $join->on('penyertaan.categorizable_id', '=', 'categories.id')
+                        ->where('penyertaan.categorizable_type', '=', \App\Models\Category::class);
+                })
+                ->leftJoin('custom_categories', function($join) {
+                    $join->on('penyertaan.categorizable_id', '=', 'custom_categories.id')
+                        ->where('penyertaan.categorizable_type', '=', \App\Models\CustomCategory::class);
+                })
+                ->where('penyertaan.event_id', $eventId)
+                ->where('penyertaan.peserta_id', $peserta->id)
+                ->select(\DB::raw('COALESCE(categories.name, custom_categories.name) as category'))
+                ->first();
+            
+            $peserta->category = $categoryData->category ?? 'Uncategorized';
+        }
+
+        $pdf = PDF::loadView('pdf.scoresheet-group', [
+            'event' => $event,
+            'group' => $group,
+            'participants' => $group->pesertas
+        ])->setPaper('a4', 'landscape');
+
+        $filename = str_replace(' ', '_', $event->title) . '_' . str_replace(' ', '_', $group->name) . '_Scoresheet.pdf';
         
-        $peserta->category = $categoryData->category ?? 'Uncategorized';
+        return $pdf->download($filename);
     }
-
-    $pdf = PDF::loadView('pdf.scoresheet-group', [
-        'event' => $event,
-        'group' => $group,
-        'participants' => $group->pesertas
-    ])->setPaper('a4', 'landscape');
-
-    $filename = str_replace(' ', '_', $event->title) . '_' . str_replace(' ', '_', $group->name) . '_Scoresheet.pdf';
-    
-    return $pdf->download($filename);
-}
 
     /**
      * Export scoresheets for all groups in one PDF

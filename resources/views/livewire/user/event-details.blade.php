@@ -75,7 +75,7 @@
     @endif
 
     {{-- MAIN CONTENT CARD --}}
-    <div class="relative max-w-7xl mx-auto -mt-32 px-6 md:px-16 lg:px-24 pb-20 z-20">
+    <div class="relative max-w-7xl mx-auto px-6 md:px-16 lg:px-24 pb-20 z-20">
         <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-12 space-y-10">
 
             {{-- GRID LAYOUT --}}

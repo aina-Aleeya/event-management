@@ -15,7 +15,7 @@
 
                 <!-- Left: Logo + System Name -->
                 <div class="flex items-center gap-8">
-                    <a href="{{ route('admin.dashboard') }}" 
+                    <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('organiser.dashboard') }}" 
                        class="flex items-center gap-3 hover:opacity-80 transition group"
                        wire:navigate>
                         <x-app-logo class="w-8 h-8 text-purple-600 group-hover:text-purple-700 transition" />
@@ -24,8 +24,8 @@
 
                 <!-- Center: Navigation Links (Absolutely Positioned) -->
                 <nav class="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
-                    <a href="{{ route('admin.dashboard') }}"
-                       class="px-4 py-2 rounded-lg text-sm font-medium transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                    <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('organiser.dashboard') }}"
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition-all {{ request()->routeIs('admin.dashboard') || request()->routeIs('organiser.dashboard') ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
                         <div class="flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
@@ -33,6 +33,8 @@
                             Dashboard
                         </div>
                     </a>
+
+                    {{-- Grouping - Available for both Admin and Organiser --}}
                     <a href="{{ route('admin.grouping.index') }}"
                        class="px-4 py-2 rounded-lg text-sm font-medium transition-all {{ request()->routeIs('admin.grouping.*') || request()->routeIs('admin.groups') ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
                         <div class="flex items-center gap-2">
@@ -42,6 +44,19 @@
                             Groups
                         </div>
                     </a>
+
+                    {{-- Organisers - Admin Only --}}
+                    @if(auth()->user()->isAdmin())
+                        <a href="{{ route('admin.organisers.index') }}"
+                           class="px-4 py-2 rounded-lg text-sm font-medium transition-all {{ request()->routeIs('admin.organisers.*') ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                </svg>
+                                Organisers
+                            </div>
+                        </a>
+                    @endif
                 </nav>
 
                 <!-- Right: User Menu -->
@@ -53,7 +68,7 @@
                                 <div class="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition">
                                     <div class="hidden sm:block text-right">
                                         <p class="text-sm font-semibold text-gray-900">{{ auth()->user()->name }}</p>
-                                        <p class="text-xs text-gray-500">Administrator</p>
+                                        <p class="text-xs text-gray-500">{{ ucfirst(auth()->user()->role) }}</p>
                                     </div>
                                     <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold shadow-md">
                                         {{ auth()->user()->initials() }}
@@ -74,6 +89,9 @@
                                             </p>
                                             <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
                                                 {{ auth()->user()->email }}
+                                            </p>
+                                            <p class="text-xs text-purple-600 dark:text-purple-400 font-medium mt-0.5">
+                                                {{ ucfirst(auth()->user()->role) }}
                                             </p>
                                         </div>
                                     </div>
@@ -117,14 +135,29 @@
     <!-- Mobile Navigation -->
     <div class="md:hidden fixed top-16 left-0 right-0 z-40 bg-white border-b border-gray-200 shadow-sm">
         <nav class="flex items-center gap-1 px-6 py-2 overflow-x-auto">
-            <a href="{{ route('admin.dashboard') }}"
-               class="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100' }}">
+            <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('organiser.dashboard') }}"
+               class="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all {{ request()->routeIs('admin.dashboard') || request()->routeIs('organiser.dashboard') ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100' }}">
                 Dashboard
             </a>
+
             <a href="{{ route('admin.grouping.index') }}"
                class="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all {{ request()->routeIs('admin.grouping.*') || request()->routeIs('admin.groups') ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100' }}">
                 Groups
             </a>
+
+            {{-- @if(auth()->user()->isOrganiser())
+                <a href="{{ route('admin.events.team.index') }}"
+                   class="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all {{ request()->routeIs('organiser.events.*') ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100' }}">
+                    Manage Team
+                </a>
+            @endif --}}
+
+            @if(auth()->user()->isAdmin())
+                <a href="{{ route('admin.organisers.index') }}"
+                   class="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all {{ request()->routeIs('admin.organisers.*') ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100' }}">
+                    Organisers
+                </a>
+            @endif
         </nav>
     </div>
 
@@ -140,7 +173,7 @@
         <div class="max-w-7xl mx-auto px-6 py-3">
             <ol class="flex items-center space-x-2 text-sm text-gray-600">
                 <li>
-                    <a href="{{ route('admin.dashboard') }}" 
+                    <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('organiser.dashboard') }}" 
                        class="flex items-center gap-1 hover:text-purple-600 transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>

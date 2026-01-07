@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,29 +10,6 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class User extends Authenticatable
 {
-
-    // public function IsAdmin()
-    // {
-    //     return $this->role === 'admin';
-    // }
-
-    // public function roles()
-    // {
-    //     return $this->belongsToMany(Role::class, 'role_user');
-    // }
-
-    // public function hasRole($role)
-    // {
-    //     return $this->roles()->where('name', $role)->exists();
-    // }
-
-
-    // public function assignRole($roleName)
-    // {
-    //     $role = Role::firstOrCreate(['name' => $roleName]);
-    //     $this->roles()->syncWithoutDetaching([$role->id]);
-    // }
-
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
@@ -74,15 +50,51 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Get the user's initials
-     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isOrganiser(): bool
+    {
+        return $this->role === 'organiser';
+    }
+
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
+    }
+
+    public function hasAdminAccess(): bool
+    {
+        return in_array($this->role, ['admin', 'organiser']);
+    }
+
     public function initials(): string
     {
-        return Str::of($this->name)
-            ->explode(' ')
-            ->take(2)
-            ->map(fn($word) => Str::substr($word, 0, 1))
-            ->implode('');
+        $words = explode(' ', $this->name);
+        if (count($words) >= 2) {
+            return strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+        }
+        return strtoupper(substr($this->name, 0, 2));
+    }
+
+    // Events this user owns
+    public function ownedEvents()
+    {
+        return $this->hasMany(Event::class, 'user_id');
+    }
+
+    // Events this user is a team member of
+    public function teamMemberEvents()
+    {
+        return $this->hasManyThrough(
+            Event::class,
+            EventTeamMember::class,
+            'user_id',
+            'id',
+            'id',
+            'event_id'
+        );
     }
 }

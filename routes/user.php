@@ -9,6 +9,8 @@ use App\Livewire\User\PesertaForm;
 use App\Livewire\User\PaymentForm;
 use App\Livewire\User\SenaraiPeserta;
 use App\Livewire\User\HistoryPage;
+use App\Http\Controllers\CertificateController;
+
 
 Route::get('/events', EventPage::class)->name('events.page');
 
@@ -40,4 +42,14 @@ Route::middleware(['auth'])->group(function () {
             ),
         )
         ->name('two-factor.show');
+});
+
+Route::prefix('events')->name('user.')->group(function () {
+    // Certificate Download Page
+    Route::get('{event}/certificates', [CertificateController::class, 'participantCertificates'])
+        ->name('certificates');
+    
+    // Download Certificate (POST with email)
+    Route::post('{event}/certificate/download', [CertificateController::class, 'downloadParticipantCertificate'])
+        ->name('certificate.download');
 });
