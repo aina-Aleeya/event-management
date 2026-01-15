@@ -1,26 +1,47 @@
 <x-layouts.app.admin>
-    <div class="max-w-7xl mx-auto px-6 py-6">
+    <x-slot name="breadcrumbs">
+        <li class="flex items-center">
+            <svg class="w-4 h-4 text-gray-400 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+            <a href="{{ route('admin.organisers.index') }}" class="hover:text-purple-600 transition">
+                Organisers</a>
+        </li>
+        <li class="flex items-center">
+            <svg class="w-4 h-4 text-gray-400 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+            <span class="text-gray-900 font-medium">{{ $organiser->name }}</span>
+        </li>
+    </x-slot>
 
-        <!-- Page Header -->
-        <div class="mb-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900">{{ auth()->user()->name }} Dashboard</h1>
-                    <p class="text-sm text-gray-600 mt-1">Overview of events, participants, and engagement statistics</p>
+    <div class="max-w-7xl mx-auto px-6 py-10 space-y-10">
+
+        {{-- Page Title with Back Button --}}
+        <div class="flex items-center justify-between">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <div
+                        class="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-lg">
+                        {{ $organiser->initials() }}
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800">{{ $organiser->name }} Dashboard</h1>
+                        <p class="text-gray-500 text-sm">{{ $organiser->email }}</p>
+                    </div>
                 </div>
-                <a href="{{ route('admin.create-event') }}"
-                    class="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-green-50 to-green-100 border border-green-300 rounded-lg text-sm font-semibold text-green-700 hover:from-green-100 hover:to-green-200 hover:shadow-md transition-all duration-200">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Create New Event
-                </a>
+                <p class="text-gray-500 text-sm ml-15">Viewing as Admin</p>
             </div>
+            <a href="{{ route('admin.organisers.index') }}"
+                class="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-300 rounded-lg text-sm font-semibold text-blue-700 hover:from-blue-100 hover:to-blue-200 hover:shadow-md transition-all duration-200">
+                ← Back to Organisers
+            </a>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <!-- Total Events -->
+        {{-- Stats Overview --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            {{-- Total Events --}}
             <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-5 border border-blue-200">
                 <div class="flex items-center justify-between">
                     <div>
@@ -36,7 +57,7 @@
                 </div>
             </div>
 
-            <!-- Total Participants -->
+            {{-- Total Participants --}}
             <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 border border-green-200">
                 <div class="flex items-center justify-between">
                     <div>
@@ -52,7 +73,7 @@
                 </div>
             </div>
 
-            <!-- Most Viewed Event -->
+            {{-- Most Viewed Event --}}
             <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-5 border border-purple-200">
                 <div class="flex items-center justify-between">
                     <div class="flex-1 min-w-0">
@@ -78,8 +99,8 @@
             </div>
         </div>
 
-        <!-- Event Summary Table -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 mt-4">
+        {{-- Event Summary --}}
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
             <!-- Table Header -->
             <div class="px-6 py-5 border-b border-gray-200">
                 <div class="flex items-center justify-between">
@@ -99,18 +120,16 @@
                 </div>
             </div>
 
-            <!-- Table -->
             @if ($participantSummary->count() > 0)
                 <div class="overflow-x-auto">
-                    <table class="w-full whitespace-nowrap">
-                        <thead>
-                            <tr
-                                class="text-xs font-semibold tracking-wider text-left text-gray-600 uppercase border-b-2 border-gray-200 bg-gray-50">
-                                <th class="px-6 py-4">Event Name</th>
-                                <th class="px-6 py-4">Event Type</th>
-                                <th class="px-6 py-4 text-center">Participants</th>
-                                <th class="px-6 py-4 text-center">Click Count</th>
-                                <th class="px-6 py-4 text-center">Actions</th>
+                    <table class="w-full table-auto text-sm border border-gray-200 rounded-lg overflow-hidden">
+                        <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
+                            <tr>
+                                <th class="p-3 text-left">Event</th>
+                                <th class="p-3 text-left">Event Type</th>
+                                <th class="p-3 text-center">Participants</th>
+                                <th class="p-3 text-center">Click Count</th>
+                                <th class="p-3 text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-100">
@@ -190,8 +209,7 @@
                     <div class="flex items-center justify-between">
                         <p class="text-sm text-gray-600">
                             Showing <span
-                                class="font-semibold text-gray-900">{{ $participantSummary->count() }}</span>
-                            events
+                                class="font-semibold text-gray-900">{{ $participantSummary->count() }}</span> events
                         </p>
                     </div>
                 </div>
@@ -205,17 +223,6 @@
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                         <h3 class="text-xl font-bold text-gray-800 mb-2">No Events Created Yet</h3>
-                        <p class="text-gray-500 mb-6">Get started by creating your first event to track participants
-                            and
-                            engagement.</p>
-                        <a href="{{ route('admin.create-event') }}"
-                            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-50 to-green-100 border border-green-300 rounded-lg text-sm font-semibold text-green-700 hover:from-green-100 hover:to-green-200 hover:shadow-md transition-all">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4" />
-                            </svg>
-                            Create Your First Event
-                        </a>
                     </div>
                 </div>
             @endif

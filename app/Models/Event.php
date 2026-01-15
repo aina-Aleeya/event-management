@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class Event extends Model
 {
@@ -56,7 +60,7 @@ class Event extends Model
     {
         return $this->belongsToMany(Peserta::class, 'penyertaan', 'event_id', 'peserta_id')
             ->using(\App\Models\Penyertaan::class)
-            ->withPivot('unique_id','status_bayaran','categorizable_type','categorizable_id','created_at')
+            ->withPivot('unique_id', 'status_bayaran', 'categorizable_type', 'categorizable_id', 'created_at')
             ->withTimestamps();
     }
 
@@ -67,12 +71,93 @@ class Event extends Model
 
     public function categories()
     {
-        return $this->belongsToMany(Category::class, 'category_event','event_id', 'category_id');
+        return $this->belongsToMany(Category::class, 'category_event', 'event_id', 'category_id');
     }
 
     public function customCategories()
     {
         return $this->hasMany(CustomCategory::class);
     }
+
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function teamMembers(): HasMany
+    {
+        return $this->hasMany(EventTeamMember::class);
+    }
+
+    public function isOwnedBy(User $user): bool
+    {
+        return $this->user_id === $user->id;
+    }
+
+    public function hasTeamMember(User $user): bool
+    {
+        return $this->teamMembers()->where('user_id', $user->id)->exists();
+    }
+
+    public function canBeAccessedBy(User $user): bool
+    {
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        if ($this->isOwnedBy($user)) {
+            return true;
+        }
+
+        return $this->hasTeamMember($user);
+    }
+
+    public function getUserRole(User $user): ?EventTeamMember
+    {
+        if ($this->isOwnedBy($user)) {
+            return null;
+        }
+
+        return $this->teamMembers()->where('user_id', $user->id)->first();
+    }
+
+    public function userHasPermission(User $user, string $permission): bool
+    {
+        if ($user->isAdmin() || $this->isOwnedBy($user)) {
+            return true;
+        }
+
+        $teamMember = $this->getUserRole($user);
+        return $teamMember && $teamMember->hasPermission($permission);
+    }
+
+    public function getCertificateTemplatePath($category)
+    {
+        Log::info("Looking for template for category: " . $category);
+
+        $customCategory = $this->customCategories()->where('name', $category)->first();
+        if ($customCategory) {
+            Log::info("Custom category found: " . $customCategory->name);
+            Log::info("Template path: " . ($customCategory->certificate_template ?? 'NULL'));
+
+            if ($customCategory->certificate_template && Storage::exists($customCategory->certificate_template)) {
+                return $customCategory->certificate_template;
+            }
+        }
+
+        $defaultCategory = $this->categories()->where('name', $category)->first();
+        if ($defaultCategory) {
+            Log::info("Default category found: " . $defaultCategory->name);
+            Log::info("Template path: " . ($defaultCategory->certificate_template ?? 'NULL'));
+
+            if ($defaultCategory->certificate_template && Storage::exists($defaultCategory->certificate_template)) {
+                return $defaultCategory->certificate_template;
+            }
+        }
+
+        Log::warning("No template found for category: " . $category);
+        return null;
+    }
+
 
 }

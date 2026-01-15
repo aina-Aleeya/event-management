@@ -12,9 +12,14 @@ class AdminMiddleware
     {
         $user = Auth::user();
 
-        if (! $user || $user->role !== 'admin') {
+        if (!$user) {
+            return redirect('/')->with('error', 'You must be logged in to access that page.');
+        }
+
+        if ($user->role !== 'admin') {
             return redirect('/')->with('error', 'You are not authorised to access that page.');
         }
+
         return $next($request);
     }
 }

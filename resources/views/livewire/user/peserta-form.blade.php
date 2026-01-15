@@ -238,7 +238,9 @@
                                                     >
                                                     <span class="text-sm font-medium text-gray-700 group-hover:text-purple-700">
                                                         {{ $category['name'] }}
-                                            
+                                                        @if($category['type'] === 'custom')
+                                                            <span class="ml-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">Custom</span>
+                                                        @endif
                                                     </span>
                                                 </label>
                                             @endforeach

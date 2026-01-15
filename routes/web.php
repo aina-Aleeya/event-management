@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Livewire\OrganiserDashboard;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\GroupController;
 use App\Livewire\RankingReportPage;
 use App\Livewire\EventDashboardPage;
 use App\Livewire\LeaderBoardPage;
@@ -13,11 +14,29 @@ use App\Http\Controllers\RankingController;
 use App\Livewire\Admin\CreateEvent;
 use App\Livewire\Admin\ScoreForm;
 use App\Http\Controllers\ScoresheetController;
+use App\Http\Controllers\OrganiserController;
+use App\Http\Controllers\Admin\OrganiserController as AdminOrganiserController;
+use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\EventTeamController;
 
 // Public Routes
 require __DIR__.'/user.php';
 
+
 Route::get('/', function () {
+    // Redirect authenticated users to their respective dashboards
+    if (Auth::check()) {
+        $user = Auth::user();
+        
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        
+        if ($user->role === 'organiser') {
+            return redirect()->route('organiser.dashboard');
+        }
+    }
+    
     return view('dashboard');
 })->name('home');
 
@@ -28,14 +47,31 @@ Route::view('dashboard', 'dashboard')->name('dashboard');
 
 Route::get('/ads/{id}/click', [EventController::class, 'trackClick'])->name('ads.click');
 
-// Admin Routes - Protected by auth and admin middleware
+// ADMIN ONLY ROUTES (Super Admin)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
+    Route::get('/organisers/{organiser}/dashboard', [AdminOrganiserController::class, 'viewDashboard'])
+    ->name('organisers.dashboard');
+
+    // Organiser Management (Admin only)
+    Route::resource('organisers', AdminOrganiserController::class);
+});
+
+// ============================================================================
+// SHARED ROUTES (Admin + Organiser)
+// ============================================================================
+Route::middleware(['auth', 'role:admin,organiser'])->group(function () {
+    
+    // Admin prefix routes (accessible by both admin and organiser)
+    Route::prefix('admin')->name('admin.')->group(function () {
+
+    // Organiser Management
+    // Route::resource('organisers', AdminOrganiserController::class);
+
     // Event Management
     Route::get('/create-event', CreateEvent::class)->name('create-event');
-    //Route::get('/events/{event}/edit', \App\Livewire\Admin\EditEvent::class)->name('event.edit');
     Route::get('/events/{event}/dashboard', EventDashboardPage::class)->name('event.dashboard');
 
     // Participant Management
@@ -45,14 +81,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/event/{event}/participants/pdf', [ParticipantExportController::class, 'exportParticipantsPdf'])->name('event.participants.pdf');
 
     // Grouping System
-    Route::get('/grouping', [AdminController::class, 'groupingIndex'])->name('grouping.index');
-    Route::get('/events/{event}/groups', [AdminController::class, 'groups'])->name('groups');
-    Route::post('/events/{event}/groups/store', [AdminController::class, 'storeGroup'])->name('group.store');
-    Route::post('/events/{event}/groups/auto', [AdminController::class, 'autoGroup'])->name('group.auto');
-    Route::post('/events/{event}/assign', [AdminController::class, 'assignToGroup'])->name('group.assign');
-    Route::post('/groups/{event}/move', [AdminController::class, 'moveParticipant'])->name('group.move');
-    Route::post('/groups/{event}/remove', [AdminController::class, 'removeParticipant'])->name('group.remove');
-    Route::get('/events/{event}/grouping/{category}', [AdminController::class, 'groupingByCategory'])->name('grouping.category');
+    Route::get('/grouping', [GroupController::class, 'groupingIndex'])->name('grouping.index');
+    Route::get('/events/{event}/groups', [GroupController::class, 'groups'])->name('groups');
+    Route::post('/events/{event}/groups/store', [GroupController::class, 'storeGroup'])->name('group.store');
+    Route::post('/events/{event}/groups/auto', [GroupController::class, 'autoGroup'])->name('group.auto');
+    Route::post('/events/{event}/assign', [GroupController::class, 'assignToGroup'])->name('group.assign');
+    Route::post('/groups/{event}/move', [GroupController::class, 'moveParticipant'])->name('group.move');
+    Route::post('/groups/{event}/remove', [GroupController::class, 'removeParticipant'])->name('group.remove');
+    Route::get('/events/{event}/grouping/{category}', [GroupController::class, 'groupingByCategory'])->name('grouping.category');
     // Route::get('/events/{event}/grouping', [AdminController::class, 'eventGrouping'])->name('admin.event.grouping');
 
     // Reports & Rankings
@@ -60,11 +96,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/event/{event}/leaderboard', LeaderboardPage::class)->name('event.leaderboard');
     Route::get('/event/{event}/ranking/export', [RankingExportController::class, 'export'])->name('event.ranking.export');
 
-    //Ranking (baru)
+    //Ranking
     Route::get('/ranking/{event}', [RankingController::class, 'show'])
         ->name('ranking.show');
 
-    // Export routes (baru)
+    // Export routes
     Route::get('/ranking/{event}/export-sheet', [App\Http\Controllers\RankingExportController::class, 'exportSheet'])
         ->name('ranking.export.sheet');
     
@@ -83,11 +119,26 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         [ScoresheetController::class, 'exportAllGroups']
     )
         ->name('scoresheet.export-all-groups');
-});
-
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
-    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    
+    // Certificate Management Page
+    Route::get('events/{event}/certificates', [CertificateController::class, 'managementPage'])
+        ->name('certificate.manage');
+    
+    // Update Certificate Settings
+    Route::put('events/{event}/certificate-settings', [CertificateController::class, 'updateSettings'])
+        ->name('certificate.update-settings');
+    
+    // Download Single Certificate
+    Route::get('certificate/export-single/{event}/{peserta}', [CertificateController::class, 'exportSingle'])
+        ->name('certificate.single');
+    
+    // Download Group Certificates (ZIP)
+    Route::get('certificate/export-group/{event}/{group}', [CertificateController::class, 'exportGroup'])
+        ->name('certificate.group');
+    
+    // Download All Certificates (ZIP)
+    Route::get('certificate/export-all/{event}', [CertificateController::class, 'exportAllParticipants'])
+        ->name('certificate.all');
 });
 
 Route::get('/events/{eventId}/edit', \App\Livewire\EditEvent::class)
@@ -95,6 +146,22 @@ Route::get('/events/{eventId}/edit', \App\Livewire\EditEvent::class)
     ->name('event.edit');
 
 Route::get('/admin/events/{event}/grouping', 
-    [AdminController::class, 'eventGrouping'])
+    [GroupController::class, 'eventGrouping'])
     ->name('admin.event.grouping');
+});
 
+
+// Organiser Routes (Admin + Organiser)
+Route::middleware(['auth', 'role:admin,organiser'])->prefix('organiser')->name('organiser.')->group(function () {
+    Route::get('/dashboard', [OrganiserController::class, 'dashboard'])->name('dashboard');
+
+    // Team Management Routes
+    Route::prefix('events/{event}/team')->name('events.team.')->group(function () {
+        Route::get('/', [EventTeamController::class, 'index'])->name('index');
+        Route::get('/create', [EventTeamController::class, 'create'])->name('create');
+        Route::post('/', [EventTeamController::class, 'store'])->name('store');
+        Route::get('/{teamMember}/edit', [EventTeamController::class, 'edit'])->name('edit');
+        Route::patch('/{teamMember}', [EventTeamController::class, 'update'])->name('update');
+        Route::delete('/{teamMember}', [EventTeamController::class, 'destroy'])->name('destroy');
+    });
+});
