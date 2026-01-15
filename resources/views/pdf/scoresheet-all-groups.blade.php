@@ -268,25 +268,24 @@
                         Judge 2 - Name & Signature
                     </div>
                 </div>
-                <div class="signature-box">
-                    <div class="signature-line">
-                        Date
-                    </div>
-                    <!-- QR Code with Clickable Link -->
-                    <div class="qr-code-container">
-                        @if(!empty($group->qr_code_path) && file_exists($group->qr_code_path))
-                            <img src="{{ $group->qr_code_path }}" alt="QR Code">
-                            <p>SCAN TO SUBMIT</p>
-                            <!-- Clickable Link for Testing -->
-                            <a href="{{ url('/markah/' . $group->token) }}"
-                                style="display: block; margin-top: 5px; font-size: 7px; color: #0066cc; text-decoration: none; word-break: break-all;">
-                                {{ url('/markah/' . $group->token) }}
-                            </a>
-                        @else
-                            <p style="color: #999; font-size: 7px;">QR Code unavailable</p>
-                        @endif
-                    </div>
-                </div>
+<div class="signature-box">
+    <div class="signature-line">
+        Date
+    </div>
+    
+    <div class="qr-code-container">
+        @if(!empty($group->qr_code))
+            <img src="{{ $group->qr_code }}" alt="QR Code">
+            <p>SCAN TO SUBMIT</p>
+            <a href="{{ route('score.form', ['token' => $group->token]) }}"
+                style="display: block; margin-top: 5px; font-size: 7px; color: #0066cc; text-decoration: none; word-break: break-all;">
+                {{ route('score.form', ['token' => $group->token]) }}
+            </a>
+        @else
+            <p style="color: #999; font-size: 7px;">QR Code unavailable</p>
+        @endif
+    </div>
+</div>
             </div>
         @else
             <div class="no-participants">

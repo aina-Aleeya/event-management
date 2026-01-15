@@ -10,8 +10,8 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\RankingExportController;
 use App\Http\Controllers\ParticipantExportController;
 use App\Http\Controllers\RankingController;
-use App\Http\Controllers\MarkahController;
 use App\Livewire\Admin\CreateEvent;
+use App\Livewire\Admin\ScoreForm;
 use App\Http\Controllers\ScoresheetController;
 
 // Public Routes
@@ -22,11 +22,7 @@ Route::get('/', function () {
 })->name('home');
 
 // Score Submission Routes
-Route::get('/markah/{token}', [App\Http\Controllers\MarkahController::class, 'form'])
-    ->name('markah.form');
-
-Route::post('/markah/{token}', [App\Http\Controllers\MarkahController::class, 'submit'])
-    ->name('markah.submit');
+Route::get('/score/{token}', ScoreForm::class)->name('score.form');
 
 Route::view('dashboard', 'dashboard')->name('dashboard');
 

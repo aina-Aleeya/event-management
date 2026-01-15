@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\DB;
 
 class RankingController extends Controller
 {
-    /**
-     * Show rankings for specific event
-     */
+    
+    // Show rankings for specific event
+   
     public function show(Request $request, $eventId)
     {
         $event = Event::findOrFail($eventId);
@@ -43,7 +43,7 @@ class RankingController extends Controller
             $score->category = $categoryData->category ?? 'Uncategorized';
         }
 
-        // Get unique categories
+        // Get unique categories 
         $categories = $scores->pluck('category')->unique()->sort()->values();
 
         // Filter by category if selected

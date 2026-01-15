@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Peserta extends Model
 {
@@ -19,12 +21,17 @@ class Peserta extends Model
         'user_agent',
     ];
 
-    public function events()
+    public function events(): BelongsToMany
     {
         return $this->belongsToMany(Event::class, 'penyertaan', 'peserta_id', 'event_id')
             ->using(\App\Models\Penyertaan::class)
-            ->withPivot('unique_id','status_bayaran','categorizable_type','categorizable_id','created_at')
+            ->withPivot('unique_id', 'status_bayaran', 'categorizable_type', 'categorizable_id', 'created_at')
             ->withTimestamps();
+    }
+
+    public function penyertaans(): HasMany
+    {
+        return $this->hasMany(Penyertaan::class, 'peserta_id');
     }
 
     public function user()
@@ -32,8 +39,15 @@ class Peserta extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function groups()
+    public function groups(): BelongsToMany
     {
-        return $this->belongsToMany(Group::class, 'group_peserta', 'peserta_id', 'group_id');
+        return $this->belongsToMany(Group::class, 'group_peserta', 'peserta_id', 'group_id')
+            ->withPivot('event_id')
+            ->withTimestamps();
+    }
+
+    public function scores(): HasMany
+    {
+        return $this->hasMany(Score::class, 'peserta_id');
     }
 }

@@ -11,9 +11,9 @@ use Illuminate\Http\Request;
 
 class ParticipantExportController extends Controller
 {
-    /**
-     * Export participants to Excel
-     */
+    
+    // Export participants to Excel
+   
     public function export(Event $event)
     {
         $fileName = 'Participants_' . $event->title . '.xlsx';
@@ -21,14 +21,13 @@ class ParticipantExportController extends Controller
         return Excel::download(new ParticipantsSheet($event), $fileName);
     }
 
-    /**
-     * Export participants to PDF
-     */
+    
+    //Export participants to PDF
+     
     public function exportParticipantsPdf($eventId)
     {
         $event = Event::findOrFail($eventId);
         
-        // Get participants with pivot data (guna 'pesertas' relationship)
         $participants = $event->pesertas()
             ->orderBy('nama_penuh')
             ->get();
@@ -48,7 +47,7 @@ class ParticipantExportController extends Controller
         ];
         
         $pdf = Pdf::loadView('pdf.participants', $data);
-        $pdf->setPaper('a4', 'landscape'); // Landscape untuk table yang lebih luas
+        $pdf->setPaper('a4', 'landscape'); 
         
         $filename = 'Participants_' . str_replace(' ', '_', $event->title) . '_' . now()->format('YmdHis') . '.pdf';
         

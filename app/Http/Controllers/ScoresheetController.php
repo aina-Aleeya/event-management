@@ -4,120 +4,136 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Group;
+use App\Models\Category;
+use App\Models\CustomCategory;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Storage;
 
 class ScoresheetController extends Controller
 {
-    /**
-     * Export scoresheet for a specific group
-     */
-public function exportGroup($eventId, $groupId)
-{
-    $event = Event::findOrFail($eventId);
-    $group = Group::with('pesertas')->findOrFail($groupId);
+    // Export scoresheet for single group
+    public function exportGroup($eventId, $groupId)
+    {
+        $event = Event::findOrFail($eventId);
+        $group = Group::with('pesertas')->findOrFail($groupId);
 
-    // Debug: Check if QR code exists
-    if (empty($group->qr_code)) {
-        // Generate QR code if missing
-        $url = url('/markah/' . $group->token);
-        $group->qr_code = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($url);
-        $group->save();
+        if (empty($group->qr_code)) {
+            $group->qr_code = $this->generateQrCode($group);
+            $group->save();
+        }
+
+        $group->pesertas->each(function ($peserta) use ($eventId) {
+            $peserta->category = $this->getParticipantCategory($peserta->id, $eventId);
+        });
+
+        $pdf = PDF::loadView('pdf.scoresheet-group', [
+            'event' => $event,
+            'group' => $group,
+            'participants' => $group->pesertas
+        ])->setPaper('a4', 'landscape');
+
+        $filename = $this->generateFilename($event->title, $group->name);
+
+        return $pdf->download($filename);
     }
 
-    // Get category for each participant
-    foreach ($group->pesertas as $peserta) {
-        $categoryData = \DB::table('penyertaan')
-            ->leftJoin('categories', function($join) {
-                $join->on('penyertaan.categorizable_id', '=', 'categories.id')
-                     ->where('penyertaan.categorizable_type', '=', \App\Models\Category::class);
-            })
-            ->leftJoin('custom_categories', function($join) {
-                $join->on('penyertaan.categorizable_id', '=', 'custom_categories.id')
-                     ->where('penyertaan.categorizable_type', '=', \App\Models\CustomCategory::class);
-            })
-            ->where('penyertaan.event_id', $eventId)
-            ->where('penyertaan.peserta_id', $peserta->id)
-            ->select(\DB::raw('COALESCE(categories.name, custom_categories.name) as category'))
-            ->first();
-        
-        $peserta->category = $categoryData->category ?? 'Uncategorized';
-    }
-
-    $pdf = PDF::loadView('pdf.scoresheet-group', [
-        'event' => $event,
-        'group' => $group,
-        'participants' => $group->pesertas
-    ])->setPaper('a4', 'landscape');
-
-    $filename = str_replace(' ', '_', $event->title) . '_' . str_replace(' ', '_', $group->name) . '_Scoresheet.pdf';
-    
-    return $pdf->download($filename);
-}
-
-    /**
-     * Export scoresheets for all groups in one PDF
-     */
+    // Export scoresheets for all groups 
     public function exportAllGroups(Request $request, $eventId)
     {
         $event = Event::with(['groups.pesertas'])->findOrFail($eventId);
-        $category = $request->input('category');
-        
-        // Get all groups for this event
-        $groups = $event->groups;
-        
-        // Process each group and its participants
-        foreach ($groups as $group) {
-            // Get category for each participant in the group
-            foreach ($group->pesertas as $peserta) {
-                $categoryData = \DB::table('penyertaan')
-                    ->leftJoin('categories', function($join) {
-                        $join->on('penyertaan.categorizable_id', '=', 'categories.id')
-                             ->where('penyertaan.categorizable_type', '=', \App\Models\Category::class);
-                    })
-                    ->leftJoin('custom_categories', function($join) {
-                        $join->on('penyertaan.categorizable_id', '=', 'custom_categories.id')
-                             ->where('penyertaan.categorizable_type', '=', \App\Models\CustomCategory::class);
-                    })
-                    ->where('penyertaan.event_id', $eventId)
-                    ->where('penyertaan.peserta_id', $peserta->id)
-                    ->select(\DB::raw('COALESCE(categories.name, custom_categories.name) as category'))
-                    ->first();
-                
-                $peserta->category = $categoryData->category ?? 'Uncategorized';
-            }
-            
-            // Filter participants by category if specified
-            if ($category) {
-                $group->filtered_pesertas = $group->pesertas->filter(function($peserta) use ($category) {
-                    return $peserta->category === $category;
-                });
-            } else {
-                $group->filtered_pesertas = $group->pesertas;
-            }
-        }
-        
-        // Filter out groups with no participants (if category filter is applied)
-        if ($category) {
-            $groups = $groups->filter(function($group) {
-                return $group->filtered_pesertas->count() > 0;
+        $categoryFilter = $request->input('category');
+
+        $groups = $event->groups->map(function ($group) use ($eventId, $categoryFilter) {
+            $group->pesertas->each(function ($peserta) use ($eventId) {
+                $peserta->category = $this->getParticipantCategory($peserta->id, $eventId);
             });
+
+            $group->filtered_pesertas = $categoryFilter
+                ? $group->pesertas->filter(fn($peserta) => $peserta->category === $categoryFilter)
+                : $group->pesertas;
+
+            return $group;
+        });
+
+        if ($categoryFilter) {
+            $groups = $groups->filter(fn($group) => $group->filtered_pesertas->isNotEmpty());
         }
-        
-        // Load the PDF view with all groups
+
         $pdf = PDF::loadView('pdf.scoresheet-all-groups', [
             'event' => $event,
             'groups' => $groups,
-            'category' => $category
+            'category' => $categoryFilter
         ])->setPaper('a4', 'landscape');
-        
-        // Generate filename
-        $filename = str_replace(' ', '_', $event->title) . '_All_Groups';
-        if ($category) {
-            $filename .= '_' . str_replace(' ', '_', $category);
-        }
-        $filename .= '_Scoresheet_' . now()->format('Y-m-d') . '.pdf';
-        
+
+        $filename = $this->generateBulkFilename($event->title, $categoryFilter);
+
         return $pdf->download($filename);
+    }
+
+    // Generate QR code  
+    public function store(Request $request)
+    {
+        $group = Group::create([
+            'name' => $request->name,
+            'token' => Str::random(32),
+            'competition_id' => $request->competition_id,
+
+        ]);
+
+        $group->generateQrCode();
+
+        return redirect()->back()->with('success', 'Group created successfully!');
+    }
+
+    // Get participant category 
+    private function getParticipantCategory(int $pesertaId, int $eventId): string
+    {
+        $penyertaan = \DB::table('penyertaan')
+            ->where('event_id', $eventId)
+            ->where('peserta_id', $pesertaId)
+            ->first();
+
+        if (!$penyertaan) {
+            return 'Uncategorized';
+        }
+
+        if ($penyertaan->categorizable_type === Category::class) {
+            $category = Category::find($penyertaan->categorizable_id);
+            return $category?->name ?? 'Uncategorized';
+        }
+
+        if ($penyertaan->categorizable_type === CustomCategory::class) {
+            $category = CustomCategory::find($penyertaan->categorizable_id);
+            return $category?->name ?? 'Uncategorized';
+        }
+
+        return 'Uncategorized';
+    }
+
+    // Generate filename
+    private function generateFilename(string $eventTitle, string $groupName): string
+    {
+        $eventSlug = str_replace(' ', '_', $eventTitle);
+        $groupSlug = str_replace(' ', '_', $groupName);
+
+        return "{$eventSlug}_{$groupSlug}_Scoresheet.pdf";
+    }
+
+    // Generate filename
+    private function generateBulkFilename(string $eventTitle, ?string $category): string
+    {
+        $eventSlug = str_replace(' ', '_', $eventTitle);
+        $filename = "{$eventSlug}_All_Groups";
+
+        if ($category) {
+            $categorySlug = str_replace(' ', '_', $category);
+            $filename .= "_{$categorySlug}";
+        }
+
+        $filename .= '_Scoresheet_' . now()->format('Y-m-d') . '.pdf';
+
+        return $filename;
     }
 }

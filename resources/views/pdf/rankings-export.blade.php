@@ -137,6 +137,43 @@
         <p style="margin-top: 5px;">Generated on {{ now()->format('d M Y, h:i A') }}</p>
     </div>
 
+    {{-- Overall Ranking Section --}}
+    @if($overallScores && $overallScores->count() > 0)
+        <div class="category-section">
+            <div class="category-title">Overall Ranking (All Categories)</div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">Rank</th>
+                        <th style="width: 23%;">Participant</th>
+                        <th style="width: 15%;">Category</th>
+                        <th style="width: 15%;">Group</th>
+                        <th style="width: 10%;">Round 1</th>
+                        <th style="width: 10%;">Round 2</th>
+                        <th style="width: 10%;">Round 3</th>
+                        <th style="width: 12%;">Average</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($overallScores as $score)
+                        <tr class="{{ $score->rank <= 3 ? 'rank-' . $score->rank : '' }}">
+                            <td><strong>{{ $score->rank }}</strong></td>
+                            <td><strong>{{ $score->peserta->nama_penuh }}</strong></td>
+                            <td>{{ $score->category }}</td>
+                            <td>{{ $score->group->name }}</td>
+                            <td>{{ number_format($score->round1, 2) }}</td>
+                            <td>{{ $score->round2 ? number_format($score->round2, 2) : '-' }}</td>
+                            <td>{{ $score->round3 ? number_format($score->round3, 2) : '-' }}</td>
+                            <td><strong>{{ number_format($score->average, 2) }}</strong></td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
+
+    {{-- Category-specific Rankings --}}
     @foreach($scoresByCategory as $category => $scores)
         <div class="category-section">
             <div class="category-title">{{ $category }}</div>

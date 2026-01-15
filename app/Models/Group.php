@@ -4,7 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 
 class Group extends Model
 {
@@ -37,75 +40,32 @@ class Group extends Model
             ->withTimestamps();
     }
 
-    /**
-     * Generate and save QR code as image file
-     */
     public function generateQrCode()
     {
         try {
-            $url = url('/markah/' . $this->token);
-            $qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($url);
+            $url = route('score.form', ['token' => $this->token]);
             
-            // Fetch QR code image
-            $imageData = @file_get_contents($qrApiUrl);
+            $renderer = new ImageRenderer(
+                new RendererStyle(300, 1),
+                new SvgImageBackEnd()
+            );
             
-            if ($imageData !== false) {
-                // Create directory if not exists
-                $directory = 'qr_codes';
-                if (!Storage::disk('public')->exists($directory)) {
-                    Storage::disk('public')->makeDirectory($directory);
-                }
-                
-                // Save image file
-                $filename = 'qr_group_' . $this->id . '_' . $this->token . '.png';
-                $path = $directory . '/' . $filename;
-                
-                Storage::disk('public')->put($path, $imageData);
-                
-                // Save path to database
-                $this->qr_code = $path;
-                $this->save();
-                
-                return true;
-            }
+            $writer = new Writer($renderer);
+            $qrCodeSvg = $writer->writeString($url);
+            
+            $this->qr_code = 'data:image/svg+xml;base64,' . base64_encode($qrCodeSvg);
+            $this->save();
+            
+            return true;
+            
         } catch (\Exception $e) {
             \Log::error('Failed to generate QR code for group ' . $this->id . ': ' . $e->getMessage());
+            return false;
         }
-        
-        return false;
     }
 
-    /**
-     * Get full path to QR code image for PDF
-     */
-    public function getQrCodePathAttribute()
-    {
-        if (!empty($this->qr_code)) {
-            return storage_path('app/public/' . $this->qr_code);
-        }
-        return null;
-    }
-
-    /**
-     * Get public URL for QR code (for web display)
-     */
     public function getQrCodeUrlAttribute()
     {
-        if (!empty($this->qr_code)) {
-            return Storage::url($this->qr_code);
-        }
-        return null;
-    }
-
-    /**
-     * Delete QR code file when group is deleted
-     */
-    protected static function booted()
-    {
-        static::deleting(function ($group) {
-            if (!empty($group->qr_code)) {
-                Storage::disk('public')->delete($group->qr_code);
-            }
-        });
+        return $this->qr_code;
     }
 }

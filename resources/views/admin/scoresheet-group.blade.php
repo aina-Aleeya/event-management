@@ -300,9 +300,9 @@
                     <img src="{{ $group->qr_code_path }}" alt="QR Code">
                     <p>SCAN TO SUBMIT</p>
              
-                    <a href="{{ url('/markah/' . $group->token) }}"
+                    <a href="{{ route('score.form', ['token' => $group->token]) }}"
                         style="display: block; margin-top: 5px; font-size: 7px; color: #0066cc; text-decoration: none; word-break: break-all;">
-                        {{ url('/markah/' . $group->token) }}
+                        {{ route('score.form', ['token' => $group->token]) }}
                     </a>
                 @else
                     <p style="color: #999; font-size: 7px;">QR Code unavailable</p>
