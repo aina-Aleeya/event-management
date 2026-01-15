@@ -79,66 +79,54 @@ class Event extends Model
         return $this->hasMany(CustomCategory::class);
     }
 
-    // Event owner (organiser who created the event)
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    // Team members assigned to this event
     public function teamMembers(): HasMany
     {
         return $this->hasMany(EventTeamMember::class);
     }
 
-    // Check if a user is the owner
     public function isOwnedBy(User $user): bool
     {
         return $this->user_id === $user->id;
     }
 
-    // Check if a user is a team member
     public function hasTeamMember(User $user): bool
     {
         return $this->teamMembers()->where('user_id', $user->id)->exists();
     }
 
-    // Check if user can access this event (owner, team member, or admin)
     public function canBeAccessedBy(User $user): bool
     {
-        // Admin can access everything
         if ($user->isAdmin()) {
             return true;
         }
 
-        // Owner can access
         if ($this->isOwnedBy($user)) {
             return true;
         }
 
-        // Team member can access
         return $this->hasTeamMember($user);
     }
 
-    // Get user's role in this event
     public function getUserRole(User $user): ?EventTeamMember
     {
         if ($this->isOwnedBy($user)) {
-            return null; // Owner has full access
+            return null;
         }
 
         return $this->teamMembers()->where('user_id', $user->id)->first();
     }
 
-    // Check if user has specific permission
     public function userHasPermission(User $user, string $permission): bool
     {
-        // Admin and owner have all permissions
         if ($user->isAdmin() || $this->isOwnedBy($user)) {
             return true;
         }
 
-        // Check team member permission
         $teamMember = $this->getUserRole($user);
         return $teamMember && $teamMember->hasPermission($permission);
     }

@@ -79,13 +79,11 @@ class User extends Authenticatable
         return strtoupper(substr($this->name, 0, 2));
     }
 
-    // Events this user owns
     public function ownedEvents()
     {
         return $this->hasMany(Event::class, 'user_id');
     }
 
-    // Events this user is a team member of
     public function teamMemberEvents()
     {
         return $this->hasManyThrough(

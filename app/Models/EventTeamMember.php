@@ -19,7 +19,6 @@ class EventTeamMember extends Model
         'permissions' => 'array',
     ];
 
-    // Relationships
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
@@ -30,7 +29,6 @@ class EventTeamMember extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Check if team member has specific permission
     public function hasPermission(string $permission): bool
     {
         if (!$this->permissions) {
@@ -40,14 +38,13 @@ class EventTeamMember extends Model
         return in_array($permission, $this->permissions);
     }
 
-    // Get role display name
     public function getRoleDisplayName(): string
     {
         if ($this->role === 'custom' && $this->custom_role_name) {
             return $this->custom_role_name;
         }
 
-        return match($this->role) {
+        return match ($this->role) {
             'clerk' => 'Clerk/Admin',
             'judge' => 'Judge',
             'scorekeeper' => 'Scorekeeper',
@@ -56,56 +53,46 @@ class EventTeamMember extends Model
         };
     }
 
-    // Available permissions list
     public static function availablePermissions(): array
     {
         return [
-            'view_participants' => 'View Participants',
-            'manage_participants' => 'Manage Participants',
-            'view_groups' => 'View Groups',
-            'manage_groups' => 'Manage Groups',
-            'view_scores' => 'View Scores',
-            'manage_scores' => 'Manage/Edit Scores',
-            'view_reports' => 'View Reports',
-            'export_data' => 'Export Data',
-            'manage_event_settings' => 'Manage Event Settings',
+            'admin.participants' => 'View Participants',
+            'admin.participants-details' => 'Manage Participants',
+            'admin.event-grouping' => 'View Groups',
+            'admin.groups' => 'Manage Groups',
+            'admin.ranking' => 'View Scores',
+            'admin.markah-form' => 'Manage/Edit Scores',
+            // 'export_data' => 'Export Data',
+            // 'manage_event_settings' => 'Manage Event Settings',
         ];
     }
 
-    // Get default permissions for each role
     public static function defaultPermissionsFor(string $role): array
     {
-        return match($role) {
+        return match ($role) {
             'clerk' => [
-                'view_participants',
-                'manage_participants',
-                'view_groups',
-                'view_scores',
-                'view_reports',
-                'export_data',
+                'admin.participants',
+                'admin.participants-details',
+                'admin.event-grouping',
+                'admin.ranking',
             ],
             'judge' => [
-                'view_participants',
-                'view_groups',
-                'view_scores',
-                'manage_scores',
+                'admin.participants',
+                'admin.event-grouping',
+                'admin.ranking',
+                'admin.markah-form',
             ],
             'scorekeeper' => [
-                'view_participants',
-                'view_groups',
-                'view_scores',
-                'manage_scores',
-                'view_reports',
+                'admin.participants',
+                'admin.event-grouping',
+                'admin.ranking',
             ],
             'coordinator' => [
-                'view_participants',
-                'manage_participants',
-                'view_groups',
-                'manage_groups',
-                'view_scores',
-                'view_reports',
-                'export_data',
-                'manage_event_settings',
+                'admin.participants',
+                'admin.participants-details',
+                'admin.event-grouping',
+                'admin.groups',
+                'admin.ranking',
             ],
             default => [],
         };

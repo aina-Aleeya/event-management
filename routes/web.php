@@ -143,16 +143,6 @@ Route::middleware(['auth', 'role:admin,organiser'])->group(function () {
     // Download All Certificates (ZIP)
     Route::get('certificate/export-all/{event}', [CertificateController::class, 'exportAllParticipants'])
         ->name('certificate.all');
-
-    // Team Management Routes - ADD THIS SECTION
-    Route::prefix('events/{event}/team')->name('events.team.')->group(function () {
-        Route::get('/', [EventTeamController::class, 'index'])->name('index');
-        Route::get('/create', [EventTeamController::class, 'create'])->name('create');
-        Route::post('/', [EventTeamController::class, 'store'])->name('store');
-        Route::get('/{teamMember}/edit', [EventTeamController::class, 'edit'])->name('edit');
-        Route::patch('/{teamMember}', [EventTeamController::class, 'update'])->name('update');
-        Route::delete('/{teamMember}', [EventTeamController::class, 'destroy'])->name('destroy');
-    });
 });
 
 Route::get('/events/{eventId}/edit', \App\Livewire\EditEvent::class)
@@ -168,4 +158,14 @@ Route::get('/admin/events/{event}/grouping',
 // Organiser Routes (Admin + Organiser)
 Route::middleware(['auth', 'role:admin,organiser'])->prefix('organiser')->name('organiser.')->group(function () {
     Route::get('/dashboard', [OrganiserController::class, 'dashboard'])->name('dashboard');
+
+    // Team Management Routes
+    Route::prefix('events/{event}/team')->name('events.team.')->group(function () {
+        Route::get('/', [EventTeamController::class, 'index'])->name('index');
+        Route::get('/create', [EventTeamController::class, 'create'])->name('create');
+        Route::post('/', [EventTeamController::class, 'store'])->name('store');
+        Route::get('/{teamMember}/edit', [EventTeamController::class, 'edit'])->name('edit');
+        Route::patch('/{teamMember}', [EventTeamController::class, 'update'])->name('update');
+        Route::delete('/{teamMember}', [EventTeamController::class, 'destroy'])->name('destroy');
+    });
 });

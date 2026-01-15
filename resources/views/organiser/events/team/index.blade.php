@@ -26,7 +26,7 @@
                     <p class="text-sm text-gray-600 mt-1">{{ $event->title }}</p>
                 </div>
                 <div class="flex gap-2">
-                    <a href="{{ route('admin.events.team.create', $event->id) }}" 
+                    <a href="{{ route('organiser.events.team.create', $event->id) }}" 
                        class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -111,11 +111,11 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div class="flex justify-end gap-2">
-                                            <a href="{{ route('admin.events.team.edit', [$event->id, $member->id]) }}" 
+                                            <a href="{{ route('organiser.events.team.edit', [$event->id, $member->id]) }}" 
                                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                                                 Edit
                                             </a>
-                                            <form action="{{ route('admin.events.team.destroy', [$event->id, $member->id]) }}" 
+                                            <form action="{{ route('organiser.events.team.destroy', [$event->id, $member->id]) }}" 
                                                   method="POST" 
                                                   onsubmit="return confirm('Remove this team member?')">
                                                 @csrf

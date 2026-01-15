@@ -10,7 +10,7 @@
             <svg class="w-4 h-4 text-gray-400 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
             </svg>
-            <a href="{{ route('admin.events.team.index', $event->id) }}" class="text-gray-600 hover:text-purple-600 transition">Team</a>
+            <a href="{{ route('organiser.events.team.index', $event->id) }}" class="text-gray-600 hover:text-purple-600 transition">Team</a>
         </li>
         <li class="flex items-center">
             <svg class="w-4 h-4 text-gray-400 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,7 +31,7 @@
                     </h2>
                     <p class="text-sm text-gray-600 mt-1">{{ $teamMember->user->name }}</p>
                 </div>
-                <a href="{{ route('admin.events.team.index', $event->id) }}" 
+                <a href="{{ route('organiser.events.team.index', $event->id) }}" 
                    class="px-5 py-2.5 rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all font-medium flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -42,7 +42,7 @@
 
             {{-- Form --}}
             <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-                <form method="POST" action="{{ route('admin.events.team.update', [$event->id, $teamMember->id]) }}" class="space-y-6">
+                <form method="POST" action="{{ route('organiser.events.team.update', [$event->id, $teamMember->id]) }}" class="space-y-6">
                     @csrf
                     @method('PATCH')
 
@@ -104,7 +104,7 @@
 
                     {{-- Submit Button --}}
                     <div class="flex justify-end gap-4 pt-4">
-                        <a href="{{ route('admin.events.team.index', $event->id) }}" 
+                        <a href="{{ route('organiser.events.team.index', $event->id) }}" 
                            class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-all font-semibold">
                             Cancel
                         </a>
