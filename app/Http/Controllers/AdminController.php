@@ -62,6 +62,6 @@ class AdminController extends Controller
             $peserta = \App\Models\Peserta::findOrFail($pesertaId);
         }
 
-        return view('admin.participant', compact('peserta'));
+        return view('admin.participants', compact('peserta'));
     }
 }

@@ -2,99 +2,182 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EventTeamMember extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'event_id',
         'user_id',
-        'role',
-        'custom_role_name',
-        'permissions',
+        'name',
+        'email',
+        'role_id',
+        'invitation_token',
+        'invited_at',
+        'accepted_at',
+        'status',
     ];
 
     protected $casts = [
-        'permissions' => 'array',
+        'invited_at' => 'datetime',
+        'accepted_at' => 'datetime',
     ];
 
-    public function event(): BelongsTo
+    /**
+     * Get the role for this team member
+     */
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Get the event
+     */
+    public function event()
     {
         return $this->belongsTo(Event::class);
     }
 
-    public function user(): BelongsTo
+    /**
+     * Get the user
+     */
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function hasPermission(string $permission): bool
+    /**
+     * Check if team member has a specific permission (through role)
+     */
+    public function hasPermission($permission)
     {
-        if (!$this->permissions) {
+        return $this->role ? $this->role->hasPermission($permission) : false;
+    }
+
+    /**
+     * Get all permissions (from role)
+     */
+    public function getPermissions()
+    {
+        return $this->role ? $this->role->permissions : [];
+    }
+
+    /**
+     * Get role name
+     */
+    public function getRoleName()
+    {
+        return $this->role ? $this->role->name : 'No Role';
+    }
+
+    /**
+     * Check if invitation is still pending
+     */
+    public function isPending()
+    {
+        return $this->status === 'pending';
+    }
+
+    /**
+     * Check if invitation has been accepted
+     */
+    public function isAccepted()
+    {
+        return $this->status === 'accepted';
+    }
+
+    /**
+     * Check if invitation has been declined
+     */
+    public function isDeclined()
+    {
+        return $this->status === 'declined';
+    }
+
+    /**
+     * Check if invitation has expired (7 days)
+     */
+    public function isExpired()
+    {
+        if (!$this->invited_at) {
             return false;
         }
-
-        return in_array($permission, $this->permissions);
+        
+        return $this->invited_at->addDays(7)->isPast() && $this->status === 'pending';
     }
 
-    public function getRoleDisplayName(): string
+    /**
+     * Scope to get only pending invitations
+     */
+    public function scopePending($query)
     {
-        if ($this->role === 'custom' && $this->custom_role_name) {
-            return $this->custom_role_name;
-        }
-
-        return match ($this->role) {
-            'clerk' => 'Clerk/Admin',
-            'judge' => 'Judge',
-            'scorekeeper' => 'Scorekeeper',
-            'coordinator' => 'Event Coordinator',
-            default => ucfirst($this->role),
-        };
+        return $query->where('status', 'pending');
     }
 
-    public static function availablePermissions(): array
+    /**
+     * Scope to get only accepted invitations
+     */
+    public function scopeAccepted($query)
+    {
+        return $query->where('status', 'accepted');
+    }
+
+    /**
+     * Scope to get only declined invitations
+     */
+    public function scopeDeclined($query)
+    {
+        return $query->where('status', 'declined');
+    }
+
+    /**
+     * Get initials for display (works for both accepted and pending invitations)
+     */
+    public function getInitials()
+    {
+        if ($this->user) {
+            return $this->user->initials();
+        }
+        
+        // Generate initials from name for pending invitations
+        $words = explode(' ', $this->name);
+        if (count($words) >= 2) {
+            return strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+        }
+        
+        return strtoupper(substr($this->name, 0, 2));
+    }
+
+    /**
+     * Get display name
+     */
+    public function getDisplayName()
+    {
+        return $this->user ? $this->user->name : $this->name;
+    }
+
+    /**
+     * Get display email
+     */
+    public function getDisplayEmail()
+    {
+        return $this->user ? $this->user->email : $this->email;
+    }
+
+    /**
+     * Get available permissions (static method)
+     */
+    public static function availablePermissions()
     {
         return [
-            'admin.participants' => 'View Participants',
-            'admin.participants-details' => 'Manage Participants',
-            'admin.event-grouping' => 'View Groups',
-            'admin.groups' => 'Manage Groups',
-            'admin.ranking' => 'View Scores',
-            'admin.markah-form' => 'Manage/Edit Scores',
-            // 'export_data' => 'Export Data',
-            // 'manage_event_settings' => 'Manage Event Settings',
+            'manage_events' => 'Manage Events',
+            'manage_team' => 'Manage Team Members',
+            'view_reports' => 'View Reports',
+            'edit_settings' => 'Edit Event Settings',
         ];
-    }
-
-    public static function defaultPermissionsFor(string $role): array
-    {
-        return match ($role) {
-            'clerk' => [
-                'admin.participants',
-                'admin.participants-details',
-                'admin.event-grouping',
-                'admin.ranking',
-            ],
-            'judge' => [
-                'admin.participants',
-                'admin.event-grouping',
-                'admin.ranking',
-                'admin.markah-form',
-            ],
-            'scorekeeper' => [
-                'admin.participants',
-                'admin.event-grouping',
-                'admin.ranking',
-            ],
-            'coordinator' => [
-                'admin.participants',
-                'admin.participants-details',
-                'admin.event-grouping',
-                'admin.groups',
-                'admin.ranking',
-            ],
-            default => [],
-        };
     }
 }

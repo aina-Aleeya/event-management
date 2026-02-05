@@ -82,7 +82,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-purple-600 mb-1">Categories</p>
-                        <p class="text-3xl font-bold text-purple-900">{{ $participants->pluck('pivot.kategori_nama')->unique()->count() }}</p>
+                        <p class="text-3xl font-bold text-purple-900">{{ $participants->pluck('pivot.category_name')->unique()->count() }}</p>
                     </div>
                     <div class="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center">
                         <svg class="w-6 h-6 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -179,7 +179,7 @@
                                         <svg class="w-3 h-3 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
                                         </svg>
-                                        {{ $p->pivot->kategori_nama }}
+                                        {{ $p->pivot->category_name ?? '-' }}
                                     </span>
                                 </td>
 

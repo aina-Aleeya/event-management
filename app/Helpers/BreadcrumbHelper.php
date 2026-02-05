@@ -142,6 +142,23 @@ class BreadcrumbHelper
                 }
                 break;
 
+            case 'certificate.manage':
+                $eventParam = $parameters['event'] ?? null;
+                $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
+                $event = $eventId ? Event::find($eventId) : null;
+                $category = request('category');
+                $from = request('from', 'event-dashboard');
+
+                $breadcrumbs[] = [
+                    'label' => $event->title,
+                    'url' => route('admin.event.dashboard', $event->id)
+                ];
+                $breadcrumbs[] = [
+                    'label' => 'Manage Certificates',
+                    'url' => route('admin.certificate.manage', $event->id)
+                ];
+                break;
+
             // Ranking Report
             case 'admin.ranking.report':
                 $eventParam = $parameters['event'] ?? null;
