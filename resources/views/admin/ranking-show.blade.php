@@ -246,7 +246,6 @@
                     <p class="text-sm text-gray-600">
                         Showing <span class="font-semibold text-gray-900">{{ $scores->count() }}</span> ranked participants
                     </p>
-                    
                 </div>
             </div>
 

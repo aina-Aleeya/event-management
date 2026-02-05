@@ -188,7 +188,6 @@
                         Showing <span id="visibleCount" class="font-semibold text-gray-900">{{ $categories->count() }}</span> 
                         of <span class="font-semibold text-gray-900">{{ $categories->count() }}</span> categories
                     </p>
-                    
                 </div>
             </div>
 

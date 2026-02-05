@@ -10,6 +10,8 @@ use App\Livewire\User\PesertaForm;
 use App\Livewire\User\PaymentForm;
 use App\Livewire\User\SenaraiPeserta;
 use App\Livewire\User\HistoryPage;
+use App\Http\Controllers\CertificateController;
+
 
 Route::get('/events', EventPage::class)->name('events.page');
 
@@ -25,8 +27,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/history-participant/{eventId}', SenaraiPeserta::class)->name('history.participant');
 
-    Route::get('/update-participant/{eventId}/{peserta_id}', UpdateForm::class)->name('participant.update');
-   
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
@@ -42,4 +42,22 @@ Route::middleware(['auth'])->group(function () {
             ),
         )
         ->name('two-factor.show');
+
+    Route::get('/events/{eventId}/certificates', function ($eventId) {
+        $event = \App\Models\Event::findOrFail($eventId);
+
+        if (!$event->areCertificatesAvailable()) {
+            return view('user.certificates-not-available', compact('event'));
+        }
+    });
 });
+
+// Route::prefix('events')->name('user.')->group(function () {
+//     // Certificate Download Page
+//     Route::get('{event}/certificates', [CertificateController::class, 'participantCertificates'])
+//         ->name('certificates');
+    
+//     // Download Certificate (POST with email)
+//     Route::post('{event}/certificate/download', [CertificateController::class, 'downloadParticipantCertificate'])
+//         ->name('certificate.download');
+// });

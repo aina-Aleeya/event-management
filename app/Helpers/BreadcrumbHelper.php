@@ -31,7 +31,6 @@ class BreadcrumbHelper
             // Event Dashboard
             case 'admin.event.dashboard':
                 $eventParam = $parameters['event'] ?? null;
-                // Handle both ID and model instance
                 $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
                 $event = $eventId ? Event::find($eventId) : null;
 
@@ -55,27 +54,7 @@ class BreadcrumbHelper
                 }
                 break;
 
-            // Event Dashboard
-            case 'admin.ranking.show':
-                $eventParam = $parameters['event'] ?? null;
-                // Handle both ID and model instance
-                $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
-                $event = $eventId ? Event::find($eventId) : null;
-
-                if ($event) {
-                    $breadcrumbs[] = [
-                        'label' => 'Events',
-                        'url' => route('admin.dashboard')
-                    ];
-                    $breadcrumbs[] = [
-                        'label' => $event->title,
-                        'url' => route('admin.event.dashboard', $event->id)
-                    ];
-                    $breadcrumbs[] = ['label' => 'View Ranking'];
-                }
-                break;
-
-            // Event Dashboard
+            // Ranking Dashboard
             case 'admin.ranking.show':
                 $eventParam = $parameters['event'] ?? null;
                 // Handle both ID and model instance
@@ -161,6 +140,23 @@ class BreadcrumbHelper
                         $breadcrumbs[] = ['label' => $category];
                     }
                 }
+                break;
+
+            case 'certificate.manage':
+                $eventParam = $parameters['event'] ?? null;
+                $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
+                $event = $eventId ? Event::find($eventId) : null;
+                $category = request('category');
+                $from = request('from', 'event-dashboard');
+
+                $breadcrumbs[] = [
+                    'label' => $event->title,
+                    'url' => route('admin.event.dashboard', $event->id)
+                ];
+                $breadcrumbs[] = [
+                    'label' => 'Manage Certificates',
+                    'url' => route('admin.certificate.manage', $event->id)
+                ];
                 break;
 
             // Ranking Report
