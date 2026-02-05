@@ -1,22 +1,38 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="">
-    <head>
-        @include('partials.head')
-    </head>
-    <body class="min-h-screen bg-white antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900">
-        <div class="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-            <div class="flex w-full max-w-sm flex-col gap-2">
-                <a href="{{ route('home') }}" class="flex flex-col items-center gap-2 font-medium" wire:navigate>
-                    <span class="flex h-9 w-9 mb-1 items-center justify-center rounded-md">
-                        <!-- <x-app-logo-icon class="size-9 fill-current text-black dark:text-white" /> -->
-                    </span>
-                    <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
-                </a>
-                <div class="flex flex-col gap-6">
-                    {{ $slot }}
-                </div>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
+<head>
+    @include('partials.head')
+</head>
+
+<body class="min-h-screen antialiased">
+
+    <div class="relative min-h-screen flex items-center justify-center overflow-hidden">
+
+        <!-- Base gradient -->
+        <div class="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-red-100"></div>
+
+        <!-- Floating gradient blobs -->
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-purple-300/40 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/2 -left-24 w-96 h-96 bg-pink-300/40 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 right-1/3 w-80 h-80 bg-red-300/30 rounded-full blur-3xl"></div>
+
+        <!-- Auth card -->
+        <div class="relative z-10 w-full max-w-sm rounded-3xl
+           bg-white/80
+           backdrop-blur-xl backdrop-saturate-150
+           border border-white/60
+           shadow-[0_20px_50px_rgba(0,0,0,0.12)]
+           p-6 md:p-8">
+            <div class="flex flex-col gap-6">
+                {{ $slot }}
             </div>
         </div>
-        @fluxScripts
-    </body>
+
+
+    </div>
+
+    @fluxScripts
+</body>
+
 </html>

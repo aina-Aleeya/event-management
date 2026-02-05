@@ -108,6 +108,14 @@
                                     <i class="fa-solid fa-credit-card mr-2"></i>
                                     Payment
                                 </th>
+                                <th class="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider">
+                                    <i class="fa-solid fa-clock mr-2"></i>
+                                    Registration Date
+                                </th>
+                                <th class="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider">
+                                    
+                                </th>
+                                
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
@@ -155,6 +163,16 @@
                                                 {{ ucfirst($reg->status_bayaran ?? '-') }}
                                             </span>
                                         @endif
+                                    </td>
+                                    <td class="px-6 py-5 text-center">
+                                        <span class="font-mono text-gray-700">
+                                            {{ $reg->tarikh_daftar->format('d/m/Y') ?? '-' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-5 text-center">
+                                        <span class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-semibold">
+                                            <a href="{{ route('participant.update', ['eventId' => $reg->event_id,'peserta_id' => $reg->peserta_id]) }}">Edit</a>
+                                        </span>
                                     </td>
                                 </tr>
                             @endforeach
@@ -247,10 +265,6 @@
                     </a>
                 @endif
             </div>
-
-            
-
         @endif
-
     </div>
 </div>

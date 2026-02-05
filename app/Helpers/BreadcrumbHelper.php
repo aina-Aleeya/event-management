@@ -128,7 +128,7 @@ class BreadcrumbHelper
                 $event = $eventId ? Event::find($eventId) : null;
                 $category = request('category');
                 $from = request('from', 'event-dashboard'); // Default context
-                
+
                 if ($event) {
                     if ($from === 'grouping-system') {
                         // Path: Dashboard > Grouping System > Event > Category
@@ -139,7 +139,7 @@ class BreadcrumbHelper
                         $breadcrumbs[] = [
                             'label' => $event->title,
                             'url' => route('admin.groups', [
-                                'event' => $event->id, 
+                                'event' => $event->id,
                                 'from' => 'grouping-system'
                             ])
                         ];
@@ -156,7 +156,7 @@ class BreadcrumbHelper
                             ])
                         ];
                     }
-                    
+
                     if ($category) {
                         $breadcrumbs[] = ['label' => $category];
                     }
@@ -223,7 +223,7 @@ class BreadcrumbHelper
                     $breadcrumbs[] = ['label' => $event->title];
                 }
                 break;
-            
+
             case 'peserta.form':
                 $eventParam = $parameters['id'] ?? null;
                 $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
@@ -245,7 +245,7 @@ class BreadcrumbHelper
             case 'history':
                 $breadcrumbs[] = ['label' => 'Event History'];
                 break;
-            
+
             case 'history.participant':
                 $eventParam = $parameters['eventId'] ?? null;
                 $eventId = $eventParam instanceof Event ? $eventParam->id : $eventParam;
@@ -254,9 +254,10 @@ class BreadcrumbHelper
                 if ($event) {
                     $breadcrumbs[] = [
                         'label' => 'Event History',
-                        'url' => route('history')
+                        'url' => route('history', $event->id)
                     ];
                     $breadcrumbs[] = ['label' => $event->title];
+
                 }
                 break;
 

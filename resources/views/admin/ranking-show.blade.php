@@ -85,7 +85,12 @@
                 <div class="px-6 py-8 bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 border-b border-gray-200">
                     <h3 class="text-lg font-bold text-gray-800 mb-6 text-center">🏆 Top Performers 🏆</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-                        @foreach($scores->take(3) as $topScore)
+                        
+                        @foreach([
+                            $scores->where('rank', 2)->first(),
+                            $scores->where('rank', 1)->first(),
+                            $scores->where('rank', 2)->first()
+                            ] as $topScore)
                             <div class="bg-white rounded-xl p-5 border-2 {{ $topScore->rank === 1 ? 'border-amber-400 shadow-xl' : ($topScore->rank === 2 ? 'border-gray-400 shadow-lg' : 'border-orange-400 shadow-lg') }} transform transition-all hover:scale-105">
                                 <div class="text-center mb-4">
                                     <div class="text-5xl mb-2">
@@ -241,9 +246,7 @@
                     <p class="text-sm text-gray-600">
                         Showing <span class="font-semibold text-gray-900">{{ $scores->count() }}</span> ranked participants
                     </p>
-                    <div class="text-sm text-gray-500">
-                        Last updated: {{ now()->format('d M Y, h:i A') }}
-                    </div>
+                    
                 </div>
             </div>
 

@@ -87,7 +87,7 @@ class PesertaForm extends Component
 
         if ($field === 'nama_penuh' && strlen($value) >= 2) {
             $this->suggestions[$index] = Peserta::where('nama_penuh', 'like', "%{$value}%")
-                ->where('user_agent', request()->userAgent())
+                // ->where('user_agent', request()->userAgent())
                 ->get()
                 ->map(function ($item) {
                     return [

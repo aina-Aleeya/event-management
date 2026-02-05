@@ -171,9 +171,7 @@
                         <p class="text-sm text-gray-600">
                             Showing <span class="font-semibold text-gray-900">{{ $participantSummary->count() }}</span> events
                         </p>
-                        <div class="text-sm text-gray-500">
-                            Last updated: {{ now()->format('d M Y, h:i A') }}
-                        </div>
+                        
                     </div>
                 </div>
             @else

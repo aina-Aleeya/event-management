@@ -19,14 +19,18 @@ class Penyertaan extends Pivot
         'categorizable_type',    
     ];
 
+    protected $casts = [
+        'tarikh_daftar' => 'date',   
+    ];
+
     public function peserta()
     {
-        return $this->belongsTo(Peserta::class);
+        return $this->belongsTo(Peserta::class,'peserta_id');
     }
 
     public function event()
     {
-        return $this->belongsTo(Event::class);
+        return $this->belongsTo(Event::class, 'event_id');
     }
 
     public function pendaftar()

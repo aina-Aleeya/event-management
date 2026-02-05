@@ -74,5 +74,10 @@ class Event extends Model
     {
         return $this->hasMany(CustomCategory::class);
     }
+    
+    public function penyertaan()
+    {
+        return $this->hasMany(Penyertaan::class, 'peserta_id');
+    }
 
 }

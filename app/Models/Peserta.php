@@ -36,4 +36,9 @@ class Peserta extends Model
     {
         return $this->belongsToMany(Group::class, 'group_peserta', 'peserta_id', 'group_id');
     }
+
+    public function penyertaan()
+    {
+        return $this->hasMany(Penyertaan::class, 'peserta_id');
+    }
 }

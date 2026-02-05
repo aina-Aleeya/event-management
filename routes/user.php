@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\User\UpdateForm;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
@@ -12,7 +13,6 @@ use App\Livewire\User\HistoryPage;
 
 Route::get('/events', EventPage::class)->name('events.page');
 
-
 Route::get('/daftar/{id}', PesertaForm::class)->name('peserta.form');
 
 Route::get('/events/{id}', EventDetails::class)->name('event.details');
@@ -24,6 +24,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/history', HistoryPage::class)->name('history');
 
     Route::get('/history-participant/{eventId}', SenaraiPeserta::class)->name('history.participant');
+
+    Route::get('/update-participant/{eventId}/{peserta_id}', UpdateForm::class)->name('participant.update');
    
     Route::redirect('settings', 'settings/profile');
 

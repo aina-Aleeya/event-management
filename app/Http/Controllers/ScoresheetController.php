@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Group;
+use App\Models\Penyertaan;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -27,7 +28,10 @@ public function exportGroup($eventId, $groupId)
 
     // Get category for each participant
     foreach ($group->pesertas as $peserta) {
-        $categoryData = \DB::table('penyertaan')
+        // $categoryData = Penyertaan
+
+
+        $oldcategoryData = \DB::table('penyertaan')
             ->leftJoin('categories', function($join) {
                 $join->on('penyertaan.categorizable_id', '=', 'categories.id')
                      ->where('penyertaan.categorizable_type', '=', \App\Models\Category::class);
@@ -38,10 +42,19 @@ public function exportGroup($eventId, $groupId)
             })
             ->where('penyertaan.event_id', $eventId)
             ->where('penyertaan.peserta_id', $peserta->id)
+
             ->select(\DB::raw('COALESCE(categories.name, custom_categories.name) as category'))
             ->first();
-        
-        $peserta->category = $categoryData->category ?? 'Uncategorized';
+
+            $newcategoryData = Penyertaan::with(['categorizable'])
+            ->where('event_id', $eventId)
+            ->where('peserta_id', $peserta->id)
+            ->first();
+
+            $categoryName = $newcategoryData->categorizable->name;
+
+        // dd($oldcategoryData, $newcategoryData->toArray());
+        $peserta->category = $categoryName; //$categoryData->category ?? 'Uncategorized';
     }
 
     $pdf = PDF::loadView('pdf.scoresheet-group', [
