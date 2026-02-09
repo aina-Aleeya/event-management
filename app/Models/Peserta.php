@@ -45,4 +45,9 @@ class Peserta extends Model
             ->withPivot('event_id')
             ->withTimestamps();
     }
+
+    public function scores(): HasMany
+    {
+        return $this->hasMany(Score::class, 'peserta_id');
+    }
 }

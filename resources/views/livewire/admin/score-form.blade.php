@@ -62,7 +62,7 @@
 
         <!-- Form -->
         <form wire:submit.prevent="submit">
-            <!-- Table -->
+     
             <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full">
@@ -97,7 +97,7 @@
                         <tbody class="divide-y divide-gray-200 bg-white">
                             @foreach($participants as $index => $participant)
                                 <tr class="hover:bg-gray-50 transition-colors">
-                                    <!-- Number -->
+                                
                                     <td class="px-4 py-3 text-center">
                                         <span class="inline-flex items-center justify-center w-7 h-7 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
                                             {{ $index + 1 }}

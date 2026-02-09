@@ -9,18 +9,16 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body class="min-h-screen bg-white text-black">
+<body class="min-h-screen text-black">
 
-<div x-data="{userMenuOpen: false }" class="relative min-h-screen">
+<div x-data="{userMenuOpen: false }" class="relative min-h-screen flex flex-col">
 
     {{-- Header --}}
     <x-layouts.app.header />
 
     {{-- Page Content --}}
-    <main class="pt-8.5">
-        <flux:main class="!max-w-full !px-0 !mx-0">
-            {{ $slot }}
-        </flux:main>
+    <main class="flex-1 pt-15">
+        {{ $slot }}
     </main>
 
 </div>

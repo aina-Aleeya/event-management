@@ -8,16 +8,18 @@ class Penyertaan extends Pivot
 {
     protected $table = 'penyertaan';
 
-    protected $fillable = [
-        'event_id',
-        'peserta_id',
-        'unique_id',
-        'status_bayaran',
-        'group_token',
-        'pendaftar_id',
-        'categorizable_id',      
-        'categorizable_type',    
-    ];
+protected $fillable = [
+    'event_id',
+    'peserta_id',
+    'unique_id',
+    'status_bayaran',
+    'group_token',
+    'pendaftar_id',
+    'categorizable_id',      
+    'categorizable_type',
+    'payment_receipt',      
+    'payment_date',         
+];
 
     public function peserta()
     {
