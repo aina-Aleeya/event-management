@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\EventTeamMember;
+use App\Models\Event;
 
 class CheckTeamPermission
 {
@@ -23,10 +24,20 @@ class CheckTeamPermission
         }
 
         // Get the event from the route parameters
-        $event = $request->route('event');
-        
-        if (!$event) {
+        $eventParam = $request->route('event');
+
+        if (!$eventParam) {
             abort(403, 'Event not found.');
+        }
+
+        // Resolve event when route parameter is just an ID
+        $event = $eventParam;
+        if (is_numeric($eventParam)) {
+            $event = Event::find($eventParam);
+        }
+
+        if (!$event) {
+            abort(404, 'Event not found.');
         }
 
         // Check if user is a team member for this specific event
