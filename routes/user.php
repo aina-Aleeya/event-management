@@ -27,6 +27,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/history-participant/{eventId}', SenaraiPeserta::class)->name('history.participant');
 
+    Route::get('/update-participant/{eventId}/{peserta_id}', UpdateForm::class)->name('participant.update');
+
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');

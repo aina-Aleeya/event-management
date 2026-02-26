@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('categories', function (Blueprint $table) {
-            $table->boolean('is_default')->nullable()->after('name');
+            $table->boolean('is_default')->default(true)->after('name');
+            $table->foreignId('user_id')->nullable()->after('is_default')->constrained()->nullOnDelete();
         });
     }
 
@@ -23,6 +24,7 @@ return new class extends Migration
     {
         Schema::table('categories', function (Blueprint $table) {
             $table->dropColumn('is_default');
+            $table->dropColumn('user_id');
         });
     }
 };
