@@ -12,7 +12,9 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
 
 use Laravel\Fortify\Contracts\LoginResponse;
+use Laravel\Fortify\Contracts\RegisterResponse as RegisterResponseContract;
 use App\Http\Responses\LoginResponse as CustomLoginResponse;
+use App\Http\Responses\RegisterResponse as CustomRegisterResponse;
 use Illuminate\Support\Facades\App;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -23,7 +25,7 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(RegisterResponseContract::class, CustomRegisterResponse::class);
     }
 
     /**

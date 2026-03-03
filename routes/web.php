@@ -86,10 +86,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     });
 
     // ----------------------------------------
-    // Event Dashboard (Event Owner or any team member can access)
+    // Event Dashboard (Event Owner or accepted team member only)
     // ----------------------------------------
-    Route::get('/events/{event}/dashboard', EventDashboardPage::class)->name('event.dashboard');
-    Route::get('/events/{eventId}/edit', \App\Livewire\EditEvent::class)->name('event.edit');
+    Route::middleware(['event.access'])->group(function () {
+        Route::get('/events/{event}/dashboard', EventDashboardPage::class)->name('event.dashboard');
+        Route::get('/events/{eventId}/edit', \App\Livewire\EditEvent::class)->name('event.edit');
+    });
 
     // ----------------------------------------
     // Participant Management (needs 'view_participants' permission)

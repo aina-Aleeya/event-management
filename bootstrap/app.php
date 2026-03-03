@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'role' => \App\Http\Middleware\CheckRole::class,
             'team.permission' => \App\Http\Middleware\CheckTeamPermission::class,
+            'event.access' => \App\Http\Middleware\EnsureEventAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

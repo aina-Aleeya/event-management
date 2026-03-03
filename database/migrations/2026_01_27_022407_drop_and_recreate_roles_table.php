@@ -26,6 +26,18 @@ return new class extends Migration
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });
+
+        // Reset auto_increment sequence for both SQLite and MySQL
+        $connection = Schema::getConnection();
+        $driver = $connection->getDriverName();
+
+        if ($driver === 'sqlite') {
+            // SQLite: Delete from sqlite_sequence table to reset sequence
+            $connection->statement("DELETE FROM sqlite_sequence WHERE name='roles'");
+        } elseif (in_array($driver, ['mysql', 'mariadb'])) {
+            // MySQL/MariaDB: Set auto_increment to 1
+            $connection->statement("ALTER TABLE roles AUTO_INCREMENT = 1");
+        }
     }
 
     public function down(): void

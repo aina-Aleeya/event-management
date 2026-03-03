@@ -7,11 +7,15 @@
 
         <form method="POST" action="{{ route('register.store') }}" class="flex flex-col gap-6">
             @csrf
+            @if(request('invitation_token'))
+                <input type="hidden" name="invitation_token" value="{{ request('invitation_token') }}">
+            @endif
             <!-- Name -->
             <flux:input
                 name="name"
                 :label="__('Name')"
                 type="text"
+                :value="old('name', request('name'))"
                 required
                 autofocus
                 autocomplete="name"
@@ -23,6 +27,7 @@
                 name="email"
                 :label="__('Email address')"
                 type="email"
+                :value="old('email', request('email'))"
                 required
                 autocomplete="email"
                 placeholder="email@example.com"

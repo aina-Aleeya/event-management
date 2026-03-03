@@ -154,10 +154,16 @@ class TeamMemberController extends Controller
 
     /**
      * Accept team invitation
+     *
+     * Clicking the email link should:
+     * - Mark the invite as accepted
+     * - Ensure the invitee is linked as a team member for the event
+     * - Log them in (or switch account) and take them straight to the event dashboard
      */
     public function acceptInvitation($token)
     {
-        $teamMember = EventTeamMember::where('invitation_token', $token)
+        $teamMember = EventTeamMember::with('event')
+            ->where('invitation_token', $token)
             ->where('status', 'pending')
             ->firstOrFail();
 
@@ -167,8 +173,28 @@ class TeamMemberController extends Controller
                 ->with('error', 'This invitation has expired. Please contact the event organizer.');
         }
 
-        // If user doesn't exist, redirect to registration with pre-filled data
+        // If this invitation isn't linked to a user yet, try to link an existing account by email
         if (!$teamMember->user_id) {
+            $existingUser = User::where('email', $teamMember->email)->first();
+
+            if ($existingUser) {
+                $teamMember->update([
+                    'user_id' => $existingUser->id,
+                    'status' => 'accepted',
+                    'accepted_at' => now(),
+                ]);
+
+                // Ensure we are logged in as the invited user
+                if (!Auth::check() || Auth::id() !== $existingUser->id) {
+                    Auth::login($existingUser);
+                }
+
+                return redirect()
+                    ->route('admin.event.dashboard', $teamMember->event_id)
+                    ->with('success', 'You have successfully joined the team!');
+            }
+
+            // No existing account: send them to registration with pre-filled data
             return redirect()->route('register', [
                 'email' => $teamMember->email,
                 'name' => $teamMember->name,
@@ -176,14 +202,29 @@ class TeamMemberController extends Controller
             ]);
         }
 
-        // If user exists, accept the invitation
-        $teamMember->update([
-            'status' => 'accepted',
-            'accepted_at' => now(),
-        ]);
+        // There is already a linked user account for this invitation.
+        // Always ensure we end up logged in as that user when following the email link.
+        if (!Auth::check() || Auth::id() !== (int) $teamMember->user_id) {
+            $user = User::find($teamMember->user_id);
+
+            if (!$user) {
+                return redirect()->route('login')
+                    ->with('error', 'The account for this invitation could not be found. Please contact the event organizer.');
+            }
+
+            Auth::login($user);
+        }
+
+        // Accept the invitation and redirect to the event dashboard (admin area)
+        if (!$teamMember->isAccepted()) {
+            $teamMember->update([
+                'status' => 'accepted',
+                'accepted_at' => now(),
+            ]);
+        }
 
         return redirect()
-            ->route('organiser.event.dashboard', $teamMember->event_id)
+            ->route('admin.event.dashboard', $teamMember->event_id)
             ->with('success', 'You have successfully joined the team!');
     }
 
