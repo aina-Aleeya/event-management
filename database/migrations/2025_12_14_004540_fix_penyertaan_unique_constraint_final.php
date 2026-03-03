@@ -8,29 +8,33 @@ return new class extends Migration
 {
     public function up()
     {
-        // Disable foreign key checks
-        DB::statement('SET FOREIGN_KEY_CHECKS=0');
-        
-        try {
-            // Try to drop old unique constraint (might not exist)
-            DB::statement('ALTER TABLE penyertaan DROP INDEX penyertaan_event_id_unique_id_unique');
-        } catch (\Exception $e) {
-            // Index doesn't exist, that's fine
+        // Only run raw MySQL statements if using mysql/mariadb
+        $driver = Schema::getConnection()->getDriverName();
+        if (in_array($driver, ['mysql', 'mariadb'])) {
+            // Disable foreign key checks
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+            
+            try {
+                // Try to drop old unique constraint (might not exist)
+                DB::statement('ALTER TABLE penyertaan DROP INDEX penyertaan_event_id_unique_id_unique');
+            } catch (\Exception $e) {
+                // Index doesn't exist, that's fine
+            }
+            
+            try {
+                // Add new unique constraint
+                DB::statement('
+                    ALTER TABLE penyertaan 
+                    ADD UNIQUE INDEX penyertaan_event_category_unique_id_unique 
+                    (event_id, categorizable_type, categorizable_id, unique_id)
+                ');
+            } catch (\Exception $e) {
+                // Might already exist
+            }
+            
+            // Re-enable foreign key checks
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
         }
-        
-        try {
-            // Add new unique constraint
-            DB::statement('
-                ALTER TABLE penyertaan 
-                ADD UNIQUE INDEX penyertaan_event_category_unique_id_unique 
-                (event_id, categorizable_type, categorizable_id, unique_id)
-            ');
-        } catch (\Exception $e) {
-            // Might already exist
-        }
-        
-        // Re-enable foreign key checks
-        DB::statement('SET FOREIGN_KEY_CHECKS=1');
         
         // Recreate foreign keys
         try {
@@ -58,24 +62,27 @@ return new class extends Migration
 
     public function down()
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0');
-        
-        try {
-            DB::statement('ALTER TABLE penyertaan DROP INDEX penyertaan_event_category_unique_id_unique');
-        } catch (\Exception $e) {
-            //
+        $driver = Schema::getConnection()->getDriverName();
+        if (in_array($driver, ['mysql', 'mariadb'])) {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+            
+            try {
+                DB::statement('ALTER TABLE penyertaan DROP INDEX penyertaan_event_category_unique_id_unique');
+            } catch (\Exception $e) {
+                //
+            }
+            
+            try {
+                DB::statement('
+                    ALTER TABLE penyertaan 
+                    ADD UNIQUE INDEX penyertaan_event_id_unique_id_unique 
+                    (event_id, unique_id)
+                ');
+            } catch (\Exception $e) {
+                //
+            }
+            
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
         }
-        
-        try {
-            DB::statement('
-                ALTER TABLE penyertaan 
-                ADD UNIQUE INDEX penyertaan_event_id_unique_id_unique 
-                (event_id, unique_id)
-            ');
-        } catch (\Exception $e) {
-            //
-        }
-        
-        DB::statement('SET FOREIGN_KEY_CHECKS=1');
     }
 };
